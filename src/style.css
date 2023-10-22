@@ -64,18 +64,30 @@ input {
     gap: 0.25rem;
     user-select: none;
     font-size: 1rem;
-
     color: black;
     justify-content: space-between;
+
+    >div {
+        display: flex;
+        flex-direction: column;
+
+        & * {
+            flex: 1;
+        }
+    }
 
     >div {
         cursor: pointer;
         border: 0.1rem solid black;
         flex: 1;
-        height: 3rem;
+        height: 4rem;
         text-align: center;
         text-shadow: 2px 2px 2px var(--main-color), -2px -2px 2px var(--main-color);
-        opacity: 0.7;
+        opacity: 0.5;
+
+        >div {
+            margin: 0.1rem;
+        }
 
         &.highlight {
             border: 0.1rem solid var(--main-color);
@@ -83,16 +95,33 @@ input {
         }
 
         &[accent="high"] {
-            background: linear-gradient(0deg, var(--main-color) 0%, var(--main-color) 100%, transparent 100%), rgba(255, 255, 255, 0.2);
+            & div:nth-child(1) {
+                background-color: var(--main-color);
+            }
+
+            & div:nth-child(2) {
+                background-color: #ffe82f;
+            }
+
+            & div:nth-child(3) {
+                background-color: #ff2f2f;
+            }
         }
 
         &[accent="medium"] {
-            background: linear-gradient(0deg, var(--main-color) 0%, var(--main-color) 49%, transparent 50%), rgba(255, 255, 255, 0.2);
+            & div:nth-child(2) {
+                background-color: #ffe82f;
+            }
 
+            & div:nth-child(3) {
+                background-color: #ff2f2f;
+            }
         }
 
         &[accent="low"] {
-            background: linear-gradient(0deg, var(--main-color) 0%, var(--main-color) 1%, transparent 2%), rgba(255, 255, 255, 0.2);
+            & div:nth-child(3) {
+                background-color: #ff2f2f;
+            }
         }
     }
 }

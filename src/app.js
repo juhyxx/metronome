@@ -64,12 +64,21 @@ function renderSelector() {
     document.querySelector('#selector').innerHTML = '';
     notes.forEach((item, index) => {
         const el = document.createElement('div');
-        el.innerHTML = index + 1;
+
+        for (let i = 0; i < 3; i++) {
+            const subel = document.createElement('div');
+            if (i == 0) {
+                subel.innerHTML = index + 1;
+            }
+
+            el.appendChild(subel)
+        }
 
         el.setAttribute('accent', notes[index].accent);
         el.addEventListener('click', (event) => {
-            console.info(index);
-            notes[index].accent = Accent.next(event.target.getAttribute('accent'));
+            console.info(event.target);
+            let el = event.target.closest('div[accent]');
+            notes[index].accent = Accent.next(el.getAttribute('accent'));
             renderSelector();
         });
         document.querySelector('#selector').appendChild(el);
@@ -88,7 +97,7 @@ async function run() {
             playTone(startTime);
             setTimeout(() => {
                 document.querySelectorAll('#selector .highlight').forEach((el) => el.classList.remove('highlight'));
-                document.querySelector(`#selector :nth-child(${event.target.counter + 1})`).classList.add('highlight');
+                document.querySelector(`#selector >div:nth-child(${event.target.counter + 1})`).classList.add('highlight');
                 document.querySelector('#counter').innerHTML = event.target.counter + 1;
                 document.querySelector('#subcounter').innerHTML = 1;
             }, startTime - audioContext.currentTime);
