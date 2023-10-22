@@ -2,6 +2,8 @@ let tempo = 120;
 let delay = 60 / tempo;
 let subdivisions = 2;
 
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+
 class Accent {
     static value = {
         LOW: 'low',
@@ -30,7 +32,6 @@ let notes = [{
 }, {
     accent: Accent.value.LOW,
 }];
-
 
 window.addEventListener('DOMContentLoaded', () => {
     document.querySelector('button').addEventListener('click', run);
@@ -74,10 +75,6 @@ function renderSelector() {
         document.querySelector('#selector').appendChild(el);
     });
 }
-
-
-window.AudioContext = window.AudioContext || window.webkitAudioContext;
-
 
 async function run() {
     const audioContext = new AudioContext();

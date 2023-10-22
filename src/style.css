@@ -6,14 +6,15 @@
 }
 
 body {
-    background-color: #505050;
+    background-color: #303030;
     font-family: 'Silkscreen', sans-serif;
     display: flex;
     justify-content: center;
     align-items: flex-start;
     font-size: 40px;
     padding: 1rem;
-    color: white;
+    color: rgba(255, 255, 255, 0.3);
+    text-shadow: 1px -1px 1px black;
 }
 
 * {
@@ -24,26 +25,29 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.5rem;
+    font-size: 0.25rem;
 
     & h1 {
-        font-size: 0.5rem;
+        font-size: 0.25rem;
         margin: 0;
         padding: 0;
     }
 }
 
+label {
+    font-size: 0.25rem;
+}
+
 #metronome {
-    background-color: black;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.5), 1px 1px 1px rgba(0, 0, 0, 0.5);
+    background-color: #181818;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    box-shadow: inset 0px 1px 1px rgba(255, 255, 255, 0.3), inset 0px 2px 2px rgba(255, 255, 255, 0.3), 0px 3px 5px rgba(0, 0, 0, 0.8);
 }
 
 input,
 button {
     font-size: 0.25rem;
-
     text-align: center;
     cursor: pointer;
 }
@@ -60,9 +64,8 @@ input {
     gap: 0.25rem;
     user-select: none;
     font-size: 1rem;
-    margin-bottom: 0.5rem;
-    color: black;
 
+    color: black;
     justify-content: space-between;
 
     >div {
