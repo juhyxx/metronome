@@ -1,6 +1,7 @@
 let tempo = 120;
 let delay = 60 / tempo;
 let subdivisions = 2;
+let volume = 0.5;
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
@@ -59,6 +60,9 @@ window.addEventListener('DOMContentLoaded', () => {
         subdivisions = parseInt(document.querySelector('#subdivisions').value, 10);
         document.querySelector('#subcounter').innerHTML = subdivisions;
     });
+    document.querySelector('#volume').addEventListener('change', () => {
+        volume = (parseInt(document.querySelector('#volume').value, 10) * 0.02) - 1;
+    });
     renderSelector();
 });
 
@@ -72,10 +76,8 @@ function renderSelector() {
             if (i == 0) {
                 subel.innerHTML = index + 1;
             }
-
             el.appendChild(subel)
         }
-
         el.setAttribute('accent', notes[index].accent);
         el.addEventListener('click', (event) => {
             console.info(event.target);
@@ -88,14 +90,19 @@ function renderSelector() {
 }
 
 
-
 async function run() {
     const audioContext = new AudioContext();
+
     let counter = 0;
 
     function playTone(t) {
         const startTime = t + delay;
+        const endTime = startTime + 0.06;
         const oscillator = audioContext.createOscillator();
+        const gainNode = new GainNode(audioContext);
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
 
         oscillator.addEventListener('ended', (event) => {
             playTone(startTime);
@@ -121,20 +128,29 @@ async function run() {
                 break;
         }
         oscillator.frequency.setValueAtTime(frequency, startTime);
+        gainNode.gain.setValueAtTime(volume, startTime);
         oscillator.connect(audioContext.destination);
         oscillator.start(startTime);
-        oscillator.stop(startTime + 0.05);
+        oscillator.stop(endTime);
+        gainNode.gain.linearRampToValueAtTime(-1, endTime - 0.01);
+
         oscillator.counter = counter;
         if (subdivisions > 1) {
             for (let i = 1; i < subdivisions; i++) {
-                const oscillator = audioContext.createOscillator();
-                oscillator.frequency.setValueAtTime(220, startTime);
-                oscillator.connect(audioContext.destination);
+                const subOscillator = audioContext.createOscillator();
+                const gainSubNode = new GainNode(audioContext);
+
+                subOscillator.connect(gainSubNode);
+                gainSubNode.connect(audioContext.destination);
+                subOscillator.frequency.setValueAtTime(220, startTime);
+                subOscillator.connect(audioContext.destination);
                 subdivisionsStartTime = startTime + i * (delay / subdivisions);
-                oscillator.start(subdivisionsStartTime);
-                oscillator.stop(subdivisionsStartTime + 0.05);
-                oscillator.subdivision = i;
-                oscillator.addEventListener('ended', (event) => {
+                subOscillator.start(subdivisionsStartTime);
+                subOscillator.stop(subdivisionsStartTime + 0.03);
+                gainSubNode.gain.setValueAtTime(Math.max(volume - 0.4, -1), subdivisionsStartTime);
+                gainSubNode.gain.linearRampToValueAtTime(-1, subdivisionsStartTime + 0.03);
+                subOscillator.subdivision = i;
+                subOscillator.addEventListener('ended', (event) => {
                     setTimeout(() => {
                         document.querySelector('#subcounter').innerHTML = event.target.subdivision + 1;
                     }, startTime - audioContext.currentTime);
