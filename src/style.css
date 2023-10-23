@@ -86,7 +86,7 @@ input {
         opacity: 0.5;
 
         >div {
-            margin: 0.1rem;
+            margin: 0.05rem;
         }
 
         &.highlight {

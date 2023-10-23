@@ -15,7 +15,6 @@ class Accent {
         this.value.MEDIUM,
         this.value.HIGH,
     ];
-
     static next(accent) {
         let index = this.queue.indexOf(accent) + 1;
         index = index >= this.queue.length ? 0 : index;
@@ -37,15 +36,18 @@ window.addEventListener('DOMContentLoaded', () => {
     document.querySelector('button').addEventListener('click', run);
     document.querySelector('#counter').innerHTML = notes.length;
     document.querySelector('#subcounter').innerHTML = subdivisions;
+    document.querySelector('#tempoview').innerHTML = `${tempo} BPM`;
 
     document.querySelector('#tempo').addEventListener('change', () => {
         tempo = parseInt(document.querySelector('#tempo').value, 10);
         delay = 60 / tempo;
+        document.querySelector('#tempoview').innerHTML = `${tempo} BPM`;
     });
     document.querySelector('#tempo-range').addEventListener('change', () => {
         document.querySelector('#tempo').value = document.querySelector('#tempo-range').value;
         tempo = parseInt(document.querySelector('#tempo').value, 10);
         delay = 60 / tempo;
+        document.querySelector('#tempoview').innerHTML = `${tempo} BPM`;
     });
     document.querySelector('#count').addEventListener('change', () => {
         const count = parseInt(document.querySelector('#count').value, 10);
@@ -84,6 +86,8 @@ function renderSelector() {
         document.querySelector('#selector').appendChild(el);
     });
 }
+
+
 
 async function run() {
     const audioContext = new AudioContext();
@@ -124,7 +128,7 @@ async function run() {
         if (subdivisions > 1) {
             for (let i = 1; i < subdivisions; i++) {
                 const oscillator = audioContext.createOscillator();
-                oscillator.frequency.setValueAtTime(440, startTime);
+                oscillator.frequency.setValueAtTime(220, startTime);
                 oscillator.connect(audioContext.destination);
                 subdivisionsStartTime = startTime + i * (delay / subdivisions);
                 oscillator.start(subdivisionsStartTime);
