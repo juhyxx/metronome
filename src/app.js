@@ -34,21 +34,66 @@ let notes = [{
     accent: Accent.value.LOW,
 }];
 
+function setTempo(tempo) {
+    delay = 60 / tempo;
+    document.querySelector('#tempoview').innerHTML = `${tempo} BPM`;
+    document.querySelector('#tempo-range').value = tempo;
+    document.querySelector('#tempo').value = tempo;
+    document.querySelector('#wheel').innerHTML = tempo;
+
+
+    document.querySelectorAll('#tempo-knob-inner .value').forEach(el => {
+        el.classList.remove("highlight")
+    })
+    const el = [...document.querySelectorAll('#tempo-knob-inner .value')].find(el => el.dataset.tempo == tempo)
+    if (el) {
+        el.classList.add("highlight")
+    }
+}
+
+
 window.addEventListener('DOMContentLoaded', () => {
+
     document.querySelector('button').addEventListener('click', run);
+    document.querySelector('#wheel').addEventListener('click', run);
     document.querySelector('#counter').innerHTML = notes.length;
     document.querySelector('#subcounter').innerHTML = subdivisions;
     document.querySelector('#tempoview').innerHTML = `${tempo} BPM`;
 
+    const range = ((260 - 40) / 10);
+    const angleSize = (180 + 2 * 40) / range;
+
+
+
+    for (i = 0; i <= range; i++) {
+        const el = document.createElement('div');
+        const subel = document.createElement('div');
+        const angle = (i * angleSize) - 40;
+        const tempo2select = (i * 10) + 40;
+
+        el.className = "value-container"
+        subel.className = "value";
+        subel.dataset.tempo = tempo2select;
+        subel.title = `${tempo2select} BPM`;
+
+        subel.addEventListener("click", (event) => {
+            setTempo(parseInt(event.target.dataset.tempo, 10));
+        })
+
+        el.style.transform = `rotate(${angle}deg)`;
+        el.append(subel);
+        document.querySelector('#tempo-knob-inner').appendChild(el);
+        setTempo(tempo)
+    }
+
     document.querySelector('#tempo').addEventListener('change', () => {
-        tempo = parseInt(document.querySelector('#tempo').value, 10);
-        delay = 60 / tempo;
-        document.querySelector('#tempoview').innerHTML = `${tempo} BPM`;
+        setTempo(parseInt(document.querySelector('#tempo').value, 10));
+
     });
     document.querySelector('#tempo-range').addEventListener('change', () => {
         document.querySelector('#tempo').value = document.querySelector('#tempo-range').value;
-        tempo = parseInt(document.querySelector('#tempo').value, 10);
-        delay = 60 / tempo;
+        setTempo(parseInt(document.querySelector('#tempo').value, 10));
+
         document.querySelector('#tempoview').innerHTML = `${tempo} BPM`;
     });
     document.querySelector('#count').addEventListener('change', () => {
@@ -94,7 +139,7 @@ function renderSelector() {
 async function run() {
 
     isPlaying = !isPlaying
-    document.querySelector('#play').innerHTML = isPlaying ? "STOP" : "play";
+    document.querySelector('#play').innerHTML = isPlaying ? "Stop" : "Play";
 
 
     if (!isPlaying) return;

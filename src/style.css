@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Silkscreen&display=swap');
 
 :root {
-    font-size: 8vh;
+    font-size: 7vh;
     --main-color: greenyellow;
 }
 
@@ -125,4 +125,66 @@ input {
             }
         }
     }
+}
+
+#tempo-knob {
+    position: relative;
+
+    #wheel {
+        position: absolute;
+        height: 4rem;
+        width: 4rem;
+        left: calc(50% - 2rem);
+        top: calc(50% - 2rem);
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 5px 40px black, inset 0 5px 5px rgba(255, 255, 255, 0.4), inset 0 -5px 5px rgba(0, 0, 0, 0.4);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        z-index: 100;
+    }
+}
+
+#tempo-knob-inner {
+    height: 5rem;
+    width: 5rem;
+
+    border-radius: 50%;
+    background-color: transparent;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem;
+
+    .value-container {
+        position: absolute;
+        height: 3px;
+        width: 5rem;
+        transform-origin: 50% right;
+
+        .value {
+            position: absolute;
+
+            height: 0.1rem;
+            width: 0.4rem;
+            background-color: rgba(255, 255, 255, 0.1);
+
+            cursor: pointer;
+
+            &:hover,
+            &.highlight {
+                background-color: var(--main-color);
+                box-shadow: 0 0 5px var(--main-color);
+            }
+        }
+    }
+
+}
+
+#bottom {
+    display: flex;
+    justify-content: center;
 }
