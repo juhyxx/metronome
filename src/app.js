@@ -34,7 +34,9 @@ let notes = [{
     accent: Accent.value.LOW,
 }];
 
-function setTempo(tempo) {
+function setTempo(t) {
+
+    tempo = t
     delay = 60 / tempo;
     document.querySelector('#tempoview').innerHTML = `${tempo} BPM`;
     document.querySelector('#tempo-range').value = tempo;
@@ -59,6 +61,14 @@ window.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#counter').innerHTML = notes.length;
     document.querySelector('#subcounter').innerHTML = subdivisions;
     document.querySelector('#tempoview').innerHTML = `${tempo} BPM`;
+    document.querySelector('#wheel').addEventListener("wheel", (event) => {
+        let t = (event.deltaY > 0) ? tempo + 10 : tempo - 10;
+        t = Math.max(t, 40);
+        t = Math.min(t, 260);
+        if (t != tempo) {
+            setTempo(t);
+        }
+    })
 
     const range = ((260 - 40) / 10);
     const angleSize = (180 + 2 * 40) / range;
