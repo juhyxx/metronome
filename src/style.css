@@ -63,10 +63,10 @@ input {
 
 #selector {
     display: flex;
-    gap: 0.25rem;
+    gap: 0.1rem;
     user-select: none;
-    font-size: 0.5rem;
-    color: black;
+    font-size: 0.25rem;
+
     justify-content: space-between;
 
     >div {
@@ -80,11 +80,10 @@ input {
 
     >div {
         cursor: pointer;
-        border: 0.1rem solid black;
         flex: 1;
         height: 4rem;
         text-align: center;
-        text-shadow: 1px 1px 1px var(--main-color), -1px -1px 1px var(--main-color);
+        color: rgba(255, 255, 255, 0.2);
         opacity: 0.5;
 
         >div {
@@ -92,7 +91,6 @@ input {
         }
 
         &.highlight {
-            border: 0.1rem solid var(--main-color);
             opacity: 1;
             background-color: rgba(255, 255, 255, 0.2);
         }
