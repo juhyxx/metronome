@@ -2,6 +2,7 @@ let tempo = 120;
 let delay = 60 / tempo;
 let subdivisions = 2;
 let volume = 0.5;
+let isPlaying = false;
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
@@ -91,6 +92,12 @@ function renderSelector() {
 
 
 async function run() {
+
+    isPlaying = !isPlaying
+    document.querySelector('#play').innerHTML = isPlaying ? "STOP" : "play";
+
+
+    if (!isPlaying) return;
     const audioContext = new AudioContext();
 
     let counter = 0;
@@ -105,7 +112,10 @@ async function run() {
         gainNode.connect(audioContext.destination);
 
         oscillator.addEventListener('ended', (event) => {
-            playTone(startTime);
+            if (isPlaying) {
+                playTone(startTime);
+            }
+
             setTimeout(() => {
                 document.querySelectorAll('#selector .highlight').forEach((el) => el.classList.remove('highlight'));
                 document.querySelector(`#selector >div:nth-child(${event.target.counter + 1})`).classList.add('highlight');
@@ -148,7 +158,7 @@ async function run() {
                 subOscillator.start(subdivisionsStartTime);
                 subOscillator.stop(subdivisionsStartTime + 0.03);
                 gainSubNode.gain.setValueAtTime(Math.max(volume - 0.4, -1), subdivisionsStartTime);
-                gainSubNode.gain.linearRampToValueAtTime(-1, subdivisionsStartTime + 0.03);
+                gainSubNode.gain.linearRampToValueAtTime(-1, subdivisionsStartTime + 0.02);
                 subOscillator.subdivision = i;
                 subOscillator.addEventListener('ended', (event) => {
                     setTimeout(() => {
