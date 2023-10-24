@@ -7,11 +7,12 @@
 </head>
 
 <body>
-
     <div id="metronome">
         <div id="header">
             <h1>Metronome</h1>
-            <div id="tempoview"></div>
+            <div id="tempoview">
+                <input id="tempo" type="number" value="120">BPM
+            </div>
             <div>
                 <span id="counter">1</span>
                 <span>:</span>
@@ -20,20 +21,16 @@
         </div>
 
         <div id=selector></div>
+
         <div id="bottom">
             <div id="tempo-knob">
                 <div id="wheel" title="Play/Stop"></div>
                 <div id="tempo-knob-inner">
                 </div>
             </div>
-
         </div>
 
         <button id="play">Play</button>
-        <label> Tempo
-            <input type="range" id="tempo-range" name="tempo-range" min="40" max="260" value="120" step="1" 0 />
-            <input id="tempo" type="number" value="120">
-        </label>
         <label>Count
             <input id="count" type="number" value="4" max="10">
         </label>
@@ -45,7 +42,6 @@
         </label>
 
     </div>
-
 </body>
 
 </html>

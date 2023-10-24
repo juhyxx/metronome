@@ -35,32 +35,26 @@ let notes = [{
 }];
 
 function setTempo(t) {
-
     tempo = t
     delay = 60 / tempo;
-    document.querySelector('#tempoview').innerHTML = `${tempo} BPM`;
-    document.querySelector('#tempo-range').value = tempo;
+
     document.querySelector('#tempo').value = tempo;
     document.querySelector('#wheel').innerHTML = tempo;
-
-
-    document.querySelectorAll('#tempo-knob-inner .value').forEach(el => {
-        el.classList.remove("highlight")
-    })
+    document.querySelectorAll('#tempo-knob-inner .value').forEach(el => el.classList.remove("highlight"))
     const el = [...document.querySelectorAll('#tempo-knob-inner .value')].find(el => el.dataset.tempo == tempo)
     if (el) {
         el.classList.add("highlight")
     }
 }
 
-
 window.addEventListener('DOMContentLoaded', () => {
+    const range = ((260 - 40) / 10);
+    const angleSize = (180 + 2 * 40) / range;
 
     document.querySelector('button').addEventListener('click', run);
     document.querySelector('#wheel').addEventListener('click', run);
     document.querySelector('#counter').innerHTML = notes.length;
     document.querySelector('#subcounter').innerHTML = subdivisions;
-    document.querySelector('#tempoview').innerHTML = `${tempo} BPM`;
     document.querySelector('#wheel').addEventListener("wheel", (event) => {
         let t = (event.deltaY > 0) ? tempo + 10 : tempo - 10;
         t = Math.max(t, 40);
@@ -70,18 +64,13 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     })
 
-    const range = ((260 - 40) / 10);
-    const angleSize = (180 + 2 * 40) / range;
-
-
-
     for (i = 0; i <= range; i++) {
         const el = document.createElement('div');
         const subel = document.createElement('div');
         const angle = (i * angleSize) - 40;
         const tempo2select = (i * 10) + 40;
 
-        el.className = "value-container"
+        el.className = "value-container";
         subel.className = "value";
         subel.dataset.tempo = tempo2select;
         subel.title = `${tempo2select} BPM`;
@@ -89,22 +78,13 @@ window.addEventListener('DOMContentLoaded', () => {
         subel.addEventListener("click", (event) => {
             setTempo(parseInt(event.target.dataset.tempo, 10));
         })
-
         el.style.transform = `rotate(${angle}deg)`;
         el.append(subel);
         document.querySelector('#tempo-knob-inner').appendChild(el);
         setTempo(tempo)
     }
-
     document.querySelector('#tempo').addEventListener('change', () => {
         setTempo(parseInt(document.querySelector('#tempo').value, 10));
-
-    });
-    document.querySelector('#tempo-range').addEventListener('change', () => {
-        document.querySelector('#tempo').value = document.querySelector('#tempo-range').value;
-        setTempo(parseInt(document.querySelector('#tempo').value, 10));
-
-        document.querySelector('#tempoview').innerHTML = `${tempo} BPM`;
     });
     document.querySelector('#count').addEventListener('change', () => {
         const count = parseInt(document.querySelector('#count').value, 10);
@@ -147,14 +127,11 @@ function renderSelector() {
 
 
 async function run() {
-
-    isPlaying = !isPlaying
+    isPlaying = !isPlaying;
     document.querySelector('#play').innerHTML = isPlaying ? "Stop" : "Play";
-
 
     if (!isPlaying) return;
     const audioContext = new AudioContext();
-
     let counter = 0;
 
     function playTone(t) {
@@ -222,7 +199,6 @@ async function run() {
                 });
             }
         }
-
         counter++;
         if (counter >= notes.length) {
             counter = 0;
