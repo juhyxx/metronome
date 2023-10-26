@@ -157,7 +157,7 @@ async function run() {
             }, startTime - audioContext.currentTime);
         });
 
-        const note = notes[counter];
+        const note = Object.assign({}, notes[counter]);
         let frequency = 880;
         switch (note.accent) {
             case Accent.value.HIGH:
