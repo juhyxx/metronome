@@ -3,7 +3,7 @@
 :root {
     font-size: 7vh;
     --main-color: greenyellow;
-    --diameter: 5rem;
+    --diameter: 6rem;
 }
 
 body {
@@ -67,6 +67,7 @@ input {
     gap: 0.1rem;
     user-select: none;
     font-size: 0.25rem;
+
 
     justify-content: space-between;
 
@@ -135,6 +136,7 @@ input {
 
 
 #tempo-knob {
+    user-select: none;
     position: relative;
     margin-top: 1rem;
 
@@ -231,6 +233,7 @@ input {
 }
 
 #subdivisions-toggle {
+    user-select: none;
     display: flex;
     justify-content: space-between;
 
@@ -249,6 +252,7 @@ input {
         & label {
             box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.2),
                 inset -1px -1px 1px rgba(0, 0, 0, 0.2),
+                inset 1px -1px 20px rgba(0, 0, 0, 0.2),
                 1px 1px 4px rgba(0, 0, 0, 0.3);
             font-size: 0.25rem;
             background-color: rgba(255, 255, 255, 0.1);
@@ -256,6 +260,10 @@ input {
             cursor: pointer;
             padding: 0.25rem;
             display: block;
+
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.08);
+            }
         }
 
         &:nth-child(1) label {
@@ -273,11 +281,69 @@ input {
         }
 
         & input:checked+label {
-            background-color: rgba(255, 255, 255, 0.01);
+            background-color: rgba(255, 255, 255, 0.02);
             box-shadow:
                 inset 1px 1px 1px rgba(0, 0, 0, 0.5);
             color: var(--main-color);
             text-shadow: 0 0 5px var(--main-color);
         }
     }
+}
+
+h2 {
+    text-align: center;
+    font-size: 0.25rem;
+    margin: 0;
+    padding: 0;
+    color: rgba(255, 255, 255, 0.2);
+    margin-bottom: 0.1rem;
+}
+
+#beat-edit {
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+
+    & div {
+        flex: 1;
+        font-weight: bold;
+        font-size: 0.75rem;
+        box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.2),
+            inset -1px -1px 1px rgba(0, 0, 0, 0.2),
+            inset 1px -1px 20px rgba(0, 0, 0, 0.2),
+            1px 1px 4px rgba(0, 0, 0, 0.3);
+
+        background-color: rgba(255, 255, 255, 0.1);
+        text-align: center;
+        cursor: pointer;
+        padding: 0.25rem;
+        display: block;
+
+        &:first-child {
+            border-top-left-radius: 2rem;
+            border-bottom-left-radius: 2rem;
+            border-bottom-right-radius: 0rem;
+            border-top-right-radius: 0rem;
+        }
+
+        &:last-child {
+            border-top-right-radius: 2rem;
+            border-bottom-right-radius: 2rem;
+            border-bottom-left-radius: 0rem;
+            border-top-left-radius: 0rem;
+        }
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        &:active {
+            background-color: rgba(255, 255, 255, 0.02);
+            box-shadow:
+                inset 1px 1px 1px rgba(0, 0, 0, 0.5);
+            color: var(--main-color);
+            text-shadow: 0 0 5px var(--main-color);
+        }
+    }
+
 }

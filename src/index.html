@@ -23,6 +23,7 @@
 
         <div id=selector></div>
 
+
         <div id="bottom">
             <div id="tempo-knob">
                 <div id="wheel" title="Play/Stop"></div>
@@ -30,14 +31,15 @@
                 </div>
             </div>
         </div>
+        <h2>Subdivisions</h2>
         <div id="subdivisions-toggle">
             <div>
-                <input type="radio" id=sub0 name="sublabel" value="0" checked>
+                <input type="radio" id=sub0 name="sublabel" value="1" checked>
                 <label for="sub0">Off</label>
             </div>
             <div>
                 <input type="radio" id="sub2" name="sublabel" value="2">
-                <label for="sub2">1/8</label>
+                <label for="sub2">1/8<br></label>
             </div>
             <div>
                 <input type="radio" id="sub3" name="sublabel" value="3">
@@ -48,14 +50,18 @@
                 <label for="sub4">1/16</label>
             </div>
         </div>
-        <button id="play">Play</button>
-        <label>Count
-            <input id="count" type="number" value="4" max="10">
-        </label>
 
-        <label> Volume
-            <input type="range" id="volume" name="tempo-range" min="0" max="100" value="50" step="1" 0 />
-        </label>
+
+        <h2>Beats</h2>
+        <div id="beat-edit">
+            <div id="add">+</div>
+            <div id="remove">−</div>
+        </div>
+        <div>
+            <label> Volume
+                <input type="range" id="volume" name="tempo-range" min="0" max="100" value="50" step="1" 0 />
+            </label>
+        </div>
 
     </div>
 

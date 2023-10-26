@@ -1,6 +1,6 @@
 let tempo = 120;
 let delay = 60 / tempo;
-let subdivisions = 0;
+let subdivisions = 1;
 let volume = 0.5;
 let isPlaying = false;
 
@@ -51,8 +51,20 @@ window.addEventListener('DOMContentLoaded', () => {
     const range = ((260 - 40) / 10);
     const angleSize = (180 + 2 * 40) / range;
 
-    document.querySelector('button').addEventListener('click', run);
     document.querySelector('#wheel').addEventListener('click', run);
+    document.querySelector('#add').addEventListener('click', () => {
+        const count = Math.min(notes.length + 1, 10);
+        notes = Array(count).fill('').map((item, i) => notes[i] ? notes[i] : { accent: Accent.value.LOW });
+        document.querySelector('#counter').innerHTML = count;
+        renderSelector();
+    });
+    document.querySelector('#remove').addEventListener('click', () => {
+        const count = Math.max(notes.length - 1, 1);
+        notes = Array(count).fill('').map((item, i) => notes[i] ? notes[i] : { accent: Accent.value.LOW });
+        document.querySelector('#counter').innerHTML = count;
+        renderSelector();
+    });
+
     document.querySelector('#counter').innerHTML = notes.length;
     document.querySelector('#subcounter').innerHTML = subdivisions;
     document.querySelector('#wheel').addEventListener("wheel", (event) => {
@@ -85,12 +97,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     document.querySelector('#tempo').addEventListener('change', () => {
         setTempo(parseInt(document.querySelector('#tempo').value, 10));
-    });
-    document.querySelector('#count').addEventListener('change', () => {
-        const count = parseInt(document.querySelector('#count').value, 10);
-        document.querySelector('#counter').innerHTML = count;
-        notes = Array(count).fill('').map((item, i) => notes[i] ? notes[i] : { accent: Accent.value.LOW });
-        renderSelector();
     });
     document.querySelector('#subdivisions-toggle').addEventListener('change', (event) => {
         subdivisions = parseInt(event.target.value, 10);
@@ -129,7 +135,6 @@ function renderSelector() {
 
 async function run() {
     isPlaying = !isPlaying;
-    document.querySelector('#play').innerHTML = isPlaying ? "Stop" : "Play";
 
     if (!isPlaying) return;
     const audioContext = new AudioContext();
