@@ -3,6 +3,7 @@
 :root {
     font-size: 7vh;
     --main-color: greenyellow;
+    --diameter: 5rem;
 }
 
 body {
@@ -87,7 +88,11 @@ input {
         opacity: 0.5;
 
         >div {
-            margin: 0.05rem;
+            margin-bottom: 0.1rem;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
         }
 
         &.highlight {
@@ -131,13 +136,14 @@ input {
 
 #tempo-knob {
     position: relative;
+    margin-top: 1rem;
 
     #wheel {
         position: absolute;
-        height: 4rem;
-        width: 4rem;
-        left: calc(50% - 2rem);
-        top: calc(50% - 2rem);
+        height: var(--diameter);
+        width: var(--diameter);
+        left: calc(50% - var(--diameter)/2);
+        top: calc(50% - var(--diameter)/2);
         border-radius: 50%;
         background-color: rgba(255, 255, 255, 0.05);
         box-shadow: 0 5px 40px black, inset 0 5px 5px rgba(255, 255, 255, 0.4), inset 0 -5px 5px rgba(0, 0, 0, 0.4);
@@ -146,16 +152,16 @@ input {
         align-items: center;
         cursor: pointer;
         z-index: 100;
+        font-size: 1rem;
+        text-shadow: 0 -1px 1px black;
 
         &:before {
             z-index: 101;
-            height: 3.8rem;
-            width: 3.8rem;
+            height: calc(var(--diameter) - 0.2rem);
+            width: calc(var(--diameter) - 0.2rem);
             position: absolute;
             content: "";
             border-radius: 50%;
-            left: calc(50% - 1.9rem);
-            top: calc(50% - 1.9rem);
             box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.8),
                 inset 0 0 1px 3px rgba(255, 255, 255, 0.3),
                 inset 0 -1px 2px 5px rgba(0, 0, 0, 0.4),
@@ -165,44 +171,43 @@ input {
         }
     }
 
+    #tempo-knob-inner {
+        height: calc(var(--diameter) + 1rem);
+        width: calc(var(--diameter) + 1rem);
+        border-radius: 50%;
+        background-color: transparent;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0.5rem;
 
-}
-
-#tempo-knob-inner {
-    height: 5rem;
-    width: 5rem;
-
-    border-radius: 50%;
-    background-color: transparent;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0.5rem;
-
-    .value-container {
-        position: absolute;
-        height: 3px;
-        width: 5rem;
-        transform-origin: 50% right;
-
-        .value {
+        .value-container {
             position: absolute;
-            height: 0.1rem;
-            width: 0.4rem;
-            background-color: rgba(255, 255, 255, 0.1);
-            cursor: pointer;
-            box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.2);
+            height: 0.15rem;
+            width: calc(var(--diameter) + 1rem);
+            transform-origin: 50% right;
 
-            &:hover,
-            &.highlight {
-                background-color: var(--main-color);
-                box-shadow: 0 0 6px var(--main-color);
+            .value {
+                position: absolute;
+                height: 0.15rem;
+                width: 0.5rem;
+                background-color: rgba(255, 255, 255, 0.1);
+                cursor: pointer;
+                box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.2);
+
+                &:hover,
+                &.highlight {
+                    background-color: var(--main-color);
+                    box-shadow: 0 0 6px var(--main-color);
+                }
             }
         }
-    }
 
+    }
 }
+
+
 
 #bottom {
     display: flex;
