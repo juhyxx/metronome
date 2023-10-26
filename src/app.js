@@ -1,6 +1,6 @@
 let tempo = 120;
 let delay = 60 / tempo;
-let subdivisions = 2;
+let subdivisions = 0;
 let volume = 0.5;
 let isPlaying = false;
 
@@ -92,8 +92,9 @@ window.addEventListener('DOMContentLoaded', () => {
         notes = Array(count).fill('').map((item, i) => notes[i] ? notes[i] : { accent: Accent.value.LOW });
         renderSelector();
     });
-    document.querySelector('#subdivisions').addEventListener('change', () => {
-        subdivisions = parseInt(document.querySelector('#subdivisions').value, 10);
+    document.querySelector('#subdivisions-toggle').addEventListener('change', (event) => {
+        subdivisions = parseInt(event.target.value, 10);
+
         document.querySelector('#subcounter').innerHTML = subdivisions;
     });
     document.querySelector('#volume').addEventListener('change', () => {
