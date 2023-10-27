@@ -31,6 +31,11 @@ class Config {
         this.notes.pop();
         return this.notes.length;
     }
+
+    toggleIsPlaying() {
+        this.isPlaying = !this.isPlaying;
+        return this.isPlaying;
+    }
 }
 
 class Accent {
@@ -150,9 +155,7 @@ function renderSelector() {
 }
 
 async function run() {
-    config.isPlaying = !config.isPlaying;
-
-    if (!config.isPlaying) return;
+    if (!config.toggleIsPlaying()) return;
     const audioContext = new AudioContext();
     let counter = 0;
 
