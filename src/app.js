@@ -1,10 +1,16 @@
-let tempo = 120;
-let delay = 60 / tempo;
-let subdivisions = 1;
-let volume = 1;
-let isPlaying = false;
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
+
+class Config {
+    tempo = 120;
+    subdivisions = 1;
+    volume = 1;
+    isPlaying = false;
+
+    get delay() {
+        return 60 / this.tempo;
+    }
+}
 
 class Accent {
     static value = {
@@ -24,6 +30,7 @@ class Accent {
     }
 }
 
+let config = new Config();
 let notes = [{
     accent: Accent.value.HIGH,
 }, {
@@ -35,13 +42,12 @@ let notes = [{
 }];
 
 function setTempo(t) {
-    tempo = t
-    delay = 60 / tempo;
+    config.tempo = t
 
-    document.querySelector('#tempo').value = tempo;
-    document.querySelector('#wheel').innerHTML = tempo;
+    document.querySelector('#tempo').value = config.tempo;
+    document.querySelector('#wheel').innerHTML = config.tempo;
     document.querySelectorAll('#tempo-knob-inner .value').forEach(el => el.classList.remove("highlight"))
-    const el = [...document.querySelectorAll('#tempo-knob-inner .value')].find(el => el.dataset.tempo == tempo)
+    const el = [...document.querySelectorAll('#tempo-knob-inner .value')].find(el => el.dataset.tempo == config.tempo)
     if (el) {
         el.classList.add("highlight")
     }
@@ -66,12 +72,12 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     document.querySelector('#counter').innerHTML = notes.length;
-    document.querySelector('#subcounter').innerHTML = subdivisions;
+    document.querySelector('#subcounter').innerHTML = config.subdivisions;
     document.querySelector('#wheel').addEventListener("wheel", (event) => {
-        let t = (event.deltaY > 0) ? tempo + 10 : tempo - 10;
+        let t = (event.deltaY > 0) ? config.tempo + 10 : config.tempo - 10;
         t = Math.max(t, 40);
         t = Math.min(t, 260);
-        if (t != tempo) {
+        if (t != config.tempo) {
             setTempo(t);
         }
     }, { passive: true })
@@ -93,14 +99,14 @@ window.addEventListener('DOMContentLoaded', () => {
         el.style.transform = `rotate(${angle}deg)`;
         el.append(subel);
         document.querySelector('#tempo-knob-inner').appendChild(el);
-        setTempo(tempo)
+        setTempo(config.tempo)
     }
     document.querySelector('#tempo').addEventListener('change', () => {
         setTempo(parseInt(document.querySelector('#tempo').value, 10));
     });
     document.querySelector('#subdivisions-toggle').addEventListener('change', (event) => {
-        subdivisions = parseInt(event.target.value, 10);
-        document.querySelector('#subcounter').innerHTML = subdivisions;
+        config.subdivisions = parseInt(event.target.value, 10);
+        document.querySelector('#subcounter').innerHTML = config.subdivisions;
     });
     document.querySelector('#volume-container').addEventListener('click', (event) => {
         let old = document.querySelector("#volume-container div.selected");
@@ -108,7 +114,7 @@ window.addEventListener('DOMContentLoaded', () => {
             old.classList.remove("selected")
         }
         event.target.classList.add("selected");
-        volume = (parseInt(event.target.dataset.volume, 10) * 0.02) - 1;
+        config.volume = (parseInt(event.target.dataset.volume, 10) * 0.02) - 1;
     });
     renderSelector();
 });
@@ -136,14 +142,14 @@ function renderSelector() {
 }
 
 async function run() {
-    isPlaying = !isPlaying;
+    config.isPlaying = !config.isPlaying;
 
-    if (!isPlaying) return;
+    if (!config.isPlaying) return;
     const audioContext = new AudioContext();
     let counter = 0;
 
     function playTone(t) {
-        const startTime = t + delay;
+        const startTime = t + config.delay;
         const endTime = startTime + 0.06;
         const oscillator = audioContext.createOscillator();
         const gainNode = new GainNode(audioContext);
@@ -152,7 +158,7 @@ async function run() {
         gainNode.connect(audioContext.destination);
 
         oscillator.addEventListener('ended', (event) => {
-            if (isPlaying) {
+            if (config.isPlaying) {
                 playTone(startTime);
             }
 
@@ -178,15 +184,15 @@ async function run() {
                 break;
         }
         oscillator.frequency.setValueAtTime(frequency, startTime);
-        gainNode.gain.setValueAtTime(volume, startTime);
+        gainNode.gain.setValueAtTime(config.volume, startTime);
         oscillator.connect(audioContext.destination);
         oscillator.start(startTime);
         oscillator.stop(endTime);
         gainNode.gain.linearRampToValueAtTime(-1, endTime - 0.01);
 
         oscillator.counter = counter;
-        if (subdivisions > 1) {
-            for (let i = 1; i < subdivisions; i++) {
+        if (config.subdivisions > 1) {
+            for (let i = 1; i < config.subdivisions; i++) {
                 const subOscillator = audioContext.createOscillator();
                 const gainSubNode = new GainNode(audioContext);
 
@@ -194,10 +200,10 @@ async function run() {
                 gainSubNode.connect(audioContext.destination);
                 subOscillator.frequency.setValueAtTime(220, startTime);
                 subOscillator.connect(audioContext.destination);
-                subdivisionsStartTime = startTime + i * (delay / subdivisions);
+                subdivisionsStartTime = startTime + i * (config.delay / config.subdivisions);
                 subOscillator.start(subdivisionsStartTime);
                 subOscillator.stop(subdivisionsStartTime + 0.03);
-                gainSubNode.gain.setValueAtTime(Math.max(volume - 0.4, -1), subdivisionsStartTime);
+                gainSubNode.gain.setValueAtTime(Math.max(config.volume - 0.4, -1), subdivisionsStartTime);
                 gainSubNode.gain.linearRampToValueAtTime(-1, subdivisionsStartTime + 0.02);
                 subOscillator.subdivision = i;
                 subOscillator.addEventListener('ended', (event) => {
