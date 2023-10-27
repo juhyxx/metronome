@@ -10,6 +10,27 @@ class Config {
     get delay() {
         return 60 / this.tempo;
     }
+
+    notes = [{
+        accent: Accent.value.HIGH,
+    }, {
+        accent: Accent.value.LOW,
+    }, {
+        accent: Accent.value.MEDIUM,
+    }, {
+        accent: Accent.value.LOW,
+    }]
+
+    addNote() {
+        const count = Math.min(this.notes.length + 1, 10);
+        this.notes = Array(count).fill('').map((item, i) => this.notes[i] ? this.notes[i] : { accent: Accent.value.LOW });
+        return this.notes.length;
+    }
+    removeNote() {
+        const count = Math.max(this.notes.length - 1, 1);
+        this.notes.pop();
+        return this.notes.length;
+    }
 }
 
 class Accent {
@@ -31,18 +52,9 @@ class Accent {
 }
 
 let config = new Config();
-let notes = [{
-    accent: Accent.value.HIGH,
-}, {
-    accent: Accent.value.LOW,
-}, {
-    accent: Accent.value.MEDIUM,
-}, {
-    accent: Accent.value.LOW,
-}];
 
-function setTempo(t) {
-    config.tempo = t
+function setTempo(tempo) {
+    config.tempo = tempo;
 
     document.querySelector('#tempo').value = config.tempo;
     document.querySelector('#wheel').innerHTML = config.tempo;
@@ -59,19 +71,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
     document.querySelector('#wheel').addEventListener('click', run);
     document.querySelector('#add').addEventListener('click', () => {
-        const count = Math.min(notes.length + 1, 10);
-        notes = Array(count).fill('').map((item, i) => notes[i] ? notes[i] : { accent: Accent.value.LOW });
-        document.querySelector('#counter').innerHTML = count;
+        document.querySelector('#counter').innerHTML = config.addNote();
         renderSelector();
     });
     document.querySelector('#remove').addEventListener('click', () => {
-        const count = Math.max(notes.length - 1, 1);
-        notes = Array(count).fill('').map((item, i) => notes[i] ? notes[i] : { accent: Accent.value.LOW });
-        document.querySelector('#counter').innerHTML = count;
+        document.querySelector('#counter').innerHTML = config.removeNote();
         renderSelector();
     });
 
-    document.querySelector('#counter').innerHTML = notes.length;
+    document.querySelector('#counter').innerHTML = config.notes.length;
     document.querySelector('#subcounter').innerHTML = config.subdivisions;
     document.querySelector('#wheel').addEventListener("wheel", (event) => {
         let t = (event.deltaY > 0) ? config.tempo + 10 : config.tempo - 10;
@@ -121,7 +129,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 function renderSelector() {
     document.querySelector('#selector').innerHTML = '';
-    notes.forEach((item, index) => {
+    config.notes.forEach((item, index) => {
         const el = document.createElement('div');
 
         for (let i = 0; i < 3; i++) {
@@ -131,10 +139,10 @@ function renderSelector() {
             }
             el.appendChild(subel)
         }
-        el.setAttribute('accent', notes[index].accent);
+        el.setAttribute('accent', config.notes[index].accent);
         el.addEventListener('click', (event) => {
             let el = event.target.closest('div[accent]');
-            notes[index].accent = Accent.next(el.getAttribute('accent'));
+            config.notes[index].accent = Accent.next(el.getAttribute('accent'));
             renderSelector();
         });
         document.querySelector('#selector').appendChild(el);
@@ -156,7 +164,6 @@ async function run() {
 
         oscillator.connect(gainNode);
         gainNode.connect(audioContext.destination);
-
         oscillator.addEventListener('ended', (event) => {
             if (config.isPlaying) {
                 playTone(startTime);
@@ -170,7 +177,7 @@ async function run() {
             }, startTime - audioContext.currentTime);
         });
 
-        const note = Object.assign({}, notes[counter]);
+        const note = Object.assign({}, config.notes[counter]);
         let frequency = 880;
         switch (note.accent) {
             case Accent.value.HIGH:
@@ -214,7 +221,7 @@ async function run() {
             }
         }
         counter++;
-        if (counter >= notes.length) {
+        if (counter >= config.notes.length) {
             counter = 0;
         }
     }
