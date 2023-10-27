@@ -1,7 +1,7 @@
 let tempo = 120;
 let delay = 60 / tempo;
 let subdivisions = 1;
-let volume = 0.5;
+let volume = 1;
 let isPlaying = false;
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -74,7 +74,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (t != tempo) {
             setTempo(t);
         }
-    })
+    }, { passive: true })
 
     for (i = 0; i <= range; i++) {
         const el = document.createElement('div');
@@ -100,11 +100,15 @@ window.addEventListener('DOMContentLoaded', () => {
     });
     document.querySelector('#subdivisions-toggle').addEventListener('change', (event) => {
         subdivisions = parseInt(event.target.value, 10);
-
         document.querySelector('#subcounter').innerHTML = subdivisions;
     });
-    document.querySelector('#volume').addEventListener('change', () => {
-        volume = (parseInt(document.querySelector('#volume').value, 10) * 0.02) - 1;
+    document.querySelector('#volume-container').addEventListener('click', (event) => {
+        let old = document.querySelector("#volume-container div.selected");
+        if (old) {
+            old.classList.remove("selected")
+        }
+        event.target.classList.add("selected");
+        volume = (parseInt(event.target.dataset.volume, 10) * 0.02) - 1;
     });
     renderSelector();
 });
@@ -123,7 +127,6 @@ function renderSelector() {
         }
         el.setAttribute('accent', notes[index].accent);
         el.addEventListener('click', (event) => {
-            console.info(event.target);
             let el = event.target.closest('div[accent]');
             notes[index].accent = Accent.next(el.getAttribute('accent'));
             renderSelector();
@@ -131,7 +134,6 @@ function renderSelector() {
         document.querySelector('#selector').appendChild(el);
     });
 }
-
 
 async function run() {
     isPlaying = !isPlaying;
