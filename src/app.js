@@ -11,7 +11,7 @@ class Config {
         return 60 / this.tempo;
     }
 
-    notes = [{
+    beats = [{
         accent: Accent.value.HIGH,
     }, {
         accent: Accent.value.LOW,
@@ -22,19 +22,18 @@ class Config {
     }]
 
     addNote() {
-        const count = Math.min(this.notes.length + 1, 10);
-        this.notes = Array(count).fill('').map((item, i) => this.notes[i] ? this.notes[i] : { accent: Accent.value.LOW });
-        return this.notes.length;
+        const count = Math.min(this.beats.length + 1, 10);
+        this.beats = Array(count).fill('').map((item, i) => this.beats[i] ? this.beats[i] : { accent: Accent.value.LOW });
+        return this.beats.length;
     }
     removeNote() {
-        const count = Math.max(this.notes.length - 1, 1);
-        this.notes.pop();
-        return this.notes.length;
+        const count = Math.max(this.beats.length - 1, 1);
+        this.beats.pop();
+        return this.beats.length;
     }
 
     toggleIsPlaying() {
-        this.isPlaying = !this.isPlaying;
-        return this.isPlaying;
+        return this.isPlaying = !this.isPlaying;
     }
 }
 
@@ -84,7 +83,7 @@ window.addEventListener('DOMContentLoaded', () => {
         renderSelector();
     });
 
-    document.querySelector('#counter').innerHTML = config.notes.length;
+    document.querySelector('#counter').innerHTML = config.beats.length;
     document.querySelector('#subcounter').innerHTML = config.subdivisions;
     document.querySelector('#wheel').addEventListener("wheel", (event) => {
         let t = (event.deltaY > 0) ? config.tempo + 10 : config.tempo - 10;
@@ -93,6 +92,19 @@ window.addEventListener('DOMContentLoaded', () => {
         if (t != config.tempo) {
             setTempo(t);
         }
+    }, { passive: true });
+
+    document.querySelector('#volume-container').addEventListener("wheel", (event) => {
+        const selectedElement = document.querySelector("#volume-container .selected");
+        const selected = parseInt(selectedElement.getAttribute("data-volume"), 10);
+        let newValue = (event.deltaY > 0) ? selected + 10 : selected - 10;
+
+        newValue = Math.max(newValue, 10);
+        newValue = Math.min(newValue, 100);
+        selectedElement.classList.remove("selected");
+        document.querySelector(`#volume-container [data-volume="${newValue}"]`).classList.add("selected");
+        config.volume = (newValue * 0.02) - 1;
+
     }, { passive: true })
 
     for (i = 0; i <= range; i++) {
@@ -134,7 +146,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 function renderSelector() {
     document.querySelector('#selector').innerHTML = '';
-    config.notes.forEach((item, index) => {
+    config.beats.forEach((item, index) => {
         const el = document.createElement('div');
 
         for (let i = 0; i < 3; i++) {
@@ -144,10 +156,10 @@ function renderSelector() {
             }
             el.appendChild(subel)
         }
-        el.setAttribute('accent', config.notes[index].accent);
+        el.setAttribute('accent', config.beats[index].accent);
         el.addEventListener('click', (event) => {
             let el = event.target.closest('div[accent]');
-            config.notes[index].accent = Accent.next(el.getAttribute('accent'));
+            config.beats[index].accent = Accent.next(el.getAttribute('accent'));
             renderSelector();
         });
         document.querySelector('#selector').appendChild(el);
@@ -180,7 +192,7 @@ async function run() {
             }, startTime - audioContext.currentTime);
         });
 
-        const note = Object.assign({}, config.notes[counter]);
+        const note = Object.assign({}, config.beats[counter]);
         let frequency = 880;
         switch (note.accent) {
             case Accent.value.HIGH:
@@ -224,7 +236,7 @@ async function run() {
             }
         }
         counter++;
-        if (counter >= config.notes.length) {
+        if (counter >= config.beats.length) {
             counter = 0;
         }
     }
