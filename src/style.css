@@ -95,7 +95,10 @@ input {
 
         &.highlight {
             opacity: 1;
-            background-color: rgba(255, 255, 255, 0.2);
+
+            & div {
+                background-color: rgba(255, 255, 255, 0.2);
+            }
         }
 
         &[accent="high"] {
@@ -219,16 +222,13 @@ input {
 
 
 
-#bottom {
-    display: flex;
-    justify-content: center;
-}
+
 
 #tempo {
     background-color: transparent;
 }
 
-#subdivisions-toggle {
+#subdivisions {
     user-select: none;
     display: flex;
     justify-content: space-between;
@@ -344,7 +344,7 @@ h2 {
 
 }
 
-#volume-container {
+#volume {
     position: absolute;
     right: -1rem;
     top: 0.5rem;

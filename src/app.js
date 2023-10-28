@@ -1,14 +1,40 @@
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
-class Config {
-    tempo = 120;
+class Model {
+    #tempo = 120;
     subdivisions = 1;
-    volume = 1;
-    isPlaying = false;
+    #volume = 0.8;
+    #isPlaying = false;
+    #delay = 0.5
+
+    get volume() {
+        return this.#volume;
+    }
+
+    get volumePercentage() {
+        return Math.round((this.#volume + 1) / 0.02);
+    }
+
+    set volume(value) {
+        value = Math.max(value, 10);
+        value = Math.min(value, 100);
+        this.#volume = (value * 0.02) - 1;
+    }
+
+    set tempo(value) {
+        value = Math.max(value, 40);
+        value = Math.min(value, 260);
+        this.#delay = 60 / this.tempo;
+        this.#tempo = value
+    }
+
+    get tempo() {
+        return this.#tempo
+    }
 
     get delay() {
-        return 60 / this.tempo;
+        return this.#delay;
     }
 
     beats = [{
@@ -21,19 +47,20 @@ class Config {
         accent: Accent.value.LOW,
     }]
 
-    addNote() {
+    addBeat() {
         const count = Math.min(this.beats.length + 1, 10);
         this.beats = Array(count).fill('').map((item, i) => this.beats[i] ? this.beats[i] : { accent: Accent.value.LOW });
-        return this.beats.length;
     }
-    removeNote() {
+    removeBeat() {
         const count = Math.max(this.beats.length - 1, 1);
         this.beats.pop();
-        return this.beats.length;
     }
 
     toggleIsPlaying() {
-        return this.isPlaying = !this.isPlaying;
+        return this.#isPlaying = !this.#isPlaying;
+    }
+    get isPlaying() {
+        return this.#isPlaying
     }
 }
 
@@ -55,124 +82,139 @@ class Accent {
     }
 }
 
-let config = new Config();
 
-function setTempo(tempo) {
-    config.tempo = tempo;
+class View {
+    #model = undefined;
 
-    document.querySelector('#tempo').value = config.tempo;
-    document.querySelector('#wheel').innerHTML = config.tempo;
-    document.querySelectorAll('#tempo-knob-inner .value').forEach(el => el.classList.remove("highlight"))
-    const el = [...document.querySelectorAll('#tempo-knob-inner .value')].find(el => el.dataset.tempo == config.tempo)
-    if (el) {
-        el.classList.add("highlight")
+    get model() {
+        return this.#model;
+    }
+
+    constructor(model) {
+        this.#model = model;
+
+        document.querySelector(`#volume [data-volume="${this.model.volumePercentage}"]`).classList.add("selected");
+        document.querySelector('#counter').innerHTML = this.model.beats.length;
+        document.querySelector('#subcounter').innerHTML = this.model.subdivisions;
+        document.querySelector('#add').addEventListener('click', () => {
+            this.model.addBeat();
+            this.renderBeatSelector();
+        });
+        document.querySelector('#remove').addEventListener('click', () => {
+            model.removeBeat();
+            this.renderBeatSelector();
+        });
+
+        document.querySelector('#subdivisions').addEventListener('change', (event) => {
+            this.model.subdivisions = parseInt(event.target.value, 10);
+            document.querySelector('#subcounter').innerHTML = this.model.subdivisions;
+        });
+
+        this.renderTempoSelector();
+        this.renderBeatSelector();
+        this.renderVolume();
+        this.setTempo(this.model.tempo)
+    }
+
+    renderVolume() {
+        document.querySelector('#volume').addEventListener("wheel", (event) => {
+            const selectedElement = document.querySelector("#volume .selected");
+            const selected = parseInt(selectedElement.getAttribute("data-volume"), 10);
+            this.model.volume = (event.deltaY > 0) ? selected + 10 : selected - 10;
+
+            selectedElement.classList.remove("selected");
+            document.querySelector(`#volume [data-volume="${model.volumePercentage}"]`).classList.add("selected");
+
+        }, { passive: true });
+
+        document.querySelector('#volume').addEventListener('click', (event) => {
+            let old = document.querySelector("#volume div.selected");
+            if (old) {
+                old.classList.remove("selected")
+            }
+            event.target.classList.add("selected");
+            this.model.volume = parseInt(event.target.dataset.volume, 10)
+        });
+
+    }
+
+    setTempo(tempo) {
+        this.model.tempo = tempo;
+        document.querySelector('#tempo').value = this.model.tempo;
+        document.querySelector('#wheel').innerHTML = this.model.tempo;
+        document.querySelectorAll('#tempo-knob-inner .value').forEach(el => el.classList.remove("highlight"))
+        const el = [...document.querySelectorAll('#tempo-knob-inner .value')].find(el => el.dataset.tempo == this.model.tempo)
+        if (el) {
+            el.classList.add("highlight")
+        }
+    }
+
+    renderTempoSelector() {
+        const range = ((260 - 40) / 10);
+        const angleSize = (180 + 2 * 40) / range;
+
+        for (let i = 0; i <= range; i++) {
+            const el = document.createElement('div');
+            const subel = document.createElement('div');
+            const angle = (i * angleSize) - 40;
+            const tempo2select = (i * 10) + 40;
+
+            el.className = "value-container";
+            subel.className = "value";
+            subel.dataset.tempo = tempo2select;
+            subel.title = `${tempo2select} BPM`;
+
+            subel.addEventListener("click", (event) => {
+                this.setTempo(parseInt(event.target.dataset.tempo, 10));
+            })
+            el.style.transform = `rotate(${angle}deg)`;
+            el.append(subel);
+            document.querySelector('#tempo-knob-inner').appendChild(el);
+        }
+        document.querySelector('#wheel').addEventListener("wheel", (event) => {
+            this.setTempo((event.deltaY > 0) ? model.tempo + 10 : model.tempo - 10);
+        }, { passive: true });
+        document.querySelector('#wheel').addEventListener('click', run);
+    }
+
+    renderBeatSelector() {
+        document.querySelector('#counter').innerHTML = this.model.beats.length;
+        document.querySelector('#selector').innerHTML = '';
+        this.model.beats.forEach((item, index) => {
+            const el = document.createElement('div');
+
+            for (let i = 0; i < 3; i++) {
+                const subel = document.createElement('div');
+                if (i == 0) {
+                    subel.innerHTML = index + 1;
+                }
+                el.appendChild(subel)
+            }
+            el.setAttribute('accent', this.model.beats[index].accent);
+            el.addEventListener('click', (event) => {
+                let el = event.target.closest('div[accent]');
+                model.beats[index].accent = Accent.next(el.getAttribute('accent'));
+                this.renderBeatSelector();
+            });
+            document.querySelector('#selector').appendChild(el);
+        });
     }
 }
+
+let model = new Model();
 
 window.addEventListener('DOMContentLoaded', () => {
-    const range = ((260 - 40) / 10);
-    const angleSize = (180 + 2 * 40) / range;
-
-    document.querySelector('#wheel').addEventListener('click', run);
-    document.querySelector('#add').addEventListener('click', () => {
-        document.querySelector('#counter').innerHTML = config.addNote();
-        renderSelector();
-    });
-    document.querySelector('#remove').addEventListener('click', () => {
-        document.querySelector('#counter').innerHTML = config.removeNote();
-        renderSelector();
-    });
-
-    document.querySelector('#counter').innerHTML = config.beats.length;
-    document.querySelector('#subcounter').innerHTML = config.subdivisions;
-    document.querySelector('#wheel').addEventListener("wheel", (event) => {
-        let t = (event.deltaY > 0) ? config.tempo + 10 : config.tempo - 10;
-        t = Math.max(t, 40);
-        t = Math.min(t, 260);
-        if (t != config.tempo) {
-            setTempo(t);
-        }
-    }, { passive: true });
-
-    document.querySelector('#volume-container').addEventListener("wheel", (event) => {
-        const selectedElement = document.querySelector("#volume-container .selected");
-        const selected = parseInt(selectedElement.getAttribute("data-volume"), 10);
-        let newValue = (event.deltaY > 0) ? selected + 10 : selected - 10;
-
-        newValue = Math.max(newValue, 10);
-        newValue = Math.min(newValue, 100);
-        selectedElement.classList.remove("selected");
-        document.querySelector(`#volume-container [data-volume="${newValue}"]`).classList.add("selected");
-        config.volume = (newValue * 0.02) - 1;
-
-    }, { passive: true })
-
-    for (i = 0; i <= range; i++) {
-        const el = document.createElement('div');
-        const subel = document.createElement('div');
-        const angle = (i * angleSize) - 40;
-        const tempo2select = (i * 10) + 40;
-
-        el.className = "value-container";
-        subel.className = "value";
-        subel.dataset.tempo = tempo2select;
-        subel.title = `${tempo2select} BPM`;
-
-        subel.addEventListener("click", (event) => {
-            setTempo(parseInt(event.target.dataset.tempo, 10));
-        })
-        el.style.transform = `rotate(${angle}deg)`;
-        el.append(subel);
-        document.querySelector('#tempo-knob-inner').appendChild(el);
-        setTempo(config.tempo)
-    }
-    document.querySelector('#tempo').addEventListener('change', () => {
-        setTempo(parseInt(document.querySelector('#tempo').value, 10));
-    });
-    document.querySelector('#subdivisions-toggle').addEventListener('change', (event) => {
-        config.subdivisions = parseInt(event.target.value, 10);
-        document.querySelector('#subcounter').innerHTML = config.subdivisions;
-    });
-    document.querySelector('#volume-container').addEventListener('click', (event) => {
-        let old = document.querySelector("#volume-container div.selected");
-        if (old) {
-            old.classList.remove("selected")
-        }
-        event.target.classList.add("selected");
-        config.volume = (parseInt(event.target.dataset.volume, 10) * 0.02) - 1;
-    });
-    renderSelector();
+    new View(model);
 });
 
-function renderSelector() {
-    document.querySelector('#selector').innerHTML = '';
-    config.beats.forEach((item, index) => {
-        const el = document.createElement('div');
-
-        for (let i = 0; i < 3; i++) {
-            const subel = document.createElement('div');
-            if (i == 0) {
-                subel.innerHTML = index + 1;
-            }
-            el.appendChild(subel)
-        }
-        el.setAttribute('accent', config.beats[index].accent);
-        el.addEventListener('click', (event) => {
-            let el = event.target.closest('div[accent]');
-            config.beats[index].accent = Accent.next(el.getAttribute('accent'));
-            renderSelector();
-        });
-        document.querySelector('#selector').appendChild(el);
-    });
-}
 
 async function run() {
-    if (!config.toggleIsPlaying()) return;
+    if (!model.toggleIsPlaying()) return;
     const audioContext = new AudioContext();
     let counter = 0;
 
     function playTone(t) {
-        const startTime = t + config.delay;
+        const startTime = t + model.delay;
         const endTime = startTime + 0.06;
         const oscillator = audioContext.createOscillator();
         const gainNode = new GainNode(audioContext);
@@ -180,7 +222,7 @@ async function run() {
         oscillator.connect(gainNode);
         gainNode.connect(audioContext.destination);
         oscillator.addEventListener('ended', (event) => {
-            if (config.isPlaying) {
+            if (model.isPlaying) {
                 playTone(startTime);
             }
 
@@ -192,7 +234,7 @@ async function run() {
             }, startTime - audioContext.currentTime);
         });
 
-        const note = Object.assign({}, config.beats[counter]);
+        const note = Object.assign({}, model.beats[counter]);
         let frequency = 880;
         switch (note.accent) {
             case Accent.value.HIGH:
@@ -206,15 +248,15 @@ async function run() {
                 break;
         }
         oscillator.frequency.setValueAtTime(frequency, startTime);
-        gainNode.gain.setValueAtTime(config.volume, startTime);
+        gainNode.gain.setValueAtTime(model.volume, startTime);
         oscillator.connect(audioContext.destination);
         oscillator.start(startTime);
         oscillator.stop(endTime);
         gainNode.gain.linearRampToValueAtTime(-1, endTime - 0.01);
 
         oscillator.counter = counter;
-        if (config.subdivisions > 1) {
-            for (let i = 1; i < config.subdivisions; i++) {
+        if (model.subdivisions > 1) {
+            for (let i = 1; i < model.subdivisions; i++) {
                 const subOscillator = audioContext.createOscillator();
                 const gainSubNode = new GainNode(audioContext);
 
@@ -222,10 +264,10 @@ async function run() {
                 gainSubNode.connect(audioContext.destination);
                 subOscillator.frequency.setValueAtTime(220, startTime);
                 subOscillator.connect(audioContext.destination);
-                subdivisionsStartTime = startTime + i * (config.delay / config.subdivisions);
+                subdivisionsStartTime = startTime + i * (model.delay / model.subdivisions);
                 subOscillator.start(subdivisionsStartTime);
                 subOscillator.stop(subdivisionsStartTime + 0.03);
-                gainSubNode.gain.setValueAtTime(Math.max(config.volume - 0.4, -1), subdivisionsStartTime);
+                gainSubNode.gain.setValueAtTime(Math.max(model.volume - 0.4, -1), subdivisionsStartTime);
                 gainSubNode.gain.linearRampToValueAtTime(-1, subdivisionsStartTime + 0.02);
                 subOscillator.subdivision = i;
                 subOscillator.addEventListener('ended', (event) => {
@@ -236,7 +278,7 @@ async function run() {
             }
         }
         counter++;
-        if (counter >= config.beats.length) {
+        if (counter >= model.beats.length) {
             counter = 0;
         }
     }
@@ -245,4 +287,3 @@ async function run() {
         playTone(audioContext.currentTime);
     }
 }
-

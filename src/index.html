@@ -10,8 +10,8 @@
 <body>
 
     <div id="metronome">
-        <div id="volume-container">
-            <div data-volume="100" class="selected"></div>
+        <div id="volume">
+            <div data-volume="100"></div>
             <div data-volume="90"></div>
             <div data-volume="80"></div>
             <div data-volume="70"></div>
@@ -37,15 +37,14 @@
         <div id=selector></div>
 
 
-        <div id="bottom">
-            <div id="tempo-knob">
-                <div id="wheel" title="Play/Stop"></div>
-                <div id="tempo-knob-inner">
-                </div>
+        <div id="tempo-knob">
+            <div id="wheel" title="Play/Stop"></div>
+            <div id="tempo-knob-inner">
             </div>
         </div>
+
         <h2>Subdivisions</h2>
-        <div id="subdivisions-toggle">
+        <div id="subdivisions">
             <div>
                 <input type="radio" id=sub0 name="sublabel" value="1" checked>
                 <label for="sub0">Off</label>
