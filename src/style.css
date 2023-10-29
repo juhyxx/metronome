@@ -51,7 +51,7 @@ input {
 
 
 #metronome {
-    background-color: #202020;
+    background-color: #151515;
     padding: 0.5rem;
     position: relative;
     border-radius: 0.25rem;
@@ -299,9 +299,11 @@ input {
 
 
 #beat-edit {
+    flex: 1;
     user-select: none;
     display: flex;
     justify-content: space-between;
+
 
     & div {
         flex: 1;
@@ -345,6 +347,17 @@ input {
         }
     }
 
+}
+
+#beat-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+
+    &>:first-child {
+        flex: 3;
+
+    }
 }
 
 #volume {
@@ -392,5 +405,32 @@ input {
         border-left: calc(var(--volume-width) + 2px) solid transparent;
         border-right: 0 solid transparent;
         border-bottom: calc(var(--volume-height) + 2px) solid #303030;
+    }
+}
+
+#tap-tempo {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.2),
+        inset -1px -1px 1px rgba(0, 0, 0, 0.2),
+        inset 1px -1px 20px rgba(0, 0, 0, 0.2),
+        1px 1px 4px rgba(0, 0, 0, 0.3);
+    border-radius: 2rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    text-align: center;
+    cursor: pointer;
+    padding: 0.25rem;
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    &:active {
+        color: var(--main-color);
+        text-shadow: 0 0 5px var(--main-color);
+        background-color: rgba(255, 255, 255, 0.02);
     }
 }

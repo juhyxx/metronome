@@ -13,6 +13,7 @@ class Model {
     #volume = 0.8;
     #isPlaying = false;
     #delay = 0.5
+    #lastTime = undefined
 
     get volume() {
         return this.#volume;
@@ -28,9 +29,10 @@ class Model {
     }
 
     set tempo(value) {
-        value = limit(value, 40, 260)
+        value = limit(value, 40, 260);
+        this.#tempo = value;
         this.#delay = 60 / this.tempo;
-        this.#tempo = value
+
     }
 
     get tempo() {
@@ -68,6 +70,14 @@ class Model {
     get isPlaying() {
         return this.#isPlaying
     }
+
+    tapTempo() {
+        const now = Date.now();
+        const lastTime = this.#lastTime || now;
+
+        this.#lastTime = now;
+        return Math.round((60 / ((now - lastTime) / 1000)));
+    }
 }
 
 class Accent {
@@ -87,6 +97,7 @@ class Accent {
         return this.queue[index];
     }
 }
+
 
 
 class View {
@@ -110,6 +121,17 @@ class View {
         document.querySelector('#remove').addEventListener('click', () => {
             model.removeBeat();
             this.renderBeatSelector();
+        });
+
+        document.querySelector('#tap-tempo').addEventListener('click', () => {
+            let tap = this.model.tapTempo();
+            if (tap) {
+                this.setTempo(tap);
+            }
+        });
+
+        document.querySelector('#tempo').addEventListener('change', (event) => {
+            this.setTempo(parseInt(event.target.value, 10));
         });
 
         document.querySelector('#subdivisions').addEventListener('change', (event) => {
