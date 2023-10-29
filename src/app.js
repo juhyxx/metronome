@@ -91,6 +91,7 @@ class Accent {
 
 class View {
     #model = undefined;
+    #beatSelector = undefined
 
     get model() {
         return this.#model;
@@ -98,6 +99,7 @@ class View {
 
     constructor(model) {
         this.#model = model;
+        this.#beatSelector = document.querySelector('#selector')
 
         document.querySelector('#counter').innerHTML = this.model.beats.length;
         document.querySelector('#subcounter').innerHTML = this.model.subdivisions;
@@ -177,7 +179,7 @@ class View {
 
     renderBeatSelector() {
         document.querySelector('#counter').innerHTML = this.model.beats.length;
-        document.querySelector('#selector').innerHTML = '';
+        this.#beatSelector.innerHTML = '';
         this.model.beats.forEach((item, index) => {
             const el = document.createElement('div');
 
@@ -194,7 +196,7 @@ class View {
                 model.beats[index].accent = Accent.next(el.getAttribute('accent'));
                 this.renderBeatSelector();
             });
-            document.querySelector('#selector').appendChild(el);
+            this.#beatSelector.appendChild(el);
         });
     }
 }

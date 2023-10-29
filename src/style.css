@@ -12,9 +12,9 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    font-size: 40px;
     padding: 1rem;
-    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.25rem;
+    color: rgba(255, 255, 255, 0.7);
     text-shadow: 0px -1px 1px black;
 }
 
@@ -22,50 +22,61 @@ body {
     font-family: 'Silkscreen', sans-serif;
 }
 
-#header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.25rem;
 
-    & h1 {
-        font-size: 0.25rem;
-        margin: 0;
-        padding: 0;
-    }
+
+h1 {
+    font-size: 0.25rem;
+    margin: 0;
+    padding: 0;
 }
 
-#metronome {
-    background-color: #181818;
-    padding: 0.5rem;
-    position: relative;
-    border-radius: 0.25rem;
-    box-shadow: inset 0px 1px 1px rgba(255, 255, 255, 0.1),
-        inset 0px 2px 2px rgba(255, 255, 255, 0.1),
-        0px 3px 5px rgba(0, 0, 0, 0.8);
-}
-
-input,
-button {
-    font-size: 0.25rem;
+h2 {
     text-align: center;
-    cursor: pointer;
+    font-size: 0.25rem;
+    margin: 0;
+    padding: 0;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 0.1rem;
 }
 
 input {
+    text-align: center;
+    cursor: pointer;
     width: 1rem;
+    font-size: 0.25rem;
     background-color: #505050;
     color: white;
     border: 0;
 }
 
+
+#metronome {
+    background-color: #202020;
+    padding: 0.5rem;
+    position: relative;
+    border-radius: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 8rem;
+    box-shadow: inset 0px 1px 1px rgba(255, 255, 255, 0.1),
+        inset 0px 2px 2px rgba(255, 255, 255, 0.1),
+        0px 3px 5px rgba(0, 0, 0, 0.8);
+
+    & header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.25rem;
+    }
+}
+
+
+
 #selector {
     display: flex;
     gap: 0.1rem;
     user-select: none;
-    font-size: 0.25rem;
-
-
     justify-content: space-between;
 
     >div {
@@ -138,10 +149,14 @@ input {
 #tempo-knob {
     user-select: none;
     position: relative;
-    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0.5rem;
 
     #wheel {
         position: absolute;
+        display: flex;
         height: var(--diameter);
         width: var(--diameter);
         left: calc(50% - var(--diameter)/2);
@@ -149,7 +164,6 @@ input {
         border-radius: 50%;
         background-color: rgba(255, 255, 255, 0.05);
         box-shadow: 0 5px 40px black, inset 0 5px 5px rgba(255, 255, 255, 0.4), inset 0 -5px 5px rgba(0, 0, 0, 0.4);
-        display: flex;
         justify-content: center;
         align-items: center;
         cursor: pointer;
@@ -182,7 +196,7 @@ input {
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 0.5rem;
+
 
         .value-container {
             position: absolute;
@@ -221,9 +235,6 @@ input {
 }
 
 
-
-
-
 #tempo {
     background-color: transparent;
 }
@@ -250,7 +261,6 @@ input {
                 inset -1px -1px 1px rgba(0, 0, 0, 0.2),
                 inset 1px -1px 20px rgba(0, 0, 0, 0.2),
                 1px 1px 4px rgba(0, 0, 0, 0.3);
-            font-size: 0.25rem;
             background-color: rgba(255, 255, 255, 0.1);
             text-align: center;
             cursor: pointer;
@@ -286,14 +296,7 @@ input {
     }
 }
 
-h2 {
-    text-align: center;
-    font-size: 0.25rem;
-    margin: 0;
-    padding: 0;
-    color: rgba(255, 255, 255, 0.2);
-    margin-bottom: 0.1rem;
-}
+
 
 #beat-edit {
     user-select: none;
@@ -371,14 +374,8 @@ h2 {
         width: var(--volume-width);
         border-bottom: 3px solid #303030;
         box-shadow: inset 0 2px px rgba(0, 0, 0, 0.2);
-
-        &.selected,
-        &.selected~div {
-            background-color: rgb(173, 255, 47, 0.5);
-        }
     }
 
-    & input:checked+label,
     & input:checked~label {
         background-color: rgb(173, 255, 47, 0.5);
     }
