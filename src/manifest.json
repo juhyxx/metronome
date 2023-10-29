@@ -7,30 +7,30 @@
     "description": "Fastest metronome in the worlds",
     "icons": [
         {
-            "src": "../images/icon-48.png",
+            "src": "images/icon-48.png",
             "sizes": "48x48",
             "type": "image/png"
         },
         {
-            "src": "../images/icon-72.png",
+            "src": "images/icon-72.png",
             "sizes": "72x72",
             "type": "image/png"
         },
         {
-            "src": "../images/icon-144.png",
+            "src": "images/icon-144.png",
             "sizes": "144x144",
             "type": "image/png"
         }
     ],
     "screenshots": [
         {
-            "src": "/images/sshot.png",
+            "src": "images/sshot.png",
             "type": "image/png",
             "sizes": "540x720",
             "form_factor": "narrow"
         },
         {
-            "src": "/images/sshot.png",
+            "src": "images/sshot.png",
             "type": "image/png",
             "sizes": "540x720",
             "form_factor": "wide"
