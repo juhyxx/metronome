@@ -11,21 +11,42 @@
 
     <div id="metronome">
         <div id="volume">
-            <div data-volume="100"></div>
-            <div data-volume="90"></div>
-            <div data-volume="80"></div>
-            <div data-volume="70"></div>
-            <div data-volume="60"></div>
-            <div data-volume="50"></div>
-            <div data-volume="40"></div>
-            <div data-volume="30"></div>
-            <div data-volume="20"></div>
-            <div data-volume="10"></div>
+
+            <input type="radio" id=volume100 name="volume" value="100">
+            <label data-volume="100" for="volume100"></label>
+
+            <input type="radio" id=volume090 name="volume" value="90">
+            <label data-volume="90" for="volume090"></label>
+
+            <input type="radio" id=volume080 name="volume" value="80">
+            <label data-volume="80" for="volume080"></label>
+
+            <input type="radio" id=volume070 name="volume" value="70">
+            <label data-volume="70" for="volume070"></label>
+
+            <input type="radio" id=volume060 name="volume" value="60">
+            <label data-volume="60" for="volume060"></label>
+
+            <input type="radio" id=volume050 name="volume" value="50">
+            <label data-volume="50" for="volume050"></label>
+
+            <input type="radio" id=volume040 name="volume" value="40">
+            <label data-volume="40" for="volume040"></label>
+
+            <input type="radio" id=volume030 name="volume" value="30">
+            <label data-volume="30" for="volume030"></label>
+
+            <input type="radio" id=volume020 name="volume" value="20">
+            <label data-volume="20" for="volume020"></label>
+
+            <input type="radio" id=volume010 name="volume" value="10">
+            <label data-volume="10" for="volume010"></label>
+
         </div>
         <div id="header">
             <h1>Metronome</h1>
             <div id="tempoview">
-                <input id="tempo" type="number" value="120">BPM
+                <input id="tempo" type="number" value="120" min="40" max="260">BPM
             </div>
             <div>
                 <span id="counter">1</span>

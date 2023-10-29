@@ -1,6 +1,12 @@
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
+function limit(value, min, max) {
+    value = Math.max(value, min);
+    value = Math.min(value, max);
+    return value;
+}
+
 class Model {
     #tempo = 120;
     subdivisions = 1;
@@ -17,14 +23,12 @@ class Model {
     }
 
     set volume(value) {
-        value = Math.max(value, 10);
-        value = Math.min(value, 100);
+        value = limit(value, 10, 100)
         this.#volume = (value * 0.02) - 1;
     }
 
     set tempo(value) {
-        value = Math.max(value, 40);
-        value = Math.min(value, 260);
+        value = limit(value, 40, 260)
         this.#delay = 60 / this.tempo;
         this.#tempo = value
     }
@@ -53,7 +57,9 @@ class Model {
     }
     removeBeat() {
         const count = Math.max(this.beats.length - 1, 1);
-        this.beats.pop();
+        if (this.beats.length > 1) {
+            this.beats.pop();
+        }
     }
 
     toggleIsPlaying() {
@@ -93,7 +99,6 @@ class View {
     constructor(model) {
         this.#model = model;
 
-        document.querySelector(`#volume [data-volume="${this.model.volumePercentage}"]`).classList.add("selected");
         document.querySelector('#counter').innerHTML = this.model.beats.length;
         document.querySelector('#subcounter').innerHTML = this.model.subdivisions;
         document.querySelector('#add').addEventListener('click', () => {
@@ -109,33 +114,26 @@ class View {
             this.model.subdivisions = parseInt(event.target.value, 10);
             document.querySelector('#subcounter').innerHTML = this.model.subdivisions;
         });
-
         this.renderTempoSelector();
         this.renderBeatSelector();
         this.renderVolume();
-        this.setTempo(this.model.tempo)
+        this.setTempo(this.model.tempo);
+        document.querySelector("#volume input[name=volume]:nth-child(3)").click();
     }
 
     renderVolume() {
         document.querySelector('#volume').addEventListener("wheel", (event) => {
-            const selectedElement = document.querySelector("#volume .selected");
-            const selected = parseInt(selectedElement.getAttribute("data-volume"), 10);
-            this.model.volume = (event.deltaY > 0) ? selected + 10 : selected - 10;
-
-            selectedElement.classList.remove("selected");
-            document.querySelector(`#volume [data-volume="${model.volumePercentage}"]`).classList.add("selected");
-
+            let inputs = [...document.querySelectorAll("#volume input[name=volume]")];
+            let selected = document.querySelector("#volume input[name=volume]:checked");
+            let index = inputs.indexOf(selected);
+            index = (event.deltaY < 0) ? index + 1 : index - 1;
+            index = limit(index, 0, inputs.length - 1);
+            inputs[index].click();
         }, { passive: true });
 
-        document.querySelector('#volume').addEventListener('click', (event) => {
-            let old = document.querySelector("#volume div.selected");
-            if (old) {
-                old.classList.remove("selected")
-            }
-            event.target.classList.add("selected");
-            this.model.volume = parseInt(event.target.dataset.volume, 10)
+        document.querySelector('#volume').addEventListener('change', (event) => {
+            this.model.volume = parseInt(event.target.value, 10)
         });
-
     }
 
     setTempo(tempo) {
