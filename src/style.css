@@ -4,6 +4,10 @@
     font-size: 5vh;
     --main-color: rgb(173, 255, 47);
     --diameter: 6rem;
+
+    @media only screen and (max-device-width: 700px) {
+        --diameter: 80vw;
+    }
 }
 
 body {
@@ -16,6 +20,13 @@ body {
     font-size: 0.25rem;
     color: rgba(255, 255, 255, 0.7);
     text-shadow: 0px -1px 1px black;
+
+    @media only screen and (max-device-width: 700px) {
+        padding: 0rem;
+        background-color: #151515;
+        height: 98vh;
+        align-items: stretch;
+    }
 }
 
 * {
@@ -59,9 +70,19 @@ input {
     flex-direction: column;
     gap: 0.5rem;
     min-width: 8rem;
-    box-shadow: inset 0px 1px 1px rgba(255, 255, 255, 0.1),
-        inset 0px 2px 2px rgba(255, 255, 255, 0.1),
-        0px 3px 5px rgba(0, 0, 0, 0.8);
+    box-shadow: inset 0px 1px 4px rgba(255, 255, 255, 0.4),
+        inset 0px 0px 10px 10px rgba(255, 255, 255, 0.05),
+        0px 3px 5px rgba(0, 0, 0, 0.7),
+        0px 3px 10px 10px rgba(0, 0, 0, 0.4);
+
+
+    @media only screen and (max-device-width: 700px) {
+        min-width: auto;
+        flex: 1;
+        gap: unset;
+        box-shadow: none;
+        justify-content: space-between;
+    }
 
     & header {
         display: flex;
@@ -361,6 +382,12 @@ input {
 }
 
 #volume {
+
+    @media (pointer:none),
+    (pointer:coarse) {
+        display: none !important;
+    }
+
     position: absolute;
     right: -1.2rem;
     top: 0.5rem;
