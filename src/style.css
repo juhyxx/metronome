@@ -6,7 +6,7 @@
     --diameter: 6rem;
 
     @media only screen and (max-device-width: 700px) {
-        --diameter: 80vw;
+        --diameter: 65vw;
     }
 }
 
@@ -265,6 +265,8 @@ input {
     display: flex;
     justify-content: space-between;
 
+
+
     & div {
         flex: 1;
 
@@ -285,7 +287,7 @@ input {
             background-color: rgba(255, 255, 255, 0.1);
             text-align: center;
             cursor: pointer;
-            padding: 0.25rem;
+            padding: 0.5rem;
             display: block;
 
             &:hover {
