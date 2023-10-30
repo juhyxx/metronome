@@ -8,6 +8,10 @@
     @media only screen and (max-device-width: 700px) {
         --diameter: 65vw;
     }
+
+    @media screen and (pointer:coarse) and (orientation: landscape) {
+        --diameter: 55vh;
+    }
 }
 
 body {
@@ -67,25 +71,37 @@ input {
     position: relative;
     border-radius: 0.25rem;
     display: flex;
+
     flex-direction: column;
+
+    @media screen and (pointer:coarse) and (orientation: landscape) {
+        flex-direction: row;
+    }
+
     gap: 0.5rem;
     min-width: 8rem;
     box-shadow: inset 0px 1px 4px rgba(255, 255, 255, 0.4),
-        inset 0px 0px 10px 10px rgba(255, 255, 255, 0.05),
-        0px 3px 5px rgba(0, 0, 0, 0.7),
-        0px 3px 10px 10px rgba(0, 0, 0, 0.4);
+    inset 0px 0px 10px 10px rgba(255, 255, 255, 0.05),
+    0px 3px 5px rgba(0, 0, 0, 0.7),
+    0px 3px 10px 10px rgba(0, 0, 0, 0.4);
 
 
     @media only screen and (max-device-width: 700px) {
         min-width: auto;
         flex: 1;
-        gap: unset;
+        gap: 0.25rem;
         box-shadow: none;
         justify-content: space-between;
     }
 
     & header {
         display: flex;
+
+        @media screen and (pointer:coarse) and (orientation: landscape) {
+            flex-direction: column;
+            display: none;
+        }
+
         justify-content: space-between;
         align-items: center;
         margin-bottom: 0.25rem;
@@ -99,6 +115,7 @@ input {
     gap: 0.1rem;
     user-select: none;
     justify-content: space-between;
+    flex: 3;
 
     >div {
         display: flex;
@@ -112,8 +129,13 @@ input {
     >div {
         cursor: pointer;
         flex: 1;
-        height: 4rem;
+        min-height: 4rem;
         text-align: center;
+
+        @media screen and (pointer:coarse) and (orientation: landscape) {
+            align-items: stretch;
+        }
+
         color: rgba(255, 255, 255, 0.2);
         opacity: 0.5;
 
@@ -174,6 +196,7 @@ input {
     justify-content: center;
     align-items: center;
     margin-top: 0.5rem;
+    flex: 1;
 
     #wheel {
         position: absolute;
@@ -260,126 +283,180 @@ input {
     background-color: transparent;
 }
 
-#subdivisions {
-    user-select: none;
+#subdivisions-container {
+    flex: 1;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
 
-
-
-    & div {
+    #subdivisions {
         flex: 1;
+        user-select: none;
+        display: flex;
+        justify-content: space-between;
 
-        & input {
-            visibility: hidden;
-            width: 0;
-            height: 0;
-            margin: 0;
-            padding: 0;
-            position: absolute;
+        @media screen and (pointer:coarse) and (orientation: landscape) {
+            flex-direction: column;
         }
 
-        & label {
-            box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.2),
-                inset -1px -1px 1px rgba(0, 0, 0, 0.2),
-                inset 1px -1px 20px rgba(0, 0, 0, 0.2),
-                1px 1px 4px rgba(0, 0, 0, 0.3);
-            background-color: rgba(255, 255, 255, 0.1);
-            text-align: center;
-            cursor: pointer;
-            padding: 0.5rem;
-            display: block;
+        & div {
+            flex: 1;
+            display: flex;
 
-            &:hover {
-                background-color: rgba(255, 255, 255, 0.08);
+            & input {
+                visibility: hidden;
+                width: 0;
+                height: 0;
+                margin: 0;
+                padding: 0;
+                position: absolute;
+            }
+
+            & label {
+                flex: 1;
+                box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.2),
+                    inset -1px -1px 1px rgba(0, 0, 0, 0.2),
+                    inset 1px -1px 20px rgba(0, 0, 0, 0.2),
+                    1px 1px 4px rgba(0, 0, 0, 0.3);
+                background-color: rgba(255, 255, 255, 0.1);
+                text-align: center;
+                cursor: pointer;
+                padding: 0.5rem;
+                display: block;
+
+                &:hover {
+                    background-color: rgba(255, 255, 255, 0.08);
+                }
+            }
+
+            &:nth-child(1) label {
+                border-top-left-radius: 2rem;
+                border-bottom-left-radius: 2rem;
+                border-bottom-right-radius: 0rem;
+                border-top-right-radius: 0rem;
+
+                @media screen and (pointer:coarse) and (orientation: landscape) {
+                    border-top-right-radius: 2rem;
+                    border-bottom-right-radius: 0rem;
+                    border-bottom-left-radius: 0rem;
+                    border-top-left-radius: 2rem;
+                }
+            }
+
+            &:last-child label {
+                border-top-right-radius: 2rem;
+                border-bottom-right-radius: 2rem;
+                border-bottom-left-radius: 0rem;
+                border-top-left-radius: 0rem;
+
+                @media screen and (pointer:coarse) and (orientation: landscape) {
+                    border-top-right-radius: 0rem;
+                    border-bottom-right-radius: 2rem;
+                    border-bottom-left-radius: 2rem;
+                    border-top-left-radius: 0rem;
+                }
+            }
+
+            & input:checked+label {
+                background-color: rgba(255, 255, 255, 0.02);
+                box-shadow:
+                    inset 1px 1px 1px rgba(0, 0, 0, 0.5);
+                color: var(--main-color);
+                text-shadow: 0 0 5px var(--main-color);
             }
         }
-
-        &:nth-child(1) label {
-            border-top-left-radius: 2rem;
-            border-bottom-left-radius: 2rem;
-            border-bottom-right-radius: 0rem;
-            border-top-right-radius: 0rem;
-        }
-
-        &:last-child label {
-            border-top-right-radius: 2rem;
-            border-bottom-right-radius: 2rem;
-            border-bottom-left-radius: 0rem;
-            border-top-left-radius: 0rem;
-        }
-
-        & input:checked+label {
-            background-color: rgba(255, 255, 255, 0.02);
-            box-shadow:
-                inset 1px 1px 1px rgba(0, 0, 0, 0.5);
-            color: var(--main-color);
-            text-shadow: 0 0 5px var(--main-color);
-        }
     }
 }
 
-
-
-#beat-edit {
-    flex: 1;
-    user-select: none;
-    display: flex;
-    justify-content: space-between;
-
-
-    & div {
-        flex: 1;
-        font-weight: bold;
-        font-size: 0.75rem;
-        box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.2),
-            inset -1px -1px 1px rgba(0, 0, 0, 0.2),
-            inset 1px -1px 20px rgba(0, 0, 0, 0.2),
-            1px 1px 4px rgba(0, 0, 0, 0.3);
-
-        background-color: rgba(255, 255, 255, 0.1);
-        text-align: center;
-        cursor: pointer;
-        padding: 0.25rem;
-        display: block;
-
-        &:first-child {
-            border-top-left-radius: 2rem;
-            border-bottom-left-radius: 2rem;
-            border-bottom-right-radius: 0rem;
-            border-top-right-radius: 0rem;
-        }
-
-        &:last-child {
-            border-top-right-radius: 2rem;
-            border-bottom-right-radius: 2rem;
-            border-bottom-left-radius: 0rem;
-            border-top-left-radius: 0rem;
-        }
-
-        &:hover {
-            background-color: rgba(255, 255, 255, 0.08);
-        }
-
-        &:active {
-            background-color: rgba(255, 255, 255, 0.02);
-            box-shadow:
-                inset 1px 1px 1px rgba(0, 0, 0, 0.5);
-            color: var(--main-color);
-            text-shadow: 0 0 5px var(--main-color);
-        }
-    }
-
-}
 
 #beat-container {
     display: flex;
+    flex: 1;
     justify-content: space-between;
+
+    @media screen and (pointer:coarse) and (orientation: landscape) {
+        flex-direction: column;
+    }
+
     gap: 0.5rem;
 
     &>:first-child {
         flex: 3;
 
+    }
+
+    #beat-subcontainer {
+        display: flex;
+        flex-direction: column;
+
+        #beat-edit {
+            user-select: none;
+            display: flex;
+            flex: 1;
+            justify-content: space-between;
+
+            @media screen and (pointer:coarse) and (orientation: landscape) {
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            & div {
+                flex: 1;
+                display: flex;
+                font-weight: bold;
+                font-size: 0.75rem;
+                box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.2),
+                    inset -1px -1px 1px rgba(0, 0, 0, 0.2),
+                    inset 1px -1px 20px rgba(0, 0, 0, 0.2),
+                    1px 1px 4px rgba(0, 0, 0, 0.3);
+
+                background-color: rgba(255, 255, 255, 0.1);
+                text-align: center;
+                cursor: pointer;
+                padding: 0.25rem;
+                display: block;
+
+                &:first-child {
+                    border-top-left-radius: 2rem;
+                    border-bottom-left-radius: 2rem;
+                    border-bottom-right-radius: 0rem;
+                    border-top-right-radius: 0rem;
+
+                    @media screen and (pointer:coarse) and (orientation: landscape) {
+                        border-top-left-radius: 2rem;
+                        border-bottom-left-radius: 0rem;
+                        border-bottom-right-radius: 0rem;
+                        border-top-right-radius: 2rem;
+                    }
+                }
+
+                &:last-child {
+                    border-top-right-radius: 2rem;
+                    border-bottom-right-radius: 2rem;
+                    border-bottom-left-radius: 0rem;
+                    border-top-left-radius: 0rem;
+
+                    @media screen and (pointer:coarse) and (orientation: landscape) {
+                        border-top-left-radius: 0rem;
+                        border-bottom-left-radius: 2rem;
+                        border-bottom-right-radius: 2rem;
+                        border-top-right-radius: 0rem;
+                    }
+                }
+
+                &:hover {
+                    background-color: rgba(255, 255, 255, 0.08);
+                }
+
+                &:active {
+                    background-color: rgba(255, 255, 255, 0.02);
+                    box-shadow:
+                        inset 1px 1px 1px rgba(0, 0, 0, 0.5);
+                    color: var(--main-color);
+                    text-shadow: 0 0 5px var(--main-color);
+                }
+            }
+
+        }
     }
 }
 
