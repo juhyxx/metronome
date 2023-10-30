@@ -14,6 +14,7 @@ class Model {
     #isPlaying = false;
     #delay = 0.5
     #lastTime = undefined
+    #taptempo = []
 
     get volume() {
         return this.#volume;
@@ -71,12 +72,29 @@ class Model {
         return this.#isPlaying
     }
 
+
     tapTempo() {
         const now = Date.now();
-        const lastTime = this.#lastTime || now;
+        let lastTime = this.#lastTime || now;
+
+
+        if (now - lastTime > 2000) {
+            this.#taptempo = [];
+            lastTime = now;
+        }
+        if (this.#taptempo.length > 5) {
+            this.#taptempo.shift()
+        }
 
         this.#lastTime = now;
-        return Math.round((60 / ((now - lastTime) / 1000)));
+        let tempo = Math.round((60 / ((now - lastTime) / 1000)));
+        if (Number.isFinite(tempo) && tempo > 39) {
+            this.#taptempo.push(tempo);
+            let avg = Math.round(this.#taptempo.reduce((prev, item) => prev + item, 0) / this.#taptempo.length);
+
+            return avg;
+        }
+
     }
 }
 
