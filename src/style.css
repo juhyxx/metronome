@@ -11,6 +11,7 @@
 
     @media screen and (pointer:coarse) and (orientation: landscape) {
         --diameter: 55vh;
+        font-size: 10vh;
     }
 }
 
@@ -22,7 +23,7 @@ body {
     align-items: flex-start;
     padding: 1rem;
     font-size: 0.25rem;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.8);
     text-shadow: 0px -1px 1px black;
 
     @media only screen and (max-device-width: 700px) {
@@ -72,18 +73,15 @@ input {
     border-radius: 0.25rem;
     display: flex;
 
+    display: flex;
     flex-direction: column;
-
-    @media screen and (pointer:coarse) and (orientation: landscape) {
-        flex-direction: row;
-    }
 
     gap: 0.5rem;
     min-width: 8rem;
     box-shadow: inset 0px 1px 4px rgba(255, 255, 255, 0.4),
-    inset 0px 0px 10px 10px rgba(255, 255, 255, 0.05),
-    0px 3px 5px rgba(0, 0, 0, 0.7),
-    0px 3px 10px 10px rgba(0, 0, 0, 0.4);
+        inset 0px 0px 10px 10px rgba(255, 255, 255, 0.05),
+        0px 3px 5px rgba(0, 0, 0, 0.7),
+        0px 3px 10px 10px rgba(0, 0, 0, 0.4);
 
 
     @media only screen and (max-device-width: 700px) {
@@ -97,14 +95,19 @@ input {
     & header {
         display: flex;
 
-        @media screen and (pointer:coarse) and (orientation: landscape) {
-            flex-direction: column;
-            display: none;
-        }
-
         justify-content: space-between;
         align-items: center;
         margin-bottom: 0.25rem;
+    }
+
+    #metronome-inner {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        @media screen and (pointer:coarse) and (orientation: landscape) {
+            flex-direction: row;
+        }
     }
 }
 
@@ -226,7 +229,7 @@ input {
                 inset 0 0 1px 3px rgba(255, 255, 255, 0.3),
                 inset 0 -1px 2px 5px rgba(0, 0, 0, 0.4),
                 inset 0 -2px 40px 5px rgba(0, 0, 0, 0.4);
-            background-color: rgba(0, 0, 0, 0.);
+
             pointer-events: none;
         }
     }
@@ -257,7 +260,7 @@ input {
                 box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.2);
 
                 &::before {
-                    color: rgba(255, 255, 255, 0.2);
+                    color: rgba(255, 255, 255, 0.3);
                     position: absolute;
                     content: attr(data-tempo);
                     font-size: 0.2rem;
@@ -270,7 +273,7 @@ input {
                     box-shadow: 0 0 6px var(--main-color);
 
                     &::before {
-                        color: rgba(255, 255, 255, 0.6);
+                        color: white
                     }
                 }
             }
