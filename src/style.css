@@ -5,6 +5,11 @@
     --main-color: rgb(173, 255, 47);
     --diameter: 6rem;
 
+    --shadow: inset 2px 2px 2px rgba(255, 255, 255, 0.2),
+        inset -2px -2px 2px rgba(0, 0, 0, 0.3),
+        inset 1px -1px 20px rgba(0, 0, 0, 0.3),
+        1px 1px 4px rgba(0, 0, 0, 0.3);
+
     @media only screen and (max-device-width: 700px) {
         --diameter: 60vw;
     }
@@ -20,16 +25,15 @@ body {
     font-family: 'Silkscreen', sans-serif;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    padding: 1rem;
+    align-items: center;
     font-size: 0.25rem;
     color: rgba(255, 255, 255, 0.8);
     text-shadow: 0px -1px 1px black;
+    height: 100vh;
 
     @media only screen and (max-device-width: 700px) {
         padding: 0rem;
         background-color: #151515;
-        height: 98vh;
         align-items: stretch;
     }
 }
@@ -155,6 +159,41 @@ input {
 
             & div {
                 background-color: rgba(255, 255, 255, 0.2);
+            }
+
+            &[accent="high"] {
+                & div:nth-child(1) {
+                    background-color: var(--main-color);
+                    box-shadow: 0 0 10px var(--main-color);
+                }
+
+                & div:nth-child(2) {
+                    background-color: #ffe82f;
+                    box-shadow: 0 0 10px #ffe82f;
+                }
+
+                & div:nth-child(3) {
+                    background-color: #ff2f2f;
+                    box-shadow: 0 0 10px #ff2f2f;
+                }
+            }
+
+            &[accent="medium"] {
+                & div:nth-child(2) {
+                    background-color: #ffe82f;
+                    box-shadow: 0 0 10px #ffe82f;
+                }
+
+                & div:nth-child(3) {
+                    background-color: #ff2f2f;
+                    box-shadow: 0 0 10px #ff2f2f;
+                }
+            }
+
+            &[accent="low"] {
+                & div:nth-child(3) {
+                    background-color: #ff2f2f;
+                }
             }
         }
 
@@ -316,10 +355,7 @@ input {
 
             & label {
                 flex: 1;
-                box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.2),
-                    inset -1px -1px 1px rgba(0, 0, 0, 0.2),
-                    inset 1px -1px 20px rgba(0, 0, 0, 0.2),
-                    1px 1px 4px rgba(0, 0, 0, 0.3);
+                box-shadow: var(--shadow);
                 background-color: rgba(255, 255, 255, 0.1);
                 text-align: center;
                 cursor: pointer;
@@ -332,30 +368,18 @@ input {
             }
 
             &:nth-child(1) label {
-                border-top-left-radius: 2rem;
-                border-bottom-left-radius: 2rem;
-                border-bottom-right-radius: 0rem;
-                border-top-right-radius: 0rem;
+                border-radius: 2rem 0rem 0rem 2rem;
 
                 @media screen and (pointer:coarse) and (orientation: landscape) {
-                    border-top-right-radius: 2rem;
-                    border-bottom-right-radius: 0rem;
-                    border-bottom-left-radius: 0rem;
-                    border-top-left-radius: 2rem;
+                    border-radius: 2rem 2rem 0rem 0rem;
                 }
             }
 
             &:last-child label {
-                border-top-right-radius: 2rem;
-                border-bottom-right-radius: 2rem;
-                border-bottom-left-radius: 0rem;
-                border-top-left-radius: 0rem;
+                border-radius: 0rem 2rem 2rem 0rem;
 
                 @media screen and (pointer:coarse) and (orientation: landscape) {
-                    border-top-right-radius: 0rem;
-                    border-bottom-right-radius: 2rem;
-                    border-bottom-left-radius: 2rem;
-                    border-top-left-radius: 0rem;
+                    border-radius: 0rem 0rem 2rem 2rem;
                 }
             }
 
@@ -407,10 +431,7 @@ input {
                 display: flex;
                 font-weight: bold;
                 font-size: 0.75rem;
-                box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.2),
-                    inset -1px -1px 1px rgba(0, 0, 0, 0.2),
-                    inset 1px -1px 20px rgba(0, 0, 0, 0.2),
-                    1px 1px 4px rgba(0, 0, 0, 0.3);
+                box-shadow: var(--shadow);
 
                 background-color: rgba(255, 255, 255, 0.1);
                 text-align: center;
@@ -419,30 +440,18 @@ input {
                 display: block;
 
                 &:first-child {
-                    border-top-left-radius: 2rem;
-                    border-bottom-left-radius: 2rem;
-                    border-bottom-right-radius: 0rem;
-                    border-top-right-radius: 0rem;
+                    border-radius: 2rem 0rem 0rem 2rem;
 
                     @media screen and (pointer:coarse) and (orientation: landscape) {
-                        border-top-left-radius: 2rem;
-                        border-bottom-left-radius: 0rem;
-                        border-bottom-right-radius: 0rem;
-                        border-top-right-radius: 2rem;
+                        border-radius: 2rem 2rem 0rem 0rem;
                     }
                 }
 
                 &:last-child {
-                    border-top-right-radius: 2rem;
-                    border-bottom-right-radius: 2rem;
-                    border-bottom-left-radius: 0rem;
-                    border-top-left-radius: 0rem;
+                    border-radius: 0rem 2rem 2rem 0rem;
 
                     @media screen and (pointer:coarse) and (orientation: landscape) {
-                        border-top-left-radius: 0rem;
-                        border-bottom-left-radius: 2rem;
-                        border-bottom-right-radius: 2rem;
-                        border-top-right-radius: 0rem;
+                        border-radius: 0rem 0rem 2rem 2rem;
                     }
                 }
 
@@ -452,8 +461,7 @@ input {
 
                 &:active {
                     background-color: rgba(255, 255, 255, 0.02);
-                    box-shadow:
-                        inset 1px 1px 1px rgba(0, 0, 0, 0.5);
+                    box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.5);
                     color: var(--main-color);
                     text-shadow: 0 0 5px var(--main-color);
                 }
@@ -523,10 +531,7 @@ input {
     align-items: center;
     justify-content: center;
     user-select: none;
-    box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.2),
-        inset -1px -1px 1px rgba(0, 0, 0, 0.2),
-        inset 1px -1px 20px rgba(0, 0, 0, 0.2),
-        1px 1px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow);
     border-radius: 2rem;
     background-color: rgba(255, 255, 255, 0.1);
     text-align: center;
