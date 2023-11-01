@@ -121,14 +121,18 @@ class Accent {
 class View {
     #model = undefined;
     #beatSelector = undefined
+    #volume = undefined;
+    #dndY = undefined;
 
     get model() {
         return this.#model;
     }
 
+
     constructor(model) {
         this.#model = model;
         this.#beatSelector = document.querySelector('#selector')
+        this.#volume = document.querySelector('#volume');
 
         document.querySelector('#counter').innerHTML = this.model.beats.length;
         document.querySelector('#subcounter').innerHTML = this.model.subdivisions;
@@ -164,7 +168,7 @@ class View {
     }
 
     renderVolume() {
-        document.querySelector('#volume').addEventListener("wheel", (event) => {
+        this.#volume.addEventListener("wheel", (event) => {
             let inputs = [...document.querySelectorAll("#volume input[name=volume]")];
             let selected = document.querySelector("#volume input[name=volume]:checked");
             let index = inputs.indexOf(selected);
@@ -173,7 +177,7 @@ class View {
             inputs[index].click();
         }, { passive: true });
 
-        document.querySelector('#volume').addEventListener('change', (event) => {
+        this.#volume.addEventListener('change', (event) => {
             this.model.volume = parseInt(event.target.value, 10)
         });
     }
@@ -215,6 +219,19 @@ class View {
             this.setTempo((event.deltaY > 0) ? model.tempo + 10 : model.tempo - 10);
         }, { passive: true });
         document.querySelector('#wheel').addEventListener('click', run);
+        document.querySelector('#wheel').addEventListener('mousedown', (event) => {
+            this.#dndY = event.clientY;
+        }, { passive: true });
+        document.querySelector('body').addEventListener('mousemove', (event) => {
+            if (this.#dndY && event.buttons == 1) {
+                let diff = Math.round((this.#dndY - event.clientY) / 4);
+                this.setTempo((this.model.tempo + diff));
+                this.#dndY = event.clientY;
+            }
+        }, { passive: true });
+        document.querySelector('body').addEventListener('mouseup', (event) => {
+            this.#dndY = undefined;
+        }, { passive: true });
     }
 
     renderBeatSelector() {

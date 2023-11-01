@@ -6,7 +6,7 @@
     --diameter: 6rem;
 
     @media only screen and (max-device-width: 700px) {
-        --diameter: 65vw;
+        --diameter: 60vw;
     }
 
     @media screen and (pointer:coarse) and (orientation: landscape) {
