@@ -38,6 +38,11 @@ body {
     }
 }
 
+.dnd {
+    cursor: grab !important;
+
+}
+
 * {
     font-family: 'Silkscreen', sans-serif;
 }
@@ -76,8 +81,6 @@ input {
     position: relative;
     border-radius: 0.25rem;
     display: flex;
-
-    display: flex;
     flex-direction: column;
 
     gap: 0.5rem;
@@ -98,7 +101,6 @@ input {
 
     & header {
         display: flex;
-
         justify-content: space-between;
         align-items: center;
         margin-bottom: 0.25rem;
@@ -257,6 +259,10 @@ input {
         font-size: 1rem;
         text-shadow: 0 -1px 1px black;
 
+        .dnd & {
+            color: var(--main-color);
+        }
+
         &:before {
             z-index: 101;
             height: calc(var(--diameter) - 0.2rem);
@@ -297,6 +303,8 @@ input {
                 background-color: rgba(255, 255, 255, 0.1);
                 cursor: pointer;
                 box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.2);
+
+
 
                 &::before {
                     color: rgba(255, 255, 255, 0.3);

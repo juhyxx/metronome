@@ -215,11 +215,12 @@ class View {
             el.append(subel);
             document.querySelector('#tempo-knob-inner').appendChild(el);
         }
-        document.querySelector('#wheel').addEventListener("wheel", (event) => {
+        document.querySelector('#tempo-knob').addEventListener("wheel", (event) => {
             this.setTempo((event.deltaY > 0) ? model.tempo + 10 : model.tempo - 10);
         }, { passive: true });
         document.querySelector('#wheel').addEventListener('click', run);
         document.querySelector('#wheel').addEventListener('mousedown', (event) => {
+            document.querySelector('body').classList.add("dnd");
             this.#dndY = event.clientY;
         }, { passive: true });
         document.querySelector('body').addEventListener('mousemove', (event) => {
@@ -230,6 +231,7 @@ class View {
             }
         }, { passive: true });
         document.querySelector('body').addEventListener('mouseup', (event) => {
+            document.querySelector('body').classList.remove("dnd");
             this.#dndY = undefined;
         }, { passive: true });
     }
