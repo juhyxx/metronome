@@ -85,8 +85,8 @@ input {
 
     gap: 0.5rem;
     min-width: 8rem;
-    box-shadow: inset 0px 1px 4px rgba(255, 255, 255, 0.4),
-        inset 0px 0px 10px 10px rgba(255, 255, 255, 0.05),
+    box-shadow: inset 0px 0px 0px 1px rgba(255, 255, 255, 0.2),
+
         0px 3px 5px rgba(0, 0, 0, 0.7),
         0px 3px 10px 10px rgba(0, 0, 0, 0.4);
 
@@ -252,16 +252,46 @@ input {
         border-radius: 50%;
         background-color: rgba(255, 255, 255, 0.05);
         box-shadow: 0 5px 40px black, inset 0 5px 5px rgba(255, 255, 255, 0.4), inset 0 -5px 5px rgba(0, 0, 0, 0.4);
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
         cursor: pointer;
         z-index: 100;
         font-size: 1rem;
         text-shadow: 0 -1px 1px black;
+        flex-direction: column;
 
         .dnd & {
             color: var(--main-color);
         }
+
+        #tempo-value {
+            padding-top: 2.2rem;
+            padding-bottom: 0.5rem;
+        }
+
+        & #play {
+
+            color: rgba(255, 255, 255, 0.3)
+        }
+
+        & #stop {
+
+            color: rgba(255, 255, 255, 0.6)
+        }
+
+        #stop {
+            display: none;
+        }
+
+        .is-playing & #play {
+            display: none;
+        }
+
+        .is-playing & #stop {
+            display: block;
+
+        }
+
 
         &:before {
             z-index: 101;
@@ -512,6 +542,8 @@ input {
         width: var(--volume-width);
         border-bottom: 3px solid #303030;
         box-shadow: inset 0 2px px rgba(0, 0, 0, 0.2);
+
+
     }
 
     & input:checked~label {

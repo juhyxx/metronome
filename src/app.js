@@ -185,7 +185,7 @@ class View {
     setTempo(tempo) {
         this.model.tempo = tempo;
         document.querySelector('#tempo').value = this.model.tempo;
-        document.querySelector('#wheel').innerHTML = this.model.tempo;
+        document.querySelector('#wheel #tempo-value').innerHTML = this.model.tempo;
         document.querySelectorAll('#tempo-knob-inner .value').forEach(el => el.classList.remove("highlight"))
         const el = [...document.querySelectorAll('#tempo-knob-inner .value')].find(el => el.dataset.tempo == this.model.tempo)
         if (el) {
@@ -218,7 +218,10 @@ class View {
         document.querySelector('#tempo-knob').addEventListener("wheel", (event) => {
             this.setTempo((event.deltaY > 0) ? model.tempo + 10 : model.tempo - 10);
         }, { passive: true });
-        document.querySelector('#wheel').addEventListener('click', run);
+        document.querySelector('#wheel').addEventListener('click', () => {
+            document.querySelector("body").classList.toggle("is-playing")
+            run()
+        });
         document.querySelector('#wheel').addEventListener('mousedown', (event) => {
             document.querySelector('body').classList.add("dnd");
             this.#dndY = event.clientY;
