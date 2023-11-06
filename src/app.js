@@ -94,17 +94,18 @@ class Model {
 
             return avg;
         }
-
     }
 }
 
 class Accent {
     static value = {
+        NONE: "none",
         LOW: 'low',
         MEDIUM: 'medium',
         HIGH: 'high',
     };
     static queue = [
+        this.value.NONE,
         this.value.LOW,
         this.value.MEDIUM,
         this.value.HIGH,
@@ -278,10 +279,28 @@ async function run() {
     let counter = 0;
 
     function playTone(t) {
-        const startTime = t + model.delay;
-        const endTime = startTime + 0.06;
+
         const oscillator = audioContext.createOscillator();
         const gainNode = new GainNode(audioContext);
+        const note = Object.assign({}, model.beats[counter]);
+        let noteOff = false;
+        let frequency = 880;
+        switch (note.accent) {
+            case Accent.value.HIGH:
+                frequency = 880;
+                break;
+            case Accent.value.MEDIUM:
+                frequency = 600;
+                break;
+            case Accent.value.LOW:
+                frequency = 440;
+                break;
+            case Accent.value.NONE:
+                noteOff = true;
+                break;
+        }
+        const startTime = t + model.delay;
+        const endTime = startTime + 0.06;
 
         oscillator.connect(gainNode);
         gainNode.connect(audioContext.destination);
@@ -298,21 +317,8 @@ async function run() {
             }, startTime - audioContext.currentTime);
         });
 
-        const note = Object.assign({}, model.beats[counter]);
-        let frequency = 880;
-        switch (note.accent) {
-            case Accent.value.HIGH:
-                frequency = 880;
-                break;
-            case Accent.value.MEDIUM:
-                frequency = 600;
-                break;
-            case Accent.value.LOW:
-                frequency = 440;
-                break;
-        }
         oscillator.frequency.setValueAtTime(frequency, startTime);
-        gainNode.gain.setValueAtTime(model.volume, startTime);
+        gainNode.gain.setValueAtTime(noteOff ? -1 : model.volume, startTime);
         oscillator.connect(audioContext.destination);
         oscillator.start(startTime);
         oscillator.stop(endTime);
