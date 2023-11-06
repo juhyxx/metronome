@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Silkscreen&display=swap');
 
 :root {
-    font-size: 5vh;
     --main-color: rgb(173, 255, 47);
     --diameter: 6rem;
 
@@ -9,6 +8,7 @@
         inset -2px -2px 2px rgba(0, 0, 0, 0.3),
         inset 1px -1px 20px rgba(0, 0, 0, 0.3),
         1px 1px 4px rgba(0, 0, 0, 0.3);
+    font-size: 5vh;
 
     @media only screen and (max-device-width: 700px) {
         --diameter: 60vw;
@@ -21,20 +21,21 @@
 }
 
 body {
-    background-color: #303030;
-    font-family: 'Silkscreen', sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 0.25rem;
-    color: rgba(255, 255, 255, 0.8);
-    text-shadow: 0px -1px 1px black;
+    margin: 0;
+    background-color: #404040;
     height: 100vh;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.25rem;
+    font-family: 'Silkscreen', sans-serif;
+    text-shadow: 0px -1px 1px black;
 
     @media only screen and (max-device-width: 700px) {
-        padding: 0rem;
-        background-color: #151515;
         align-items: stretch;
+        background-color: #151515;
+        padding: 0rem;
     }
 }
 
@@ -50,54 +51,56 @@ body {
 
 
 h1 {
-    font-size: 0.25rem;
     margin: 0;
     padding: 0;
+    font-size: 0.25rem;
 }
 
 h2 {
-    text-align: center;
-    font-size: 0.25rem;
     margin: 0;
+    margin-bottom: 0.1rem;
     padding: 0;
     color: rgba(255, 255, 255, 0.5);
-    margin-bottom: 0.1rem;
+    font-size: 0.25rem;
+    text-align: center;
 }
 
 input {
-    text-align: center;
     cursor: pointer;
-    width: 1rem;
-    font-size: 0.25rem;
-    background-color: #505050;
-    color: white;
     border: 0;
+    background-color: #505050;
+    width: 1rem;
+    color: white;
+    font-size: 0.25rem;
+    text-align: center;
 }
 
 
 #metronome {
-    background-color: #151515;
-    padding: 0.5rem;
-    position: relative;
-    border-radius: 0.25rem;
     display: flex;
+    position: relative;
     flex-direction: column;
-
     gap: 0.5rem;
-    min-width: 8rem;
     box-shadow: inset 0px 0px 0px 1px rgba(255, 255, 255, 0.2),
-
         0px 3px 5px rgba(0, 0, 0, 0.7),
-        0px 3px 10px 10px rgba(0, 0, 0, 0.4);
+        5px 5px 20px 10px rgba(0, 0, 0, 0.4);
+    border-radius: 0.25rem;
+    background-color: #202020;
+    padding: 0.5rem;
+    min-width: 8rem;
 
 
     @media only screen and (max-device-width: 700px) {
-        min-width: auto;
         flex: 1;
+        justify-content: space-between;
         gap: 0.25rem;
         box-shadow: none;
-        justify-content: space-between;
+        border-radius: 0;
+        padding: 0.5rem;
+        min-width: auto;
     }
+
+    overflow: hidden;
 
     & header {
         display: flex;
@@ -115,16 +118,29 @@ input {
             flex-direction: row;
         }
     }
+
+    &::before {
+        position: absolute;
+        top: -2rem;
+        left: -2rem;
+        z-index: 0;
+        border-top-left-radius: 20rem;
+        background-color: rgba(0, 0, 0, 0.2);
+        width: 200%;
+        height: 120vh;
+        pointer-events: none;
+        content: "x";
+    }
 }
 
 
 
 #selector {
     display: flex;
+    flex: 3;
+    justify-content: space-between;
     gap: 0.1rem;
     user-select: none;
-    justify-content: space-between;
-    flex: 3;
 
     >div {
         display: flex;
@@ -136,8 +152,8 @@ input {
     }
 
     >div {
-        cursor: pointer;
         flex: 1;
+        cursor: pointer;
         min-height: 4rem;
         text-align: center;
 
@@ -145,8 +161,9 @@ input {
             align-items: stretch;
         }
 
-        color: rgba(255, 255, 255, 0.2);
         opacity: 0.5;
+
+        color: rgba(255, 255, 255, 0.2);
 
         >div {
             margin-bottom: 0.1rem;
@@ -165,30 +182,30 @@ input {
 
             &[accent="high"] {
                 & div:nth-child(1) {
-                    background-color: var(--main-color);
                     box-shadow: 0 0 10px var(--main-color);
+                    background-color: var(--main-color);
                 }
 
                 & div:nth-child(2) {
-                    background-color: #ffe82f;
                     box-shadow: 0 0 10px #ffe82f;
+                    background-color: #ffe82f;
                 }
 
                 & div:nth-child(3) {
-                    background-color: #ff2f2f;
                     box-shadow: 0 0 10px #ff2f2f;
+                    background-color: #ff2f2f;
                 }
             }
 
             &[accent="medium"] {
                 & div:nth-child(2) {
-                    background-color: #ffe82f;
                     box-shadow: 0 0 10px #ffe82f;
+                    background-color: #ffe82f;
                 }
 
                 & div:nth-child(3) {
-                    background-color: #ff2f2f;
                     box-shadow: 0 0 10px #ff2f2f;
+                    background-color: #ff2f2f;
                 }
             }
 
@@ -234,120 +251,109 @@ input {
 
 
 #tempo-knob {
-    user-select: none;
-    position: relative;
     display: flex;
+    position: relative;
+    flex: 1;
     justify-content: center;
     align-items: center;
     margin-top: 0.5rem;
-    flex: 1;
+    user-select: none;
 
     #wheel {
-        position: absolute;
         display: flex;
-        height: var(--diameter);
-        width: var(--diameter);
-        left: calc(50% - var(--diameter)/2);
+        position: absolute;
         top: calc(50% - var(--diameter)/2);
+        left: calc(50% - var(--diameter)/2);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        cursor: pointer;
+        box-shadow: 0 5px 40px black, inset 0 5px 5px rgba(255, 255, 255, 0.4), inset 0 -5px 5px rgba(0, 0, 0, 0.4);
         border-radius: 50%;
         background-color: rgba(255, 255, 255, 0.05);
-        box-shadow: 0 5px 40px black, inset 0 5px 5px rgba(255, 255, 255, 0.4), inset 0 -5px 5px rgba(0, 0, 0, 0.4);
-        justify-content: flex-start;
-        align-items: center;
-        cursor: pointer;
-        z-index: 100;
+        width: var(--diameter);
+        height: var(--diameter);
         font-size: 1rem;
         text-shadow: 0 -1px 1px black;
-        flex-direction: column;
 
         .dnd & {
             color: var(--main-color);
         }
 
-        #tempo-value {
-            padding-top: 2.2rem;
-            padding-bottom: 0.5rem;
-        }
-
         & #play {
-
-            color: rgba(255, 255, 255, 0.3)
-        }
-
-        & #stop {
-
-            color: rgba(255, 255, 255, 0.6)
-        }
-
-        #stop {
-            display: none;
+            position: absolute;
+            top: calc(50% - (var(--diameter) - 3rem)/2);
+            left: calc(50% - (var(--diameter) - 3rem)/2);
+            z-index: -2;
+            clip-path: polygon(0% 0%, 0% 100%, 100% 50%, 100% 50%);
+            transition: all 1s;
+            background: rgba(255, 255, 255, 0.04);
+            width: calc(var(--diameter) - 3rem);
+            height: calc(var(--diameter) - 3rem);
         }
 
         .is-playing & #play {
-            display: none;
-        }
-
-        .is-playing & #stop {
-            display: block;
-
+            clip-path: polygon(0% 0%, 0% 100%, 100% 100%, 100% 0%);
+            background: rgba(255, 255, 255, 0.06);
         }
 
 
         &:before {
-            z-index: 101;
-            height: calc(var(--diameter) - 0.2rem);
-            width: calc(var(--diameter) - 0.2rem);
             position: absolute;
-            content: "";
-            border-radius: 50%;
+            z-index: 101;
             box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.8),
                 inset 0 0 1px 3px rgba(255, 255, 255, 0.3),
                 inset 0 -1px 2px 5px rgba(0, 0, 0, 0.4),
                 inset 0 -2px 40px 5px rgba(0, 0, 0, 0.4);
+            border-radius: 50%;
+            width: calc(var(--diameter) - 0.2rem);
+            height: calc(var(--diameter) - 0.2rem);
 
             pointer-events: none;
+            content: "";
         }
     }
 
     #tempo-knob-inner {
-        height: calc(var(--diameter) + 1rem);
-        width: calc(var(--diameter) + 1rem);
-        border-radius: 50%;
-        background-color: transparent;
-        position: relative;
         display: flex;
+        position: relative;
         justify-content: center;
         align-items: center;
+        border-radius: 50%;
+        background-color: transparent;
+        width: calc(var(--diameter) + 1rem);
+        height: calc(var(--diameter) + 1rem);
 
 
         .value-container {
             position: absolute;
-            height: 0.15rem;
-            width: calc(var(--diameter) + 1rem);
             transform-origin: 50% right;
+            width: calc(var(--diameter) + 1rem);
+            height: 0.15rem;
 
             .value {
                 position: absolute;
-                height: 0.15rem;
-                width: 0.5rem;
-                background-color: rgba(255, 255, 255, 0.1);
                 cursor: pointer;
                 box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.2);
+                background-color: rgba(255, 255, 255, 0.1);
+                width: 0.5rem;
+                height: 0.15rem;
 
 
 
                 &::before {
-                    color: rgba(255, 255, 255, 0.3);
                     position: absolute;
-                    content: attr(data-tempo);
-                    font-size: 0.2rem;
                     left: 0.8rem;
+                    content: attr(data-tempo);
+                    color: rgba(255, 255, 255, 0.3);
+                    font-size: 0.2rem;
                 }
 
                 &:hover,
                 &.highlight {
-                    background-color: var(--main-color);
                     box-shadow: 0 0 6px var(--main-color);
+                    background-color: var(--main-color);
 
                     &::before {
                         color: white
@@ -364,41 +370,41 @@ input {
 }
 
 #subdivisions-container {
-    flex: 1;
     display: flex;
+    flex: 1;
     flex-direction: column;
 
     #subdivisions {
-        flex: 1;
-        user-select: none;
         display: flex;
+        flex: 1;
         justify-content: space-between;
+        user-select: none;
 
         @media screen and (pointer:coarse) and (orientation: landscape) {
             flex-direction: column;
         }
 
         & div {
-            flex: 1;
             display: flex;
+            flex: 1;
 
             & input {
+                position: absolute;
                 visibility: hidden;
-                width: 0;
-                height: 0;
                 margin: 0;
                 padding: 0;
-                position: absolute;
+                width: 0;
+                height: 0;
             }
 
             & label {
+                display: block;
                 flex: 1;
+                cursor: pointer;
                 box-shadow: var(--shadow);
                 background-color: rgba(255, 255, 255, 0.1);
-                text-align: center;
-                cursor: pointer;
                 padding: 0.5rem;
-                display: block;
+                text-align: center;
 
                 &:hover {
                     background-color: rgba(255, 255, 255, 0.08);
@@ -422,9 +428,9 @@ input {
             }
 
             & input:checked+label {
-                background-color: rgba(255, 255, 255, 0.02);
                 box-shadow:
                     inset 1px 1px 1px rgba(0, 0, 0, 0.5);
+                background-color: rgba(255, 255, 255, 0.02);
                 color: var(--main-color);
                 text-shadow: 0 0 5px var(--main-color);
             }
@@ -454,10 +460,10 @@ input {
         flex-direction: column;
 
         #beat-edit {
-            user-select: none;
             display: flex;
             flex: 1;
             justify-content: space-between;
+            user-select: none;
 
             @media screen and (pointer:coarse) and (orientation: landscape) {
                 flex-direction: column;
@@ -465,17 +471,17 @@ input {
             }
 
             & div {
-                flex: 1;
                 display: flex;
-                font-weight: bold;
-                font-size: 0.75rem;
+                display: block;
+                flex: 1;
+                cursor: pointer;
                 box-shadow: var(--shadow);
 
                 background-color: rgba(255, 255, 255, 0.1);
-                text-align: center;
-                cursor: pointer;
                 padding: 0.25rem;
-                display: block;
+                font-weight: bold;
+                font-size: 0.75rem;
+                text-align: center;
 
                 &:first-child {
                     border-radius: 2rem 0rem 0rem 2rem;
@@ -498,8 +504,8 @@ input {
                 }
 
                 &:active {
-                    background-color: rgba(255, 255, 255, 0.02);
                     box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.5);
+                    background-color: rgba(255, 255, 255, 0.02);
                     color: var(--main-color);
                     text-shadow: 0 0 5px var(--main-color);
                 }
@@ -510,40 +516,40 @@ input {
 }
 
 #volume {
+    position: fixed;
 
     @media (pointer:none),
     (pointer:coarse) {
         display: none !important;
     }
 
-    position: absolute;
-    right: -1.2rem;
-    top: 0.5rem;
     --volume-height: 5rem;
     --volume-width: 0.9rem;
 
+    position: absolute;
+    top: 0.5rem;
+    right: 1rem;
+
     & input {
+        position: absolute;
         visibility: hidden;
-        width: 0;
-        height: 0;
         margin: 0;
         padding: 0;
-        position: absolute;
+        width: 0;
+        height: 0;
     }
 
 
     & label {
         display: block;
-        background-color: rgba(255, 255, 255, 0.1);
-        box-sizing: border-box;
         cursor: pointer;
-        font-size: 0.4rem;
-        height: calc(var(--volume-height) / 10);
-        width: var(--volume-width);
-        border-bottom: 3px solid #303030;
+        box-sizing: border-box;
         box-shadow: inset 0 2px px rgba(0, 0, 0, 0.2);
-
-
+        border-bottom: 3px solid #303030;
+        background-color: rgba(255, 255, 255, 0.1);
+        width: var(--volume-width);
+        height: calc(var(--volume-height) / 10);
+        font-size: 0.4rem;
     }
 
     & input:checked~label {
@@ -551,40 +557,40 @@ input {
     }
 
     &::before {
-        pointer-events: none;
-        left: -1px;
         position: absolute;
+        top: 0;
+        left: -1px;
         z-index: 100;
-        content: "";
+        border-right: 0 solid transparent;
+        border-bottom: calc(var(--volume-height) + 2px) solid #404040;
+        border-left: calc(var(--volume-width) + 2px) solid transparent;
         width: 0;
         height: 0;
-        top: 0;
-        border-left: calc(var(--volume-width) + 2px) solid transparent;
-        border-right: 0 solid transparent;
-        border-bottom: calc(var(--volume-height) + 2px) solid #303030;
+        pointer-events: none;
+        content: "";
     }
 }
 
 #tap-tempo {
-    flex: 1;
     display: flex;
-    align-items: center;
+    flex: 1;
     justify-content: center;
-    user-select: none;
+    align-items: center;
+    cursor: pointer;
     box-shadow: var(--shadow);
     border-radius: 2rem;
     background-color: rgba(255, 255, 255, 0.1);
-    text-align: center;
-    cursor: pointer;
     padding: 0.25rem;
+    user-select: none;
+    text-align: center;
 
     &:hover {
         background-color: rgba(255, 255, 255, 0.08);
     }
 
     &:active {
+        background-color: rgba(255, 255, 255, 0.02);
         color: var(--main-color);
         text-shadow: 0 0 5px var(--main-color);
-        background-color: rgba(255, 255, 255, 0.02);
     }
 }

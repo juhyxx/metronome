@@ -175,7 +175,8 @@ class View {
             index = (event.deltaY < 0) ? index + 1 : index - 1;
             index = limit(index, 0, inputs.length - 1);
             inputs[index].click();
-        }, { passive: true });
+            event.preventDefault()
+        });
 
         this.#volume.addEventListener('change', (event) => {
             this.model.volume = parseInt(event.target.value, 10)
@@ -217,7 +218,8 @@ class View {
         }
         document.querySelector('#tempo-knob').addEventListener("wheel", (event) => {
             this.setTempo((event.deltaY > 0) ? model.tempo + 10 : model.tempo - 10);
-        }, { passive: true });
+            event.preventDefault()
+        });
         document.querySelector('#wheel').addEventListener('click', () => {
             document.querySelector("body").classList.toggle("is-playing")
             run()
