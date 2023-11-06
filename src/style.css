@@ -3,7 +3,6 @@
 :root {
     --main-color: rgb(173, 255, 47);
     --diameter: 6rem;
-
     --shadow: inset 2px 2px 2px rgba(255, 255, 255, 0.2),
         inset -2px -2px 2px rgba(0, 0, 0, 0.3),
         inset 1px -1px 20px rgba(0, 0, 0, 0.3),
@@ -49,7 +48,6 @@ body {
 }
 
 
-
 h1 {
     margin: 0;
     padding: 0;
@@ -75,21 +73,21 @@ input {
     text-align: center;
 }
 
-
 #metronome {
     display: flex;
     position: relative;
     flex-direction: column;
-
     box-shadow: inset 0px 0px 0px 1px rgba(255, 255, 255, 0.2),
         0px 3px 5px rgba(0, 0, 0, 0.7),
         5px 5px 20px 10px rgba(0, 0, 0, 0.4);
     border-radius: 0.25rem;
+    background: radial-gradient(circle, #202020 49%, #090909 100%);
+    background: radial-gradient(farthest-corner at right bottom, transparent 0%, transparent 70%, rgba(255, 255, 255, 0.03) 70%),
+        radial-gradient(circle, #202020 49%, #090909 100%);
     background-color: #202020;
     padding: 0.5rem;
     min-width: 8rem;
     overflow: hidden;
-
 
     @media only screen and (max-device-width: 700px) {
         flex: 1;
@@ -99,8 +97,6 @@ input {
         padding: 0.5rem;
         min-width: auto;
     }
-
-
 
     & header {
         display: flex;
@@ -126,28 +122,8 @@ input {
                 display: flex;
                 flex-direction: column;
                 gap: 0.5rem;
+                font-size: 0.4rem;
             }
-        }
-    }
-
-    &:before {
-        position: absolute;
-        top: -2rem;
-        left: -2rem;
-        z-index: 0;
-        border-top-left-radius: 20rem;
-        background-color: rgba(0, 0, 0, 0.2);
-        width: 200%;
-        height: 120vh;
-        pointer-events: none;
-        content: "";
-    }
-
-    @media screen and (pointer:coarse) and (orientation: landscape) {
-        &:before {
-            top: -1rem;
-            left: -1rem;
-            width: 800%;
         }
     }
 }
@@ -316,7 +292,6 @@ input {
             background: rgba(255, 255, 255, 0.06);
         }
 
-
         &:before {
             position: absolute;
             z-index: 101;
@@ -368,7 +343,7 @@ input {
 
                 &:hover,
                 &.highlight {
-                    box-shadow: 0 0 6px var(--main-color);
+                    box-shadow: 0 0 10px var(--main-color);
                     background-color: var(--main-color);
 
                     &::before {
@@ -448,9 +423,6 @@ input {
     display: flex;
     flex: 1;
     justify-content: space-between;
-
-
-
     gap: 0.5rem;
 
     &>:first-child {
@@ -467,8 +439,6 @@ input {
             justify-content: space-between;
             user-select: none;
 
-
-
             & div {
                 display: flex;
                 display: block;
@@ -484,14 +454,10 @@ input {
 
                 &:first-child {
                     border-radius: 2rem 0rem 0rem 2rem;
-
-
                 }
 
                 &:last-child {
                     border-radius: 0rem 2rem 2rem 0rem;
-
-
                 }
 
                 &:hover {
@@ -510,61 +476,6 @@ input {
     }
 }
 
-#volume {
-    position: fixed;
-
-    @media (pointer:none),
-    (pointer:coarse) {
-        display: none !important;
-    }
-
-    --volume-height: 5rem;
-    --volume-width: 0.9rem;
-
-    position: absolute;
-    top: 0.5rem;
-    right: 1rem;
-
-    & input {
-        position: absolute;
-        visibility: hidden;
-        margin: 0;
-        padding: 0;
-        width: 0;
-        height: 0;
-    }
-
-
-    & label {
-        display: block;
-        cursor: pointer;
-        box-sizing: border-box;
-        box-shadow: inset 0 2px px rgba(0, 0, 0, 0.2);
-        border-bottom: 3px solid #303030;
-        background-color: rgba(255, 255, 255, 0.1);
-        width: var(--volume-width);
-        height: calc(var(--volume-height) / 10);
-        font-size: 0.4rem;
-    }
-
-    & input:checked~label {
-        background-color: rgb(173, 255, 47, 0.5);
-    }
-
-    &::before {
-        position: absolute;
-        top: 0;
-        left: -1px;
-        z-index: 100;
-        border-right: 0 solid transparent;
-        border-bottom: calc(var(--volume-height) + 2px) solid #404040;
-        border-left: calc(var(--volume-width) + 2px) solid transparent;
-        width: 0;
-        height: 0;
-        pointer-events: none;
-        content: "";
-    }
-}
 
 #tap-tempo {
     display: flex;
@@ -587,5 +498,59 @@ input {
         background-color: rgba(255, 255, 255, 0.02);
         color: var(--main-color);
         text-shadow: 0 0 5px var(--main-color);
+    }
+}
+
+#volume {
+    position: fixed;
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+
+    @media (pointer:none),
+    (pointer:coarse) {
+        display: none !important;
+    }
+
+    --volume-height: 5rem;
+    --volume-width: 0.9rem;
+
+    & input {
+        position: absolute;
+        visibility: hidden;
+        margin: 0;
+        padding: 0;
+        width: 0;
+        height: 0;
+    }
+
+    & label {
+        display: block;
+        cursor: pointer;
+        box-sizing: border-box;
+        box-shadow: inset 0 2px px rgba(0, 0, 0, 0.2);
+        border-bottom: 3px solid #303030;
+        background-color: rgba(255, 255, 255, 0.1);
+        width: var(--volume-width);
+        height: calc(var(--volume-height) / 10);
+        font-size: 0.4rem;
+    }
+
+    & input:checked~label {
+        background-color: rgb(173, 255, 47, 0.5);
+    }
+
+    &::before {
+        position: absolute;
+        top: 0;
+        left: -1px;
+        z-index: 0;
+        border-right: 0 solid transparent;
+        border-right: calc(var(--volume-width) + 2px) solid transparent;
+        border-bottom: calc(var(--volume-height) + 2px) solid #404040;
+        width: 0;
+        height: 0;
+        pointer-events: none;
+        content: "";
     }
 }
