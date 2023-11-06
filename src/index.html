@@ -57,55 +57,54 @@
             </div>
         </header>
         <div id="metronome-inner">
-
-
-
             <section id=selector></section>
 
-            <section id="tempo-knob">
-                <div id="wheel">
-                    <div id="tempo-value"></div>
-                    <div id="play"></div>
-                </div>
-                <div id="tempo-knob-inner">
-                </div>
-            </section>
+            <div id="controls">
+                <section id="tempo-knob">
+                    <div id="wheel">
+                        <div id="tempo-value"></div>
+                        <div id="play"></div>
+                    </div>
+                    <div id="tempo-knob-inner">
+                    </div>
+                </section>
 
+                <div id="buttons">
+                    <section id="subdivisions-container">
+                        <h2>Subdivisions</h2>
+                        <div id="subdivisions">
+                            <div>
+                                <input type="radio" id=sub0 name="sublabel" value="1" checked>
+                                <label for="sub0">Off</label>
+                            </div>
+                            <div>
+                                <input type="radio" id="sub2" name="sublabel" value="2">
+                                <label for="sub2">1/8<br></label>
+                            </div>
+                            <div>
+                                <input type="radio" id="sub3" name="sublabel" value="3">
+                                <label for="sub3">1/3</label>
+                            </div>
+                            <div>
+                                <input type="radio" id="sub4" name="sublabel" value="4">
+                                <label for="sub4">1/16</label>
+                            </div>
+                        </div>
+                    </section>
 
-            <section id="subdivisions-container">
-                <h2>Subdivisions</h2>
-                <div id="subdivisions">
-                    <div>
-                        <input type="radio" id=sub0 name="sublabel" value="1" checked>
-                        <label for="sub0">Off</label>
-                    </div>
-                    <div>
-                        <input type="radio" id="sub2" name="sublabel" value="2">
-                        <label for="sub2">1/8<br></label>
-                    </div>
-                    <div>
-                        <input type="radio" id="sub3" name="sublabel" value="3">
-                        <label for="sub3">1/3</label>
-                    </div>
-                    <div>
-                        <input type="radio" id="sub4" name="sublabel" value="4">
-                        <label for="sub4">1/16</label>
-                    </div>
+                    <section id="beat-container">
+                        <div id="beat-subcontainer">
+                            <h2>Beats</h2>
+                            <div id="beat-edit">
+                                <div id="add">+</div>
+                                <div id="remove">−</div>
+                            </div>
+                        </div>
+                        <div id="tap-tempo">TAP</div>
+                    </section>
                 </div>
-            </section>
-
-            <section id="beat-container">
-                <div id="beat-subcontainer">
-                    <h2>Beats</h2>
-                    <div id="beat-edit">
-                        <div id="add">+</div>
-                        <div id="remove">−</div>
-                    </div>
-                </div>
-                <div id="tap-tempo">TAP</div>
-            </section>
+            </div>
         </div>
-
 
 
 

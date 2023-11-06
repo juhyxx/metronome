@@ -15,7 +15,7 @@
     }
 
     @media screen and (pointer:coarse) and (orientation: landscape) {
-        --diameter: 55vh;
+        --diameter: 35vh;
         font-size: 10vh;
     }
 }
@@ -80,7 +80,7 @@ input {
     display: flex;
     position: relative;
     flex-direction: column;
-    gap: 0.5rem;
+
     box-shadow: inset 0px 0px 0px 1px rgba(255, 255, 255, 0.2),
         0px 3px 5px rgba(0, 0, 0, 0.7),
         5px 5px 20px 10px rgba(0, 0, 0, 0.4);
@@ -88,38 +88,49 @@ input {
     background-color: #202020;
     padding: 0.5rem;
     min-width: 8rem;
+    overflow: hidden;
 
 
     @media only screen and (max-device-width: 700px) {
         flex: 1;
         justify-content: space-between;
-        gap: 0.25rem;
         box-shadow: none;
         border-radius: 0;
         padding: 0.5rem;
         min-width: auto;
     }
 
-    overflow: hidden;
+
 
     & header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 0.25rem;
     }
 
     #metronome-inner {
         display: flex;
+        flex: 1;
         flex-direction: column;
         gap: 0.5rem;
 
         @media screen and (pointer:coarse) and (orientation: landscape) {
             flex-direction: row;
         }
+
+        #controls {
+            display: flex;
+            flex-direction: column;
+
+            #buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
     }
 
-    &::before {
+    &:before {
         position: absolute;
         top: -2rem;
         left: -2rem;
@@ -129,7 +140,15 @@ input {
         width: 200%;
         height: 120vh;
         pointer-events: none;
-        content: "x";
+        content: "";
+    }
+
+    @media screen and (pointer:coarse) and (orientation: landscape) {
+        &:before {
+            top: -1rem;
+            left: -1rem;
+            width: 800%;
+        }
     }
 }
 
@@ -137,7 +156,7 @@ input {
 
 #selector {
     display: flex;
-    flex: 3;
+    flex: 2;
     justify-content: space-between;
     gap: 0.1rem;
     user-select: none;
@@ -256,7 +275,6 @@ input {
     flex: 1;
     justify-content: center;
     align-items: center;
-    margin-top: 0.5rem;
     user-select: none;
 
     #wheel {
@@ -340,8 +358,6 @@ input {
                 width: 0.5rem;
                 height: 0.15rem;
 
-
-
                 &::before {
                     position: absolute;
                     left: 0.8rem;
@@ -380,10 +396,6 @@ input {
         justify-content: space-between;
         user-select: none;
 
-        @media screen and (pointer:coarse) and (orientation: landscape) {
-            flex-direction: column;
-        }
-
         & div {
             display: flex;
             flex: 1;
@@ -406,25 +418,18 @@ input {
                 padding: 0.5rem;
                 text-align: center;
 
-                &:hover {
-                    background-color: rgba(255, 255, 255, 0.08);
-                }
             }
 
             &:nth-child(1) label {
                 border-radius: 2rem 0rem 0rem 2rem;
 
-                @media screen and (pointer:coarse) and (orientation: landscape) {
-                    border-radius: 2rem 2rem 0rem 0rem;
-                }
+
             }
 
             &:last-child label {
                 border-radius: 0rem 2rem 2rem 0rem;
 
-                @media screen and (pointer:coarse) and (orientation: landscape) {
-                    border-radius: 0rem 0rem 2rem 2rem;
-                }
+
             }
 
             & input:checked+label {
@@ -444,15 +449,12 @@ input {
     flex: 1;
     justify-content: space-between;
 
-    @media screen and (pointer:coarse) and (orientation: landscape) {
-        flex-direction: column;
-    }
+
 
     gap: 0.5rem;
 
     &>:first-child {
-        flex: 3;
-
+        flex: 1;
     }
 
     #beat-subcontainer {
@@ -465,10 +467,7 @@ input {
             justify-content: space-between;
             user-select: none;
 
-            @media screen and (pointer:coarse) and (orientation: landscape) {
-                flex-direction: column;
-                justify-content: space-between;
-            }
+
 
             & div {
                 display: flex;
@@ -486,17 +485,13 @@ input {
                 &:first-child {
                     border-radius: 2rem 0rem 0rem 2rem;
 
-                    @media screen and (pointer:coarse) and (orientation: landscape) {
-                        border-radius: 2rem 2rem 0rem 0rem;
-                    }
+
                 }
 
                 &:last-child {
                     border-radius: 0rem 2rem 2rem 0rem;
 
-                    @media screen and (pointer:coarse) and (orientation: landscape) {
-                        border-radius: 0rem 0rem 2rem 2rem;
-                    }
+
                 }
 
                 &:hover {
