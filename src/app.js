@@ -12,9 +12,10 @@ class Model {
     subdivisions = 1;
     #volume = 0.8;
     #isPlaying = false;
-    #delay = 0.5
-    #lastTime = undefined
-    #taptempo = []
+    #delay = 0.5;
+    #lastTime = undefined;
+    #taptempo = [];
+    #wakeLock = undefined;
 
     get volume() {
         return this.#volume;
@@ -33,7 +34,6 @@ class Model {
         value = limit(value, 40, 260);
         this.#tempo = value;
         this.#delay = 60 / this.tempo;
-
     }
 
     get tempo() {
@@ -53,6 +53,16 @@ class Model {
     }, {
         accent: Accent.value.LOW,
     }]
+
+    wakeLock() {
+        navigator.wakeLock.request("screen").finally(wakeLock => {
+            this.#wakeLock = wakeLock;
+        });
+    }
+
+    wakeUnlock() {
+        this.#wakeLock = null;
+    }
 
     addBeat() {
         const count = Math.min(this.beats.length + 1, 10);
@@ -222,7 +232,7 @@ class View {
             event.preventDefault()
         });
         document.querySelector('#wheel').addEventListener('click', () => {
-            document.querySelector("body").classList.toggle("is-playing")
+            document.querySelector("body").classList.toggle("is-playing");
             run()
         });
         document.querySelector('#wheel').addEventListener('mousedown', (event) => {
@@ -269,12 +279,17 @@ class View {
 let model = new Model();
 
 window.addEventListener('DOMContentLoaded', () => {
+
     new View(model);
 });
 
 
 async function run() {
-    if (!model.toggleIsPlaying()) return;
+    if (!model.toggleIsPlaying()) {
+        model.wakeUnlock();
+        return;
+    };
+    model.wakeLock()
     const audioContext = new AudioContext();
     let counter = 0;
 
