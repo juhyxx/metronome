@@ -11,11 +11,28 @@ class Model {
     #tempo = 120;
     subdivisions = 1;
     #volume = 0.8;
-    #isPlaying = false;
+
     #delay = 0.5;
     #lastTime = undefined;
     #taptempo = [];
     #wakeLock = undefined;
+    #maxTempo = 280;
+    #minTempo = 40;
+    #sound = undefined;
+
+    set sound(item) {
+        this.#sound = item;
+    }
+    get sound() {
+        return this.#sound;
+    }
+
+    get maxTempo() {
+        return this.#maxTempo;
+    }
+    get minTempo() {
+        return this.#minTempo;
+    }
 
     get volume() {
         return this.#volume;
@@ -31,7 +48,7 @@ class Model {
     }
 
     set tempo(value) {
-        value = limit(value, 40, 260);
+        value = limit(value, this.#minTempo, this.#maxTempo);
         this.#tempo = value;
         this.#delay = 60 / this.tempo;
     }
@@ -74,14 +91,6 @@ class Model {
             this.beats.pop();
         }
     }
-
-    toggleIsPlaying() {
-        return this.#isPlaying = !this.#isPlaying;
-    }
-    get isPlaying() {
-        return this.#isPlaying
-    }
-
 
     tapTempo() {
         const now = Date.now();
@@ -139,7 +148,6 @@ class View {
         return this.#model;
     }
 
-
     constructor(model) {
         this.#model = model;
         this.#beatSelector = document.querySelector('#selector')
@@ -168,7 +176,6 @@ class View {
         });
 
         document.querySelector('#subdivisions').addEventListener('change', (event) => {
-            console.log("change", event.target.value)
             this.model.subdivisions = parseInt(event.target.value, 10);
             document.querySelector('#subcounter').innerHTML = this.model.subdivisions;
         });
@@ -218,14 +225,15 @@ class View {
     }
 
     renderTempoSelector() {
-        const range = ((260 - 40) / 10);
-        const angleSize = (180 + 2 * 40) / range;
+        const rangeAngle = 50;
+        const range = ((this.model.maxTempo - this.model.minTempo) / 10);
+        const angleSize = (180 + 2 * rangeAngle) / range;
 
         for (let i = 0; i <= range; i++) {
             const el = document.createElement('div');
             const subel = document.createElement('div');
-            const angle = (i * angleSize) - 40;
-            const tempo2select = (i * 10) + 40;
+            const angle = (i * angleSize) - rangeAngle;
+            const tempo2select = (i * 10) + this.model.minTempo;
 
             el.className = "value-container";
             subel.className = "value";
@@ -240,12 +248,19 @@ class View {
             document.querySelector('#tempo-knob-inner').appendChild(el);
         }
         document.querySelector('#tempo-knob').addEventListener("wheel", (event) => {
-            this.setTempo((event.deltaY > 0) ? model.tempo + 10 : model.tempo - 10);
+            let tempo = Math.round(Math.round(model.tempo / 10) * 10)
+            this.setTempo((event.deltaY > 0) ? tempo + 10 : tempo - 10);
             event.preventDefault()
         });
         document.querySelector('#wheel').addEventListener('click', () => {
             document.querySelector("body").classList.toggle("is-playing");
-            run()
+            if (this.model.sound) {
+                this.model.sound.stop()
+                this.model.sound = undefined
+            }
+            else {
+                this.model.sound = new SoundManager(this)
+            }
         });
         document.querySelector('#wheel').addEventListener('mousedown', (event) => {
             document.querySelector('body').classList.add("dnd");
@@ -286,101 +301,122 @@ class View {
             this.#beatSelector.appendChild(el);
         });
     }
+
+    removeHighlight(counter) {
+        document.querySelectorAll('#selector .highlight').forEach((el) => el.classList.remove('highlight'));
+        let elToSelect = document.querySelector(`#selector >div:nth-child(${counter + 1})`);
+        if (elToSelect) {
+            elToSelect.classList.add('highlight');
+        }
+
+        document.querySelector('#counter').innerHTML = counter + 1;
+        document.querySelector('#subcounter').innerHTML = 1;
+    }
 }
 
 let model = new Model();
 
 window.addEventListener('DOMContentLoaded', () => {
-
     new View(model);
 });
 
-
-async function run() {
-    if (!model.toggleIsPlaying()) {
-        model.wakeUnlock();
-        return;
-    };
-    model.wakeLock()
-    const audioContext = new AudioContext();
-    let counter = 0;
-
-    function playTone(t) {
-
-        const oscillator = audioContext.createOscillator();
-        const gainNode = new GainNode(audioContext);
-        const note = Object.assign({}, model.beats[counter]);
-        let noteOff = false;
-        let frequency = 880;
-        switch (note.accent) {
-            case Accent.value.HIGH:
-                frequency = 880;
-                break;
-            case Accent.value.MEDIUM:
-                frequency = 600;
-                break;
-            case Accent.value.LOW:
-                frequency = 440;
-                break;
-            case Accent.value.NONE:
-                noteOff = true;
-                break;
-        }
-        const startTime = t + model.delay;
-        const endTime = startTime + 0.06;
-
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        oscillator.addEventListener('ended', (event) => {
-            if (model.isPlaying) {
-                playTone(startTime);
-            }
-
-            setTimeout(() => {
-                document.querySelectorAll('#selector .highlight').forEach((el) => el.classList.remove('highlight'));
-                document.querySelector(`#selector >div:nth-child(${event.target.counter + 1})`).classList.add('highlight');
-                document.querySelector('#counter').innerHTML = event.target.counter + 1;
-                document.querySelector('#subcounter').innerHTML = 1;
-            }, startTime - audioContext.currentTime);
-        });
-
-        oscillator.frequency.setValueAtTime(frequency, startTime);
-        gainNode.gain.setValueAtTime(noteOff ? -1 : model.volume, startTime);
-        oscillator.connect(audioContext.destination);
-        oscillator.start(startTime);
-        oscillator.stop(endTime);
-        gainNode.gain.linearRampToValueAtTime(-1, endTime - 0.01);
-
-        oscillator.counter = counter;
-        if (model.subdivisions > 1) {
-            for (let i = 1; i < model.subdivisions; i++) {
-                const subOscillator = audioContext.createOscillator();
-                const gainSubNode = new GainNode(audioContext);
-
-                subOscillator.connect(gainSubNode);
-                gainSubNode.connect(audioContext.destination);
-                subOscillator.frequency.setValueAtTime(220, startTime);
-                subOscillator.connect(audioContext.destination);
-                subdivisionsStartTime = startTime + i * (model.delay / model.subdivisions);
-                subOscillator.start(subdivisionsStartTime);
-                subOscillator.stop(subdivisionsStartTime + 0.03);
-                gainSubNode.gain.setValueAtTime(Math.max(model.volume - 0.4, -1), subdivisionsStartTime);
-                gainSubNode.gain.linearRampToValueAtTime(-1, subdivisionsStartTime + 0.02);
-                subOscillator.subdivision = i;
-                subOscillator.addEventListener('ended', (event) => {
-                    setTimeout(() => {
-                        document.querySelector('#subcounter').innerHTML = event.target.subdivision + 1;
-                    }, startTime - audioContext.currentTime);
-                });
-            }
-        }
-        counter++;
-        if (counter >= model.beats.length) {
-            counter = 0;
-        }
+class SoundManager {
+    #counter = 0
+    #isPlaying = true;
+    #audioContext = undefined;
+    #noteFreq = {
+        [Accent.value.HIGH]: 880,
+        [Accent.value.MEDIUM]: 600,
+        [Accent.value.LOW]: 440,
+        [Accent.value.NONE]: 440,
     }
 
-    if (audioContext) {
-        playTone(audioContext.currentTime);
+    stop() {
+        this.#isPlaying = false;
+        this.model.wakeUnlock();
+    }
+
+    constructor(view) {
+        this.model = view.model;
+        this.view = view;
+        this.model.wakeLock()
+        this.#audioContext = new AudioContext();
+        this.planNextBeat(this.#audioContext.currentTime);
+    }
+
+    get counter() {
+        return this.#counter
+    }
+
+    planNextBeat(t) {
+        if (!this.#isPlaying) return;
+
+        const startTime = t + this.model.delay;
+        const endTime = startTime + 0.06;
+
+        const oscillator = new OscillatorNode(this.#audioContext, { "type": "sine" });
+        const gainNode = new GainNode(this.#audioContext);
+        const beat = this.model.beats[this.counter] ? this.model.beats[this.counter] : this.model.beats[0];
+        const frequency = this.#noteFreq[beat.accent];
+
+        oscillator.counter = this.counter;
+        oscillator.startTime = startTime;
+
+        oscillator.connect(gainNode);
+        gainNode.connect(this.#audioContext.destination);
+        oscillator.connect(this.#audioContext.destination);
+
+        oscillator.frequency.setValueAtTime(frequency, startTime);
+        gainNode.gain.setValueAtTime(beat.accent === Accent.value.NONE ? -1 : this.model.volume, startTime);
+        gainNode.gain.linearRampToValueAtTime(-1, endTime - 0.01);
+
+        oscillator.start(startTime);
+        oscillator.stop(endTime);
+
+        oscillator.addEventListener('ended', this.onOscilatorEnd.bind(this));
+
+        if (this.model.subdivisions > 1) {
+            for (let i = 1; i < this.model.subdivisions; i++) {
+                const subdivisionsStartTime = startTime + i * (this.model.delay / this.model.subdivisions);
+                const subOscillator = this.#audioContext.createOscillator();
+                const gainSubNode = new GainNode(this.#audioContext);
+
+                subOscillator.subdivision = i;
+                subOscillator.startTime = startTime;
+
+                subOscillator.connect(gainSubNode);
+                gainSubNode.connect(this.#audioContext.destination);
+                subOscillator.connect(this.#audioContext.destination);
+
+                subOscillator.frequency.setValueAtTime(220, startTime);
+                gainSubNode.gain.setValueAtTime(Math.max(this.model.volume - 0.4, -1), subdivisionsStartTime);
+                gainSubNode.gain.linearRampToValueAtTime(-1, subdivisionsStartTime + 0.02);
+
+                subOscillator.start(subdivisionsStartTime);
+                subOscillator.stop(subdivisionsStartTime + 0.03);
+                subOscillator.addEventListener('ended', this.onSubOscilatorEnd.bind(this));
+            }
+        }
+        this.increaseCounter()
+    }
+
+    onOscilatorEnd(event) {
+        let startTime = event.target.startTime;
+
+        setTimeout(() => { this.view.removeHighlight(event.target.counter) }, startTime - this.#audioContext.currentTime);
+        this.planNextBeat(startTime);
+    }
+
+    onSubOscilatorEnd(event) {
+        setTimeout(() => {
+            document.querySelector('#subcounter').innerHTML = event.target.subdivision + 1;
+        }, event.target.startTime - this.#audioContext.currentTime);
+    }
+
+    increaseCounter() {
+        this.#counter++;
+        if (this.#counter >= this.model.beats.length) {
+            this.#counter = 0;
+        }
     }
 }

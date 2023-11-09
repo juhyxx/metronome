@@ -296,6 +296,7 @@ input {
         .is-playing & #play {
             clip-path: polygon(0% 0%, 0% 100%, 100% 100%, 100% 0%);
             animation: spin 4s linear infinite;
+            animation-delay: 0.5s;
             background: rgba(255, 255, 255, 0.06);
         }
     }
