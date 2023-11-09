@@ -242,7 +242,10 @@ class View {
 
             subel.addEventListener("click", (event) => {
                 this.setTempo(parseInt(event.target.dataset.tempo, 10));
-            })
+            });
+            subel.addEventListener("touchstart", (event) => {
+                this.setTempo(parseInt(event.target.dataset.tempo, 10));
+            });
             el.style.transform = `rotate(${angle}deg)`;
             el.append(subel);
             document.querySelector('#tempo-knob-inner').appendChild(el);
