@@ -168,8 +168,19 @@ class View {
         });
 
         document.querySelector('#subdivisions').addEventListener('change', (event) => {
+            console.log("change", event.target.value)
             this.model.subdivisions = parseInt(event.target.value, 10);
             document.querySelector('#subcounter').innerHTML = this.model.subdivisions;
+        });
+        document.querySelector('#subdivisions').addEventListener('click', (event) => {
+            let value = event.target.closest('div').querySelector("input").value
+            if (this.model.subdivisions == parseInt(value, 10)) {
+                this.model.subdivisions = 0;
+
+                event.preventDefault();
+                event.stopPropagation();
+                document.querySelector("#sub0").checked = true
+            }
         });
         this.renderTempoSelector();
         this.renderBeatSelector();
