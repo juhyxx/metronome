@@ -37,6 +37,7 @@ body {
         padding: 0rem;
     }
 
+    touch-action: none;
 
 }
 
