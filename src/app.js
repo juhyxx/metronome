@@ -279,6 +279,23 @@ class View {
             document.querySelector('body').classList.remove("dnd");
             this.#dndY = undefined;
         }, { passive: true });
+
+
+        document.querySelector('#wheel').addEventListener('touchstart', (event) => {
+            document.querySelector('body').classList.add("dnd");
+            this.#dndY = event.touches[0].clientY;
+        }, { passive: true });
+        document.querySelector('body').addEventListener('touchmove', (event) => {
+            if (this.#dndY) {
+                let diff = Math.round((this.#dndY - event.touches[0].clientY) / 4);
+                this.setTempo((this.model.tempo + diff));
+                this.#dndY = event.touches[0].clientY;
+            }
+        }, { passive: true });
+        document.querySelector('body').addEventListener('touchend', (event) => {
+            document.querySelector('body').classList.remove("dnd");
+            this.#dndY = undefined;
+        }, { passive: true });
     }
 
     renderBeatSelector() {
