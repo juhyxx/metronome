@@ -36,6 +36,8 @@ body {
         background-color: #151515;
         padding: 0rem;
     }
+
+
 }
 
 .dnd {
@@ -44,7 +46,10 @@ body {
 }
 
 * {
+    -webkit-user-select: none;
     font-family: 'Silkscreen', sans-serif;
+    /* Safari */
+    user-select: none;
 }
 
 
@@ -80,7 +85,7 @@ input {
     box-shadow: inset 0px 0px 0px 1px rgba(255, 255, 255, 0.2),
         0px 3px 5px rgba(0, 0, 0, 0.7),
         5px 5px 20px 10px rgba(0, 0, 0, 0.4);
-    border-radius: 0.25rem;
+    border-radius: 0.5rem;
     background: radial-gradient(circle, #202020 49%, #090909 100%);
     background: radial-gradient(farthest-corner at right bottom, transparent 0%, transparent 70%, rgba(255, 255, 255, 0.03) 70%),
         radial-gradient(circle, #202020 49%, #090909 100%);
@@ -135,7 +140,6 @@ input {
     flex: 2;
     justify-content: space-between;
     gap: 0.1rem;
-    user-select: none;
 
     >div {
         display: flex;
@@ -146,7 +150,6 @@ input {
         cursor: pointer;
         min-height: 4rem;
         text-align: center;
-
 
 
         @media screen and (pointer:coarse) and (orientation: landscape) {
@@ -248,7 +251,6 @@ input {
     flex: 1;
     justify-content: center;
     align-items: center;
-    user-select: none;
 
     #wheel {
         display: flex;
@@ -332,7 +334,7 @@ input {
                     left: 0.8rem;
                     content: attr(data-tempo);
                     color: rgba(255, 255, 255, 0.3);
-                    font-size: 0.2rem;
+                    font-size: 0.23rem;
                 }
 
                 &:hover,
@@ -369,7 +371,7 @@ input#tempo {
         display: flex;
         flex: 1;
         justify-content: space-between;
-        user-select: none;
+
 
         & div {
             display: flex;
@@ -443,7 +445,6 @@ input#tempo {
             display: flex;
             flex: 1;
             justify-content: space-between;
-            user-select: none;
 
             & div {
                 display: flex;
@@ -493,7 +494,6 @@ input#tempo {
     border-radius: 2rem;
     background-color: rgba(255, 255, 255, 0.1);
     padding: 0.25rem;
-    user-select: none;
     text-align: center;
 
     &:hover {

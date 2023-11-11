@@ -183,7 +183,6 @@ class View {
             let value = event.target.closest('div').querySelector("input").value
             if (this.model.subdivisions == parseInt(value, 10)) {
                 this.model.subdivisions = 0;
-
                 event.preventDefault();
                 event.stopPropagation();
                 document.querySelector("#sub0").checked = true
@@ -262,7 +261,7 @@ class View {
                 this.model.sound = undefined
             }
             else {
-                this.model.sound = new SoundManager(this)
+                this.model.sound = new SynthSound1(this)
             }
         });
         document.querySelector('#wheel').addEventListener('mousedown', (event) => {
@@ -323,11 +322,11 @@ window.addEventListener('DOMContentLoaded', () => {
     new View(model);
 });
 
-class SoundManager {
+class SynthSound1 {
     #counter = 0
-    #isPlaying = true;
-    #audioContext = undefined;
-    #noteFreq = {
+    isPlaying = true;
+    audioContext = undefined;
+    noteFreq = {
         [Accent.value.HIGH]: 880,
         [Accent.value.MEDIUM]: 600,
         [Accent.value.LOW]: 440,
@@ -335,7 +334,7 @@ class SoundManager {
     }
 
     stop() {
-        this.#isPlaying = false;
+        this.isPlaying = false;
         this.model.wakeUnlock();
     }
 
@@ -343,8 +342,8 @@ class SoundManager {
         this.model = view.model;
         this.view = view;
         this.model.wakeLock()
-        this.#audioContext = new AudioContext();
-        this.planNextBeat(this.#audioContext.currentTime);
+        this.audioContext = new AudioContext();
+        this.planNextBeat(this.audioContext.currentTime);
     }
 
     get counter() {
@@ -352,22 +351,22 @@ class SoundManager {
     }
 
     planNextBeat(t) {
-        if (!this.#isPlaying) return;
+        if (!this.isPlaying) return;
 
         const startTime = t + this.model.delay;
         const endTime = startTime + 0.06;
 
-        const oscillator = new OscillatorNode(this.#audioContext, { "type": "sine" });
-        const gainNode = new GainNode(this.#audioContext);
+        const oscillator = new OscillatorNode(this.audioContext, { "type": "sine" });
+        const gainNode = new GainNode(this.audioContext);
         const beat = this.model.beats[this.counter] ? this.model.beats[this.counter] : this.model.beats[0];
-        const frequency = this.#noteFreq[beat.accent];
+        const frequency = this.noteFreq[beat.accent];
 
         oscillator.counter = this.counter;
         oscillator.startTime = startTime;
 
         oscillator.connect(gainNode);
-        gainNode.connect(this.#audioContext.destination);
-        oscillator.connect(this.#audioContext.destination);
+        gainNode.connect(this.audioContext.destination);
+        oscillator.connect(this.audioContext.destination);
 
         oscillator.frequency.setValueAtTime(frequency, startTime);
         gainNode.gain.setValueAtTime(beat.accent === Accent.value.NONE ? -1 : this.model.volume, startTime);
@@ -381,15 +380,15 @@ class SoundManager {
         if (this.model.subdivisions > 1) {
             for (let i = 1; i < this.model.subdivisions; i++) {
                 const subdivisionsStartTime = startTime + i * (this.model.delay / this.model.subdivisions);
-                const subOscillator = this.#audioContext.createOscillator();
-                const gainSubNode = new GainNode(this.#audioContext);
+                const subOscillator = this.audioContext.createOscillator();
+                const gainSubNode = new GainNode(this.audioContext);
 
                 subOscillator.subdivision = i;
                 subOscillator.startTime = startTime;
 
                 subOscillator.connect(gainSubNode);
-                gainSubNode.connect(this.#audioContext.destination);
-                subOscillator.connect(this.#audioContext.destination);
+                gainSubNode.connect(this.audioContext.destination);
+                subOscillator.connect(this.audioContext.destination);
 
                 subOscillator.frequency.setValueAtTime(220, startTime);
                 gainSubNode.gain.setValueAtTime(Math.max(this.model.volume - 0.4, -1), subdivisionsStartTime);
@@ -406,14 +405,14 @@ class SoundManager {
     onOscilatorEnd(event) {
         let startTime = event.target.startTime;
 
-        setTimeout(() => { this.view.removeHighlight(event.target.counter) }, startTime - this.#audioContext.currentTime);
+        setTimeout(() => { this.view.removeHighlight(event.target.counter) }, startTime - this.audioContext.currentTime);
         this.planNextBeat(startTime);
     }
 
     onSubOscilatorEnd(event) {
         setTimeout(() => {
             document.querySelector('#subcounter').innerHTML = event.target.subdivision + 1;
-        }, event.target.startTime - this.#audioContext.currentTime);
+        }, event.target.startTime - this.audioContext.currentTime);
     }
 
     increaseCounter() {
@@ -423,3 +422,4 @@ class SoundManager {
         }
     }
 }
+
