@@ -137,7 +137,6 @@ class Accent {
 }
 
 
-
 class View {
     #model = undefined;
     #beatSelector = undefined
@@ -263,6 +262,26 @@ class View {
             else {
                 this.model.sound = new SynthSound1(this)
             }
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.code === "Space" || event.code === "Enter") {
+                document.querySelector("body").classList.toggle("is-playing");
+                if (this.model.sound) {
+                    this.model.sound.stop()
+                    this.model.sound = undefined
+                }
+                else {
+                    this.model.sound = new SynthSound1(this)
+                }
+            }
+            if (event.code === "ArrowUp") {
+                this.setTempo(model.tempo + (event.altKey ? 10 : 1));
+
+            }
+            if (event.code === "ArrowDown") {
+                this.setTempo(model.tempo - (event.altKey ? 10 : 1));
+            }
+
         });
         document.querySelector('#wheel').addEventListener('mousedown', (event) => {
             document.querySelector('body').classList.add("dnd");

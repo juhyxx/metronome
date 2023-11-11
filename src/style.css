@@ -153,16 +153,17 @@ input {
 
 
 #selector {
+    --selector-gap: 0.2rem;
     display: flex;
     flex: 2;
     justify-content: space-between;
-    gap: 5px;
+    gap: var(--selector-gap);
 
     >div {
         display: flex;
         flex: 1;
         flex-direction: column;
-        gap: 5px;
+        gap: var(--selector-gap);
         opacity: 0.5;
         cursor: pointer;
         min-width: 0.5rem;
