@@ -21,6 +21,7 @@
 
 body {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     margin: 0;
@@ -588,5 +589,22 @@ input#tempo {
 
     to {
         transform: rotate(360deg);
+    }
+}
+
+#help {
+    &>div {
+        margin-bottom: 0.25rem;
+
+    }
+
+    .key {
+        box-shadow: 2px 2px 2px black;
+
+        border-radius: 4px;
+        background-color: white;
+        padding: 4px 2px;
+        color: black;
+        text-shadow: none;
     }
 }
