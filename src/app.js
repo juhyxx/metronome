@@ -217,7 +217,8 @@ class View {
     document.querySelector('#play ').style.animationDuration = (4 * 60 / this.model.tempo) + 's';
     document.querySelector('#wheel #tempo-value').innerHTML = this.model.tempo;
     document.querySelectorAll('#tempo-knob-inner .value').forEach(el => el.classList.remove('highlight'));
-    const el = [...document.querySelectorAll('#tempo-knob-inner .value')].find(el => el.dataset.tempo === this.model.tempo);
+
+    const el = [...document.querySelectorAll('#tempo-knob-inner .value')].find(el => parseInt(el.dataset.tempo, 10) === this.model.tempo);
     if (el) {
       el.classList.add('highlight');
     }
