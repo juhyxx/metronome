@@ -15,7 +15,7 @@
 
     @media screen and (pointer:coarse) and (orientation: landscape) {
         --diameter: 35vh;
-        /* font-size: 10vh; */
+        font-size: 8vh;
     }
 }
 
@@ -51,7 +51,6 @@ body {
 * {
     -webkit-user-select: none;
     font-family: 'Silkscreen', sans-serif;
-    /* Safari */
     user-select: none;
 }
 
@@ -592,19 +591,49 @@ input#tempo {
     }
 }
 
-#help {
-    &>div {
-        margin-bottom: 0.25rem;
-
+body.help {
+    #help {
+        display: flex;
     }
+}
+
+#help {
+    display: none;
+    position: absolute;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 200;
+    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.3);
+    border-radius: 0.5rem;
+
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 0.5rem;
+
+
 
     .key {
+        display: inline-block;
         box-shadow: 2px 2px 2px black;
-
         border-radius: 4px;
         background-color: white;
-        padding: 4px 2px;
+
+        padding: 0.25rem;
         color: black;
         text-shadow: none;
+    }
+}
+
+
+#help-trigger {
+    outline: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 0 5px;
+
+    &:hover {
+        cursor: pointer;
+        background-color: white;
+    }
+
+    @media screen and (pointer:coarse) {
+        display: none;
     }
 }

@@ -280,6 +280,9 @@ class View {
         this.setTempo(model.tempo - (event.altKey ? 10 : 1));
       }
     });
+    document.querySelector('#help-trigger').addEventListener('mousedown', (event) => {
+      document.querySelector('body').classList.toggle('help');
+    }, { passive: true });
     document.querySelector('#wheel').addEventListener('mousedown', (event) => {
       document.querySelector('body').classList.add('dnd');
       this.#dndY = event.clientY;
