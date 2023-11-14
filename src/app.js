@@ -18,6 +18,11 @@ class Model {
   #maxTempo = 280;
   #minTempo = 40;
   #sound = undefined;
+  #maxBeats = 9;
+
+  get maxBeats () {
+    return this.#maxBeats;
+  }
 
   set sound (item) {
     this.#sound = item;
@@ -83,13 +88,15 @@ class Model {
   }
 
   addBeat () {
-    const count = Math.min(this.beats.length + 1, 10);
+    const count = Math.min(this.beats.length + 1, this.maxBeats);
     this.beats = Array(count).fill('').map((item, i) => this.beats[i] ? this.beats[i] : { accent: Accent.value.LOW });
+    document.querySelector('#selector').dispatchEvent(new CustomEvent('refresh'));
   }
 
   removeBeat () {
     if (this.beats.length > 1) {
       this.beats.pop();
+      document.querySelector('#selector').dispatchEvent(new CustomEvent('refresh'));
     }
   }
 
@@ -107,7 +114,7 @@ class Model {
 
     this.#lastTime = now;
     const tempo = Math.round((60 / ((now - lastTime) / 1000)));
-    if (Number.isFinite(tempo) && tempo > 39) {
+    if (Number.isFinite(tempo) && tempo >= this.#minTempo) {
       this.#taptempo.push(tempo);
       const avg = Math.round(this.#taptempo.reduce((prev, item) => prev + item, 0) / this.#taptempo.length);
 
@@ -138,7 +145,7 @@ class Accent {
   }
 }
 
-class View {
+class Controller {
   #model = undefined;
   #beatSelector = undefined;
   #volume = undefined;
@@ -153,15 +160,25 @@ class View {
     this.#beatSelector = document.querySelector('#selector');
     this.#volume = document.querySelector('#volume');
 
-    document.querySelector('#counter').innerHTML = this.model.beats.length;
-    document.querySelector('#subcounter').innerHTML = this.model.subdivisions;
-    document.querySelector('#add').addEventListener('click', () => {
-      this.model.addBeat();
+    this.#beatSelector.addEventListener('refresh', () => {
       this.renderBeatSelector();
     });
-    document.querySelector('#remove').addEventListener('click', () => {
+
+    document.querySelector('#counter').innerHTML = this.model.beats.length;
+    document.querySelector('#subcounter').innerHTML = this.model.subdivisions;
+    document.querySelector('#add').addEventListener('click', (event) => {
+      this.model.addBeat();
+      document.querySelector('#remove').classList.remove('disabled');
+      if (this.model.beats.length === this.model.maxBeats) {
+        event.target.classList.add('disabled');
+      }
+    });
+    document.querySelector('#remove').addEventListener('click', (event) => {
       model.removeBeat();
-      this.renderBeatSelector();
+      document.querySelector('#add').classList.remove('disabled');
+      if (this.model.beats.length === 1) {
+        event.target.classList.add('disabled');
+      }
     });
 
     document.querySelector('#tap-tempo').addEventListener('click', () => {
@@ -238,7 +255,6 @@ class View {
       el.className = 'value-container';
       subel.className = 'value';
       subel.dataset.tempo = tempo2select;
-      subel.title = `${tempo2select} BPM`;
 
       subel.addEventListener('click', (event) => {
         this.setTempo(parseInt(event.target.dataset.tempo, 10));
@@ -256,7 +272,7 @@ class View {
       event.preventDefault();
     });
     document.querySelector('#wheel').addEventListener('click', () => {
-      document.querySelector('body').classList.toggle('is-playing');
+      document.body.classList.toggle('is-playing');
       if (this.model.sound) {
         this.model.sound.stop();
         this.model.sound = undefined;
@@ -266,7 +282,7 @@ class View {
     });
     document.addEventListener('keydown', (event) => {
       if (event.code === 'Space' || event.code === 'Enter') {
-        document.querySelector('body').classList.toggle('is-playing');
+        document.body.classList.toggle('is-playing');
         if (this.model.sound) {
           this.model.sound.stop();
           this.model.sound = undefined;
@@ -282,37 +298,37 @@ class View {
       }
     });
     document.querySelector('#help-trigger').addEventListener('mousedown', (event) => {
-      document.querySelector('body').classList.toggle('help');
+      document.body.classList.toggle('help');
     }, { passive: true });
     document.querySelector('#wheel').addEventListener('mousedown', (event) => {
-      document.querySelector('body').classList.add('dnd');
+      document.body.classList.add('dnd');
       this.#dndY = event.clientY;
     }, { passive: true });
-    document.querySelector('body').addEventListener('mousemove', (event) => {
+    document.body.addEventListener('mousemove', (event) => {
       if (this.#dndY && event.buttons === 1) {
         const diff = Math.round((this.#dndY - event.clientY) / 4);
         this.setTempo((this.model.tempo + diff));
         this.#dndY = event.clientY;
       }
     }, { passive: true });
-    document.querySelector('body').addEventListener('mouseup', (event) => {
-      document.querySelector('body').classList.remove('dnd');
+    document.body.addEventListener('mouseup', (event) => {
+      document.body.classList.remove('dnd');
       this.#dndY = undefined;
     }, { passive: true });
 
     document.querySelector('#wheel').addEventListener('touchstart', (event) => {
-      document.querySelector('body').classList.add('dnd');
+      document.body.classList.add('dnd');
       this.#dndY = event.touches[0].clientY;
     }, { passive: true });
-    document.querySelector('body').addEventListener('touchmove', (event) => {
+    document.body.addEventListener('touchmove', (event) => {
       if (this.#dndY) {
         const diff = Math.round((this.#dndY - event.touches[0].clientY) / 4);
         this.setTempo((this.model.tempo + diff));
         this.#dndY = event.touches[0].clientY;
       }
     }, { passive: true });
-    document.querySelector('body').addEventListener('touchend', (event) => {
-      document.querySelector('body').classList.remove('dnd');
+    document.body.addEventListener('touchend', (event) => {
+      document.body.classList.remove('dnd');
       this.#dndY = undefined;
     }, { passive: true });
   }
@@ -322,14 +338,15 @@ class View {
     this.#beatSelector.innerHTML = '';
     this.model.beats.forEach((item, index) => {
       const el = document.createElement('div');
-
-      for (let i = 0; i < 3; i++) {
+      const els = Array(3).fill(null).map((item, i) => {
         const subel = document.createElement('div');
         if (i === 0) {
           subel.innerHTML = index + 1;
         }
-        el.appendChild(subel);
-      }
+        return subel;
+      });
+
+      el.append(...els);
       el.setAttribute('accent', this.model.beats[index].accent);
       el.addEventListener('click', (event) => {
         const el = event.target.closest('div[accent]');
@@ -355,7 +372,7 @@ class View {
 const model = new Model();
 
 window.addEventListener('DOMContentLoaded', () => {
-  new View(model);
+  new Controller(model);
 });
 
 class SynthSound1 {
@@ -374,9 +391,9 @@ class SynthSound1 {
     this.model.wakeUnlock();
   }
 
-  constructor (view) {
-    this.model = view.model;
-    this.view = view;
+  constructor (controller) {
+    this.model = controller.model;
+    this.controller = controller;
     this.model.wakeLock();
     this.audioContext = new AudioContext();
     this.planNextBeat(this.audioContext.currentTime);
@@ -441,7 +458,7 @@ class SynthSound1 {
   onOscilatorEnd (event) {
     const startTime = event.target.startTime;
 
-    setTimeout(() => { this.view.removeHighlight(event.target.counter); }, startTime - this.audioContext.currentTime);
+    setTimeout(() => { this.controller.removeHighlight(event.target.counter); }, startTime - this.audioContext.currentTime);
     this.planNextBeat(startTime);
   }
 

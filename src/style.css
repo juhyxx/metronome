@@ -163,22 +163,28 @@ input {
         display: flex;
         flex: 1;
         flex-direction: column;
+        justify-content: center;
         gap: var(--selector-gap);
         opacity: 0.5;
+
         cursor: pointer;
         min-width: 0.5rem;
 
         min-height: 4rem;
+        font-size: 0.5rem;
         text-align: center;
+        text-shadow: none;
 
         @media screen and (pointer:coarse) and (orientation: landscape) {
-
             min-width: 0.5rem;
         }
 
         &[accent] {
             &>div {
+                display: flex;
                 flex: 1;
+                justify-content: center;
+                align-items: center;
             }
 
             &>div:nth-child(1) {
@@ -191,6 +197,10 @@ input {
 
             &>div:nth-child(3) {
                 background-color: #ff2f2f;
+            }
+
+            &[accent="high"] {
+                color: #404040;
             }
 
             &[accent="medium"] {
@@ -226,6 +236,7 @@ input {
 
             & div:nth-child(1) {
                 box-shadow: 0 0 10px var(--main-color);
+
             }
 
             & div:nth-child(2) {
@@ -489,6 +500,12 @@ input#tempo {
 
                 &:hover {
                     background-color: rgba(255, 255, 255, 0.08);
+                }
+
+                &.disabled {
+                    box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.5);
+                    pointer-events: none;
+                    color: rgba(255, 255, 255, 0.3);
                 }
 
                 &:active {
