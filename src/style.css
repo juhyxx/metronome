@@ -423,7 +423,7 @@ input#tempo {
                 cursor: pointer;
                 box-shadow: var(--shadow);
                 background-color: rgba(255, 255, 255, 0.1);
-                padding: 0.5rem;
+                padding: 0.25rem;
                 text-align: center;
 
                 &:active {
@@ -479,16 +479,18 @@ input#tempo {
 
             & div {
                 display: flex;
-                display: block;
-                flex: 1;
-                cursor: pointer;
-                box-shadow: var(--shadow);
 
+                flex: 1;
+                justify-content: center;
+                align-items: flex-start;
+
+                cursor: pointer;
+                box-sizing: content-box;
+                box-shadow: var(--shadow);
                 background-color: rgba(255, 255, 255, 0.1);
-                padding: 0.25rem;
                 font-weight: bold;
-                font-size: 0.75rem;
-                text-align: center;
+                font-size: 0.7rem;
+
 
                 &:first-child {
                     border-radius: 2rem 0rem 0rem 2rem;
@@ -622,7 +624,6 @@ body.help {
     z-index: 200;
     box-shadow: 0 0 1rem rgba(0, 0, 0, 0.3);
     border-radius: 0.5rem;
-
     background-color: rgba(0, 0, 0, 0.6);
     padding: 0.5rem;
 
