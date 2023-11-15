@@ -10,7 +10,6 @@ class Model {
   #tempo = 120;
   subdivisions = 1;
   #volume = 0.8;
-
   #delay = 0.5;
   #lastTime = undefined;
   #taptempo = [];
@@ -67,6 +66,11 @@ class Model {
     return this.#delay;
   }
 
+  setAccentAt (accent, index) {
+    model.beats[index].accent = accent;
+    document.querySelector('#selector').dispatchEvent(new CustomEvent('refresh', { detail: { beats: this.beats } }));
+  }
+
   beats = [{
     accent: Accent.value.HIGH
   }, {
@@ -90,13 +94,15 @@ class Model {
   addBeat () {
     const count = Math.min(this.beats.length + 1, this.maxBeats);
     this.beats = Array(count).fill('').map((item, i) => this.beats[i] ? this.beats[i] : { accent: Accent.value.LOW });
-    document.querySelector('#selector').dispatchEvent(new CustomEvent('refresh'));
+    document.querySelector('#selector').dispatchEvent(
+      new CustomEvent('refresh', { detail: { beats: this.beats } }));
   }
 
   removeBeat () {
     if (this.beats.length > 1) {
       this.beats.pop();
-      document.querySelector('#selector').dispatchEvent(new CustomEvent('refresh'));
+      document.querySelector('#selector').dispatchEvent(
+        new CustomEvent('refresh', { detail: { beats: this.beats } }));
     }
   }
 
@@ -160,8 +166,8 @@ class Controller {
     this.#beatSelector = document.querySelector('#selector');
     this.#volume = document.querySelector('#volume');
 
-    this.#beatSelector.addEventListener('refresh', () => {
-      this.renderBeatSelector();
+    this.#beatSelector.addEventListener('refresh', (event) => {
+      this.renderBeatSelector(event.detail.beats);
     });
 
     document.querySelector('#counter').innerHTML = this.model.beats.length;
@@ -196,6 +202,7 @@ class Controller {
       this.model.subdivisions = parseInt(event.target.value, 10);
       document.querySelector('#subcounter').innerHTML = this.model.subdivisions;
     });
+
     document.querySelector('#subdivisions').addEventListener('click', (event) => {
       const value = event.target.closest('div').querySelector('input').value;
       if (this.model.subdivisions === parseInt(value, 10)) {
@@ -206,7 +213,7 @@ class Controller {
       }
     });
     this.renderTempoSelector();
-    this.renderBeatSelector();
+    this.renderBeatSelector(this.model.beats);
     this.renderVolume();
     this.setTempo(this.model.tempo);
     document.querySelector('#volume input[name=volume]:nth-child(3)').click();
@@ -245,6 +252,9 @@ class Controller {
     const rangeAngle = 50;
     const range = ((this.model.maxTempo - this.model.minTempo) / 10);
     const angleSize = (180 + 2 * rangeAngle) / range;
+    const subelClick = function (event) {
+      this.setTempo(parseInt(event.target.dataset.tempo, 10));
+    }.bind(this);
 
     for (let i = 0; i <= range; i++) {
       const el = document.createElement('div');
@@ -256,12 +266,8 @@ class Controller {
       subel.className = 'value';
       subel.dataset.tempo = tempo2select;
 
-      subel.addEventListener('click', (event) => {
-        this.setTempo(parseInt(event.target.dataset.tempo, 10));
-      });
-      subel.addEventListener('touchstart', (event) => {
-        this.setTempo(parseInt(event.target.dataset.tempo, 10));
-      });
+      subel.addEventListener('click', subelClick);
+      subel.addEventListener('touchstart', subelClick);
       el.style.transform = `rotate(${angle}deg)`;
       el.append(subel);
       document.querySelector('#tempo-knob-inner').appendChild(el);
@@ -333,10 +339,10 @@ class Controller {
     }, { passive: true });
   }
 
-  renderBeatSelector () {
-    document.querySelector('#counter').innerHTML = this.model.beats.length;
+  renderBeatSelector (beats) {
+    document.querySelector('#counter').innerHTML = beats.length;
     this.#beatSelector.innerHTML = '';
-    this.model.beats.forEach((item, index) => {
+    beats.forEach((item, index) => {
       const el = document.createElement('div');
       const els = Array(3).fill(null).map((item, i) => {
         const subel = document.createElement('div');
@@ -347,11 +353,10 @@ class Controller {
       });
 
       el.append(...els);
-      el.setAttribute('accent', this.model.beats[index].accent);
+      el.setAttribute('accent', beats[index].accent);
       el.addEventListener('click', (event) => {
         const el = event.target.closest('div[accent]');
-        model.beats[index].accent = Accent.next(el.getAttribute('accent'));
-        this.renderBeatSelector();
+        this.model.setAccentAt(Accent.next(el.getAttribute('accent')), index);
       });
       this.#beatSelector.appendChild(el);
     });
