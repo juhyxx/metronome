@@ -655,3 +655,7 @@ body.help {
         display: none;
     }
 }
+
+#tempo-name {
+    font-size: 0.25rem;
+}

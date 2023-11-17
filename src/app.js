@@ -18,6 +18,7 @@ class Model {
   #minTempo = 40;
   #sound = undefined;
   #maxBeats = 9;
+  #tempoName = undefined;
 
   get maxBeats () {
     return this.#maxBeats;
@@ -56,10 +57,30 @@ class Model {
     value = limit(value, this.#minTempo, this.#maxTempo);
     this.#tempo = value;
     this.#delay = 60 / this.tempo;
+
+    if (this.#tempo < 60) {
+      this.#tempoName = 'Largo';
+    } else if (this.#tempo < 66) {
+      this.#tempoName = 'Larghetto';
+    } else if (this.#tempo < 76) {
+      this.#tempoName = 'Adagio';
+    } else if (this.#tempo < 108) {
+      this.#tempoName = 'Andante';
+    } else if (this.#tempo < 120) {
+      this.#tempoName = 'Moderato';
+    } else if (this.#tempo < 168) {
+      this.#tempoName = 'Allegro';
+    } else {
+      this.#tempoName = 'Presto';
+    }
   }
 
   get tempo () {
     return this.#tempo;
+  }
+
+  get tempoName () {
+    return this.#tempoName;
   }
 
   get delay () {
@@ -131,6 +152,7 @@ class Model {
 
 class Accent {
   static value = {
+    SUBDIV: 'subdiv',
     NONE: 'none',
     LOW: 'low',
     MEDIUM: 'medium',
@@ -237,6 +259,7 @@ class Controller {
 
   setTempo (tempo) {
     this.model.tempo = tempo;
+    document.querySelector('#tempo-name').innerHTML = this.model.tempoName;
     document.querySelector('#tempo').value = this.model.tempo;
     document.querySelector('#play ').style.animationDuration = (4 * 60 / this.model.tempo) + 's';
     document.querySelector('#wheel #tempo-value').innerHTML = this.model.tempo;
@@ -283,7 +306,7 @@ class Controller {
         this.model.sound.stop();
         this.model.sound = undefined;
       } else {
-        this.model.sound = new SynthSound1(this);
+        this.model.sound = new WaveSound(this);
       }
     });
     document.addEventListener('keydown', (event) => {
@@ -293,7 +316,7 @@ class Controller {
           this.model.sound.stop();
           this.model.sound = undefined;
         } else {
-          this.model.sound = new SynthSound1(this);
+          this.model.sound = new WaveSound(this);
         }
       }
       if (event.code === 'ArrowUp') {
@@ -380,16 +403,124 @@ window.addEventListener('DOMContentLoaded', () => {
   new Controller(model);
 });
 
-class SynthSound1 {
+// class SynthSound1 {
+//   #counter = 0;
+//   isPlaying = true;
+//   audioContext = undefined;
+//   noteFreq = {
+//     [Accent.value.HIGH]: 880,
+//     [Accent.value.MEDIUM]: 600,
+//     [Accent.value.LOW]: 440,
+//     [Accent.value.NONE]: 440
+//   };
+
+//   stop () {
+//     this.isPlaying = false;
+//     this.model.wakeUnlock();
+//   }
+
+//   constructor (controller) {
+//     this.model = controller.model;
+//     this.controller = controller;
+
+//     this.model.wakeLock();
+//     this.audioContext = new AudioContext();
+//     this.planNextBeat(this.audioContext.currentTime);
+//   }
+
+//   get counter () {
+//     return this.#counter;
+//   }
+
+//   async planNextBeat (t) {
+//     if (!this.isPlaying) return;
+
+//     const startTime = t + this.model.delay;
+//     const endTime = startTime + 0.06;
+
+//     const oscillator = new OscillatorNode(this.audioContext, { type: 'sine' });
+//     const gainNode = new GainNode(this.audioContext);
+//     const beat = this.model.beats[this.counter] ? this.model.beats[this.counter] : this.model.beats[0];
+//     const frequency = this.noteFreq[beat.accent];
+
+//     oscillator.counter = this.counter;
+//     oscillator.startTime = startTime;
+
+//     oscillator.connect(gainNode);
+//     gainNode.connect(this.audioContext.destination);
+//     oscillator.connect(this.audioContext.destination);
+
+//     oscillator.frequency.setValueAtTime(frequency, startTime);
+//     gainNode.gain.setValueAtTime(beat.accent === Accent.value.NONE ? -1 : this.model.volume, startTime);
+//     gainNode.gain.linearRampToValueAtTime(-1, endTime - 0.01);
+
+//     oscillator.start(startTime);
+//     oscillator.stop(endTime);
+
+//     oscillator.addEventListener('ended', this.onBeatEnd.bind(this));
+
+//     if (this.model.subdivisions > 1) {
+//       for (let i = 1; i < this.model.subdivisions; i++) {
+//         const subdivisionsStartTime = startTime + i * (this.model.delay / this.model.subdivisions);
+//         const subOscillator = this.audioContext.createOscillator();
+//         const gainSubNode = new GainNode(this.audioContext);
+
+//         subOscillator.subdivision = i;
+//         subOscillator.startTime = startTime;
+
+//         subOscillator.connect(gainSubNode);
+//         gainSubNode.connect(this.audioContext.destination);
+//         subOscillator.connect(this.audioContext.destination);
+
+//         subOscillator.frequency.setValueAtTime(220, startTime);
+//         gainSubNode.gain.setValueAtTime(Math.max(this.model.volume - 0.4, -1), subdivisionsStartTime);
+//         gainSubNode.gain.linearRampToValueAtTime(-1, subdivisionsStartTime + 0.02);
+
+//         subOscillator.start(subdivisionsStartTime);
+//         subOscillator.stop(subdivisionsStartTime + 0.03);
+//         subOscillator.addEventListener('ended', this.onSubOscilatorEnd.bind(this));
+//       }
+//     }
+//     this.increaseCounter();
+//   }
+
+//   onBeatEnd (event) {
+//     const startTime = event.target.startTime;
+
+//     setTimeout(() => { this.controller.removeHighlight(event.target.counter); }, startTime - this.audioContext.currentTime);
+//     this.planNextBeat(startTime);
+//   }
+
+//   onSubOscilatorEnd (event) {
+//     setTimeout(() => {
+//       document.querySelector('#subcounter').innerHTML = event.target.subdivision + 1;
+//     }, event.target.startTime - this.audioContext.currentTime);
+//   }
+
+//   increaseCounter () {
+//     this.#counter++;
+//     if (this.#counter >= this.model.beats.length) {
+//       this.#counter = 0;
+//     }
+//   }
+// }
+
+class WaveSound {
   #counter = 0;
+  sounds = {};
+  soundSources = {
+    [Accent.value.HIGH]: 'sounds/sticks/high.wav',
+    [Accent.value.MEDIUM]: 'sounds/sticks/medium.wav',
+    [Accent.value.LOW]: 'sounds/sticks/low.wav',
+    [Accent.value.NONE]: 'sounds/sticks/low.wav',
+    [Accent.value.SUBDIV]: 'sounds/sticks/subdiv.wav'
+  };
+
   isPlaying = true;
   audioContext = undefined;
-  noteFreq = {
-    [Accent.value.HIGH]: 880,
-    [Accent.value.MEDIUM]: 600,
-    [Accent.value.LOW]: 440,
-    [Accent.value.NONE]: 440
-  };
+  get counter () {
+    return this.#counter;
+  }
 
   stop () {
     this.isPlaying = false;
@@ -401,73 +532,67 @@ class SynthSound1 {
     this.controller = controller;
     this.model.wakeLock();
     this.audioContext = new AudioContext();
-    this.planNextBeat(this.audioContext.currentTime);
+    this.getAudioData().then(() => {
+      this.planNextBeat(this.audioContext.currentTime);
+    });
   }
 
-  get counter () {
-    return this.#counter;
+  async getAudioData () {
+    for (const item of Object.entries(this.soundSources)) {
+      const rsvp = await fetch(item[1]);
+      this.sounds[item[0]] = await this.audioContext.decodeAudioData(await rsvp.arrayBuffer());
+    }
   }
 
   planNextBeat (t) {
     if (!this.isPlaying) return;
 
     const startTime = t + this.model.delay;
-    const endTime = startTime + 0.06;
-
-    const oscillator = new OscillatorNode(this.audioContext, { type: 'sine' });
     const gainNode = new GainNode(this.audioContext);
     const beat = this.model.beats[this.counter] ? this.model.beats[this.counter] : this.model.beats[0];
-    const frequency = this.noteFreq[beat.accent];
+    const source = new AudioBufferSourceNode(this.audioContext);
 
-    oscillator.counter = this.counter;
-    oscillator.startTime = startTime;
+    source.buffer = this.sounds[beat.accent];
+    source.counter = this.counter;
+    source.startTime = startTime;
+    source.connect(this.audioContext.destination);
+    source.connect(gainNode);
+    source.addEventListener('ended', this.onBeatEnd.bind(this));
 
-    oscillator.connect(gainNode);
     gainNode.connect(this.audioContext.destination);
-    oscillator.connect(this.audioContext.destination);
-
-    oscillator.frequency.setValueAtTime(frequency, startTime);
     gainNode.gain.setValueAtTime(beat.accent === Accent.value.NONE ? -1 : this.model.volume, startTime);
-    gainNode.gain.linearRampToValueAtTime(-1, endTime - 0.01);
 
-    oscillator.start(startTime);
-    oscillator.stop(endTime);
-
-    oscillator.addEventListener('ended', this.onOscilatorEnd.bind(this));
+    source.start(startTime);
 
     if (this.model.subdivisions > 1) {
       for (let i = 1; i < this.model.subdivisions; i++) {
         const subdivisionsStartTime = startTime + i * (this.model.delay / this.model.subdivisions);
-        const subOscillator = this.audioContext.createOscillator();
+        const subSource = new AudioBufferSourceNode(this.audioContext);
         const gainSubNode = new GainNode(this.audioContext);
 
-        subOscillator.subdivision = i;
-        subOscillator.startTime = startTime;
+        subSource.buffer = this.sounds[Accent.value.SUBDIV];
+        subSource.subdivision = i;
+        subSource.startTime = startTime;
+        subSource.connect(gainSubNode);
+        subSource.connect(this.audioContext.destination);
+        subSource.addEventListener('ended', this.onSubDivisionEnd.bind(this));
+        subSource.start(subdivisionsStartTime);
 
-        subOscillator.connect(gainSubNode);
         gainSubNode.connect(this.audioContext.destination);
-        subOscillator.connect(this.audioContext.destination);
-
-        subOscillator.frequency.setValueAtTime(220, startTime);
         gainSubNode.gain.setValueAtTime(Math.max(this.model.volume - 0.4, -1), subdivisionsStartTime);
-        gainSubNode.gain.linearRampToValueAtTime(-1, subdivisionsStartTime + 0.02);
-
-        subOscillator.start(subdivisionsStartTime);
-        subOscillator.stop(subdivisionsStartTime + 0.03);
-        subOscillator.addEventListener('ended', this.onSubOscilatorEnd.bind(this));
       }
     }
     this.increaseCounter();
   }
 
-  onOscilatorEnd (event) {
+  onBeatEnd (event) {
     const startTime = event.target.startTime;
 
     setTimeout(() => { this.controller.removeHighlight(event.target.counter); }, startTime - this.audioContext.currentTime);
     this.planNextBeat(startTime);
   }
 
-  onSubOscilatorEnd (event) {
+  onSubDivisionEnd (event) {
     setTimeout(() => {
       document.querySelector('#subcounter').innerHTML = event.target.subdivision + 1;
     }, event.target.startTime - this.audioContext.currentTime);
