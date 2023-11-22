@@ -197,7 +197,6 @@ class Controller {
     this.#model = model;
     this.#beatSelector = document.querySelector('#selector');
     this.#volume = document.querySelector('#volume');
-
     this.#beatSelector.addEventListener('refresh', (event) => {
       this.renderBeatSelector(event.detail.beats);
     });
@@ -218,14 +217,12 @@ class Controller {
         event.target.classList.add('disabled');
       }
     });
-
     document.querySelector('#tap-tempo').addEventListener('click', () => {
       const tap = this.model.tapTempo();
       if (tap) {
         this.setTempo(tap);
       }
     });
-
     document.querySelector('#tempo').addEventListener('change', (event) => {
       this.setTempo(parseInt(event.target.value, 10));
     });
@@ -407,7 +404,6 @@ class Controller {
     if (elToSelect) {
       elToSelect.classList.add('highlight');
     }
-
     document.querySelector('#counter').innerHTML = counter + 1;
     document.querySelector('#subcounter').innerHTML = 1;
   }
@@ -427,6 +423,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
 class WaveSound {
   #counter = 0;
+  isPlaying = true;
+  audioContext = undefined;
   sounds = {};
   soundSets = ['sticks', 'drums', 'metronome', 'beeps'];
   soundSources = {
@@ -437,8 +435,6 @@ class WaveSound {
     [Accent.value.SUBDIV]: 'subdiv'
   };
 
-  isPlaying = true;
-  audioContext = undefined;
   get counter () {
     return this.#counter;
   }
