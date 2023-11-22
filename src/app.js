@@ -112,14 +112,20 @@ class Model {
     accent: Accent.value.LOW
   }];
 
-  wakeLock () {
-    navigator.wakeLock.request('screen').finally(wakeLock => {
-      this.#wakeLock = wakeLock;
-    });
+  async lock () {
+    try {
+      this.#wakeLock = await navigator.wakeLock.request('screen');
+    } catch (err) {
+
+    }
   }
 
-  wakeUnlock () {
-    this.#wakeLock = null;
+  unlock () {
+    if (this.#wakeLock) {
+      this.#wakeLock.release().then(() => {
+        this.wakeLock = null;
+      });
+    }
   }
 
   addBeat () {
@@ -441,13 +447,13 @@ class WaveSound {
 
   stop () {
     this.isPlaying = false;
-    this.model.wakeUnlock();
+    this.model.unlock();
   }
 
   constructor (controller) {
     this.model = controller.model;
     this.controller = controller;
-    this.model.wakeLock();
+    this.model.lock();
     this.audioContext = new AudioContext();
     if (this.model.soundSource) {
       this.planNextBeat(this.audioContext.currentTime);
