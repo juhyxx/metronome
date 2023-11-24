@@ -422,7 +422,6 @@ class Controller {
 
       const elSubdivContainer = document.createElement('div');
       elSubdivContainer.className = 'subdivisions';
-      console.log(this.model.subdivisions);
       const elSubdiv = Array(this.model.subdivisions).fill(null).map((item, i) => {
         return document.createElement('div');
       });
@@ -446,13 +445,13 @@ class Controller {
     const elToSelect = document.querySelector(`#selector >div:nth-child(${counter + 1})`);
     if (elToSelect) {
       elToSelect.classList.add('highlight');
+      elToSelect.querySelectorAll('.subdivisions >div').forEach(el => {
+        el.classList.remove('highlight');
+      });
+      elToSelect.querySelector('.subdivisions >div:nth-child(1)').classList = 'highlight';
     }
     document.querySelector('#counter').innerHTML = counter + 1;
     document.querySelector('#subcounter').innerHTML = 1;
-    elToSelect.querySelectorAll('.subdivisions >div').forEach(el => {
-      el.classList.remove('highlight');
-    });
-    elToSelect.querySelector('.subdivisions >div:nth-child(1)').classList = 'highlight';
   }
 }
 
@@ -550,7 +549,10 @@ class WaveSound {
   onSubDivisionEnd (event) {
     setTimeout(() => {
       document.querySelector('#subcounter').innerHTML = event.target.subdivision + 1;
-      document.querySelector(`#selector>div:nth-child(${event.target.counter + 1}) .subdivisions >div:nth-child(${event.target.subdivision + 1})`).classList = 'highlight';
+      const el = document.querySelector(`#selector>div:nth-child(${event.target.counter + 1}) .subdivisions >div:nth-child(${event.target.subdivision + 1})`);
+      if (el) {
+        el.classList = 'highlight';
+      }
     }, event.target.startTime - this.audioContext.currentTime);
   }
 
