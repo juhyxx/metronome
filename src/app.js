@@ -8,7 +8,7 @@ function limit (value, min, max) {
 
 class Model {
   #tempo = 120;
-  subdivisions = 1;
+  #subdivisions = 1;
   #volume = 0.8;
   #delay = 0.5;
   #lastTime = undefined;
@@ -21,6 +21,13 @@ class Model {
   #tempoName = undefined;
   #soundSet = 'sticks';
   soundSource = {};
+
+  get subdivisions () { return this.#subdivisions; }
+
+  set subdivisions (value) {
+    this.#subdivisions = value;
+    document.querySelector('#selector').dispatchEvent(new CustomEvent('refresh', { detail: { beats: this.beats } }));
+  }
 
   get maxBeats () {
     return this.#maxBeats;
@@ -266,7 +273,7 @@ class Controller {
     document.querySelector('#subdivisions').addEventListener('click', (event) => {
       const value = event.target.closest('div').querySelector('input').value;
       if (this.model.subdivisions === parseInt(value, 10)) {
-        this.model.subdivisions = 0;
+        this.model.subdivisions = 1;
         event.preventDefault();
         event.stopPropagation();
         document.querySelector('#sub0').checked = true;
@@ -413,6 +420,14 @@ class Controller {
         return subel;
       });
 
+      const elSubdivContainer = document.createElement('div');
+      elSubdivContainer.className = 'subdivisions';
+      console.log(this.model.subdivisions);
+      const elSubdiv = Array(this.model.subdivisions).fill(null).map((item, i) => {
+        return document.createElement('div');
+      });
+      elSubdivContainer.append(...elSubdiv);
+      els.push(elSubdivContainer);
       el.append(...els);
       el.setAttribute('accent', beats[index].accent);
       el.addEventListener('click', (event) => {
@@ -427,13 +442,17 @@ class Controller {
     await wait(waitingTime);
 
     const selector = document.querySelector('#selector');
-    selector.querySelector('#selector .highlight')?.classList.remove('highlight');
+    selector.querySelector('#selector>div.highlight')?.classList.remove('highlight');
     const elToSelect = document.querySelector(`#selector >div:nth-child(${counter + 1})`);
     if (elToSelect) {
       elToSelect.classList.add('highlight');
     }
     document.querySelector('#counter').innerHTML = counter + 1;
     document.querySelector('#subcounter').innerHTML = 1;
+    elToSelect.querySelectorAll('.subdivisions >div').forEach(el => {
+      el.classList.remove('highlight');
+    });
+    elToSelect.querySelector('.subdivisions >div:nth-child(1)').classList = 'highlight';
   }
 }
 
@@ -506,6 +525,7 @@ class WaveSound {
         const gainSubNode = new GainNode(this.audioContext);
 
         subSource.buffer = this.model.soundSource[this.model.soundSet][Accent.value.SUBDIV];
+        subSource.counter = this.counter;
         subSource.subdivision = i;
         subSource.startTime = startTime;
         subSource.connect(gainSubNode);
@@ -530,6 +550,7 @@ class WaveSound {
   onSubDivisionEnd (event) {
     setTimeout(() => {
       document.querySelector('#subcounter').innerHTML = event.target.subdivision + 1;
+      document.querySelector(`#selector>div:nth-child(${event.target.counter + 1}) .subdivisions >div:nth-child(${event.target.subdivision + 1})`).classList = 'highlight';
     }, event.target.startTime - this.audioContext.currentTime);
   }
 
