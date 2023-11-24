@@ -20,7 +20,7 @@ class Model {
   #maxBeats = 9;
   #tempoName = undefined;
   #soundSet = 'sticks';
-  soundSource = undefined;
+  soundSource = {};
 
   get maxBeats () {
     return this.#maxBeats;
@@ -95,6 +95,28 @@ class Model {
 
   get delay () {
     return this.#delay;
+  }
+
+  soundSets = ['sticks', 'drums', 'metronome', 'beeps'];
+  soundSources = {
+    [Accent.value.HIGH]: 'high',
+    [Accent.value.MEDIUM]: 'medium',
+    [Accent.value.LOW]: 'low',
+    [Accent.value.NONE]: 'low',
+    [Accent.value.SUBDIV]: 'subdiv'
+  };
+
+  async loadAudioData (audioContext) {
+    for (const soundSet of Object.values(this.soundSets)) {
+      for (const item of Object.entries(this.soundSources)) {
+        const rsvp = await fetch(`sounds/${soundSet}/${item[1]}.wav`);
+        if (audioContext) {
+          const buff = await rsvp.arrayBuffer();
+          this.soundSource[soundSet] = this.soundSource[soundSet] || {};
+          this.soundSource[soundSet][item[0]] = await audioContext.decodeAudioData(buff);
+        }
+      }
+    }
   }
 
   setAccentAt (accent, index) {
@@ -425,21 +447,13 @@ const model = new Model();
 
 window.addEventListener('DOMContentLoaded', () => {
   new Controller(model);
+  model.loadAudioData();
 });
 
 class WaveSound {
   #counter = 0;
   isPlaying = true;
   audioContext = undefined;
-  sounds = {};
-  soundSets = ['sticks', 'drums', 'metronome', 'beeps'];
-  soundSources = {
-    [Accent.value.HIGH]: 'high',
-    [Accent.value.MEDIUM]: 'medium',
-    [Accent.value.LOW]: 'low',
-    [Accent.value.NONE]: 'low',
-    [Accent.value.SUBDIV]: 'subdiv'
-  };
 
   get counter () {
     return this.#counter;
@@ -455,24 +469,13 @@ class WaveSound {
     this.controller = controller;
     this.model.lock();
     this.audioContext = new AudioContext();
-    if (this.model.soundSource) {
-      this.planNextBeat(this.audioContext.currentTime);
-    } else {
-      this.loadAudioData().then(() => {
-        this.planNextBeat(this.audioContext.currentTime);
-      });
-    }
-  }
 
-  async loadAudioData () {
-    this.model.soundSource = {};
-    for (const soundSet of Object.values(this.soundSets)) {
-      for (const item of Object.entries(this.soundSources)) {
-        const rsvp = await fetch(`sounds/${soundSet}/${item[1]}.wav`);
-        const buff = await rsvp.arrayBuffer();
-        this.model.soundSource[soundSet] = this.model.soundSource[soundSet] || {};
-        this.model.soundSource[soundSet][item[0]] = await this.audioContext.decodeAudioData(buff);
-      }
+    if (Object.keys(this.model.soundSource).length > 0) {
+      this.planNextBeat(this.audioContext.currentTime - this.model.delay);
+    } else {
+      this.model.loadAudioData(this.audioContext).then(() => {
+        this.planNextBeat(this.audioContext.currentTime - this.model.delay);
+      });
     }
   }
 
