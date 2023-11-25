@@ -1,14 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Silkscreen&display=swap');
 
 :root {
-    --main-color: rgb(173, 255, 47);
+    --main-color: hsl(84, 100%, 59%);
     --diameter: 6rem;
+    --bg: hsl(170, 1%, 25%);
+    --bg-metronome: hsl(170, 0%, 15%);
     --shadow: inset 2px 2px 2px rgba(255, 255, 255, 0.2),
         inset -2px -2px 2px rgba(0, 0, 0, 0.3),
         inset 1px -1px 20px rgba(0, 0, 0, 0.3),
         1px 1px 1px rgba(255, 255, 255, 0.2),
         1px 1px 4px rgba(0, 0, 0, 0.3);
+    --of-shadow: inset 0px 0px 1px 1px rgba(0, 0, 0, 0.5),
+        inset -1px -1px 2px 1px rgba(255, 255, 255, 0.3),
+        inset 0px 0px 60px rgba(0, 0, 0, 0.5);
+    --bg-grad: radial-gradient(farthest-corner at right bottom,
+            rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.3) 70%,
+            transparent 70%),
+        radial-gradient(circle, transparent 49%, rgba(0, 0, 0, 1) 100%);
 
+    color: rgba(255, 255, 255, 0.8);
     font-size: 5vh;
 
     @media only screen and (max-device-width: 800px) {
@@ -19,6 +29,19 @@
         --diameter: 35vh;
         font-size: 8vh;
     }
+
+    /* @media (prefers-color-scheme: light) {
+        --bg: hsl(170, 1%, 40%);
+        --bg-metronome: hsl(170, 0%, 90%);
+        --bg-grad: radial-gradient(farthest-corner at right bottom,
+                rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.05) 70%,
+                transparent 70%),
+            radial-gradient(circle, transparent 49%, rgba(0, 0, 0, 0.1) 100%);
+        --of-shadow: inset 0px 0px 1px 1px rgba(0, 0, 0, 0.2),
+            inset -1px -1px 2px 1px rgba(255, 255, 255, 0.3),
+            inset 0px 0px 60px rgba(0, 0, 0, 0.2);
+        color: rgba(0, 0, 0, 0.6);
+    } */
 }
 
 body {
@@ -27,9 +50,9 @@ body {
     justify-content: center;
     align-items: center;
     margin: 0;
-    background-color: #404040;
+    background-color: var(--bg);
     height: 100vh;
-    color: rgba(255, 255, 255, 0.8);
+
     font-size: 0.25rem;
     font-family: 'Silkscreen', sans-serif;
     text-shadow: 0px -1px 1px black;
@@ -90,10 +113,8 @@ input {
         0px 3px 5px rgba(0, 0, 0, 0.7),
         5px 5px 20px 10px rgba(0, 0, 0, 0.4);
     border-radius: 0.5rem;
-    background: radial-gradient(circle, #202020 49%, #090909 100%);
-    background: radial-gradient(farthest-corner at right bottom, transparent 0%, transparent 70%, rgba(255, 255, 255, 0.03) 70%),
-        radial-gradient(circle, #202020 49%, #090909 100%);
-    background-color: #202020;
+    background: var(--bg-grad);
+    background-color: var(--bg-metronome);
     padding: 0.5rem;
     min-width: 8rem;
     overflow: hidden;
@@ -195,11 +216,12 @@ input {
             }
 
             &>div:nth-child(2) {
-                background-color: #ffe82f;
+                background-color: hsl(63, 100%, 59%);
             }
 
             &>div:nth-child(3) {
-                background-color: #ff2f2f;
+
+                background-color: hsl(0, 100%, 59%);
             }
 
             &[accent="high"] {
@@ -233,21 +255,18 @@ input {
 
         &.highlight {
             opacity: 1;
-
             background-color: rgba(255, 255, 255, 0.1);
-
 
             &>div:nth-child(1) {
                 box-shadow: 0 0 10px var(--main-color);
-
             }
 
             &>div:nth-child(2) {
-                box-shadow: 0 0 10px #ffe82f;
+                box-shadow: 0 0 10px hsl(63, 100%, 59%);
             }
 
             &>div:nth-child(3) {
-                box-shadow: 0 0 10px #ff2f2f;
+                box-shadow: 0 0 10px hsl(0, 100%, 59%);
             }
 
 
@@ -277,8 +296,8 @@ input {
             .subdivisions {
 
                 .highlight {
-                    box-shadow: 0 0 10px #ff2f2f;
-                    background-color: #ff2f2f !important;
+                    box-shadow: 0 0 10px hsl(0, 100%, 59%);
+                    background-color: hsl(0, 100%, 59%) !important;
                 }
             }
         }
@@ -295,13 +314,9 @@ input {
             flex: 1;
             background-color: gray !important;
             height: 0.25rem;
-
-
         }
     }
 }
-
-
 
 #tempo-knob {
     display: flex;
@@ -328,8 +343,7 @@ input {
             inset 0 5px 5px 0.11rem rgba(0, 0, 0, 0.4),
             inset 0 5px 50px 0.11rem rgba(0, 0, 0, 0.5);
         border-radius: 50%;
-        background: radial-gradient(farthest-corner at right bottom, transparent 0%, transparent 70%, rgba(255, 255, 255, 0.03) 70%);
-        background-color: rgba(255, 255, 255, 0.03);
+        background: var(--bg-grad);
         width: var(--diameter);
         height: var(--diameter);
         font-size: 1rem;
@@ -347,7 +361,7 @@ input {
             z-index: -2;
             clip-path: polygon(0% 0%, 0% 100%, 100% 50%, 100% 50%);
             transition: all 1s;
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.2);
             width: calc(var(--diameter) - 5rem);
             height: calc(var(--diameter) - 5rem);
             pointer-events: none;
@@ -357,7 +371,7 @@ input {
             clip-path: polygon(0% 0%, 0% 100%, 100% 100%, 100% 0%);
             animation: spin 4s linear infinite;
             animation-delay: 0.5s;
-            background: rgba(255, 255, 255, 0.06);
+
         }
     }
 
@@ -370,7 +384,6 @@ input {
         background-color: transparent;
         width: calc(var(--diameter) + 1rem);
         height: calc(var(--diameter) + 1rem);
-
 
         .value-container {
             position: absolute;
@@ -454,29 +467,21 @@ input#tempo {
                 text-align: center;
 
                 &:active {
-                    box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.5);
-                    background-color: rgba(255, 255, 255, 0.01);
-                    color: var(--main-color);
-                    text-shadow: 0 0 5px var(--main-color);
+                    box-shadow: var(--of-shadow);
                 }
             }
 
             &:nth-child(1) label {
                 border-radius: 2rem 0rem 0rem 2rem;
 
-
             }
 
             &:last-child label {
                 border-radius: 0rem 2rem 2rem 0rem;
-
-
             }
 
             & input:checked+label {
-                box-shadow:
-                    inset 1px 1px 1px rgba(0, 0, 0, 0.5);
-                background-color: rgba(255, 255, 255, 0.02);
+                box-shadow: var(--of-shadow);
                 color: var(--main-color);
                 text-shadow: 0 0 5px var(--main-color);
             }
@@ -518,7 +523,6 @@ input#tempo {
                 font-weight: bold;
                 font-size: 0.7rem;
 
-
                 &:first-child {
                     border-radius: 2rem 0rem 0rem 2rem;
                 }
@@ -538,8 +542,7 @@ input#tempo {
                 }
 
                 &:active {
-                    box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.5);
-                    background-color: rgba(255, 255, 255, 0.02);
+                    box-shadow: var(--of-shadow);
                     color: var(--main-color);
                     text-shadow: 0 0 5px var(--main-color);
                 }
@@ -562,12 +565,8 @@ input#tempo {
     aspect-ratio: 1 / 1;
     text-align: center;
 
-    &:hover {
-        background-color: rgba(255, 255, 255, 0.08);
-    }
-
     &:active {
-        background-color: rgba(255, 255, 255, 0.02);
+        box-shadow: var(--of-shadow);
         color: var(--main-color);
         text-shadow: 0 0 5px var(--main-color);
     }
@@ -619,7 +618,8 @@ input#tempo {
         z-index: 0;
         border-right: 0 solid transparent;
         border-right: calc(var(--volume-width) + 2px) solid transparent;
-        border-bottom: calc(var(--volume-height) + 2px) solid #404040;
+        border-bottom: calc(var(--volume-height) + 2px) solid var(--bg);
+        ;
         width: 0;
         height: 0;
         pointer-events: none;
@@ -720,13 +720,13 @@ body.help {
         padding: 0.25rem;
         text-align: center;
 
-
+        &:active {
+            box-shadow: var(--of-shadow);
+        }
     }
 
     & input:checked+label {
-        box-shadow:
-            inset 1px 1px 1px rgba(0, 0, 0, 0.5);
-        background-color: rgba(255, 255, 255, 0.02);
+        box-shadow: var(--of-shadow);
         color: var(--main-color);
         text-shadow: 0 0 5px var(--main-color);
     }
