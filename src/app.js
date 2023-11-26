@@ -6,6 +6,29 @@ function limit (value, min, max) {
   return value;
 }
 
+class Accent {
+  static value = {
+    SUBDIV: 'subdiv',
+    NONE: 'none',
+    LOW: 'low',
+    MEDIUM: 'medium',
+    HIGH: 'high'
+  };
+
+  static queue = [
+    this.value.NONE,
+    this.value.LOW,
+    this.value.MEDIUM,
+    this.value.HIGH
+  ];
+
+  static next (accent) {
+    const index = (this.queue.indexOf(accent) + 1) % this.queue.length;
+
+    return this.queue[index];
+  }
+}
+
 class Model {
   #tempo = 120;
   #taptempo = [];
@@ -20,16 +43,7 @@ class Model {
   #sound = undefined;
   #maxBeats = 9;
   #soundSet = 'sticks';
-  soundSource = {};
-  soundSets = ['sticks', 'drums', 'metronome', 'beeps'];
-  soundSources = {
-    [Accent.value.HIGH]: 'high',
-    [Accent.value.MEDIUM]: 'medium',
-    [Accent.value.LOW]: 'low',
-    [Accent.value.NONE]: 'low',
-    [Accent.value.SUBDIV]: 'subdiv'
-  };
-
+  #propsToSerialize = ['subdivisions', 'tempo', 'soundSet', 'beats'];
   #beats = [{
     accent: Accent.value.HIGH
   }, {
@@ -40,69 +54,44 @@ class Model {
     accent: Accent.value.LOW
   }];
 
-  get beats () {
-    return this.#beats;
-  }
+  soundSource = {};
+  soundSets = ['sticks', 'drums', 'metronome', 'beeps'];
+  soundSources = {
+    [Accent.value.HIGH]: 'high',
+    [Accent.value.MEDIUM]: 'medium',
+    [Accent.value.LOW]: 'low',
+    [Accent.value.NONE]: 'low',
+    [Accent.value.SUBDIV]: 'subdiv'
+  };
 
-  set beats (data) {
-    this.#beats = data;
-    this.serialize();
-  }
+  get beats () { return this.#beats; }
+  set beats (data) { this.#beats = data; this.serialize(); }
+
+  get maxBeats () { return this.#maxBeats; }
 
   get subdivisions () { return this.#subdivisions; }
-
   set subdivisions (value) {
     this.#subdivisions = value;
     document.querySelector('#selector').dispatchEvent(new CustomEvent('refresh', { detail: { beats: this.#beats } }));
     this.serialize();
   }
 
-  get maxBeats () {
-    return this.#maxBeats;
-  }
+  get soundSet () { return this.#soundSet; }
+  set soundSet (value) { this.#soundSet = value; this.serialize(); }
 
-  set soundSet (value) {
-    this.#soundSet = value;
-    this.serialize();
-  }
+  set sound (item) { this.#sound = item; }
+  get sound () { return this.#sound; }
 
-  get soundSet () {
-    return this.#soundSet;
-  }
+  get maxTempo () { return this.#maxTempo; }
+  get minTempo () { return this.#minTempo; }
 
-  set sound (item) {
-    this.#sound = item;
-  }
+  get volumePercentage () { return Math.round((this.#volume + 1) / 0.02); }
+  get volume () { return this.#volume; }
+  set volume (value) { this.#volume = (limit(value, 10, 100) * 0.02) - 1; this.serialize(); }
 
-  get sound () {
-    return this.#sound;
-  }
-
-  get maxTempo () {
-    return this.#maxTempo;
-  }
-
-  get minTempo () {
-    return this.#minTempo;
-  }
-
-  get volume () {
-    return this.#volume;
-  }
-
-  get volumePercentage () {
-    return Math.round((this.#volume + 1) / 0.02);
-  }
-
-  set volume (value) {
-    value = limit(value, 10, 100);
-    this.#volume = (value * 0.02) - 1;
-    this.serialize();
-  }
-
+  get tempo () { return this.#tempo; }
   set tempo (value) {
-    value = limit(value, this.#minTempo, this.#maxTempo);
-    this.#tempo = value;
+    this.#tempo = limit(value, this.#minTempo, this.#maxTempo);
     this.#delay = 60 / this.tempo;
 
     if (this.#tempo < 60) {
@@ -123,17 +112,9 @@ class Model {
     this.serialize();
   }
 
-  get tempo () {
-    return this.#tempo;
-  }
+  get tempoName () { return this.#tempoName; }
 
-  get tempoName () {
-    return this.#tempoName;
-  }
-
-  get delay () {
-    return this.#delay;
-  }
+  get delay () { return this.#delay; }
 
   async loadAudioData (audioContext) {
     for (const soundSet of Object.values(this.soundSets)) {
@@ -157,16 +138,12 @@ class Model {
   async lock () {
     try {
       this.#wakeLock = await navigator.wakeLock.request('screen');
-    } catch (err) {
-
-    }
+    } catch (err) {}
   }
 
   unlock () {
     if (this.#wakeLock) {
-      this.#wakeLock.release().then(() => {
-        this.wakeLock = null;
-      });
+      this.#wakeLock.release().then(() => (this.wakeLock = null));
     }
   }
 
@@ -203,61 +180,24 @@ class Model {
     const tempo = Math.round((60 / ((now - lastTime) / 1000)));
     if (Number.isFinite(tempo) && tempo >= this.#minTempo) {
       this.#taptempo.push(tempo);
-      const avg = Math.round(this.#taptempo.reduce((prev, item) => prev + item, 0) / this.#taptempo.length);
-
-      return avg;
+      return Math.round(this.#taptempo.reduce((prev, item) => prev + item, 0) / this.#taptempo.length);
     }
   }
 
-  #propsToSerialize = ['subdivisions', 'tempo', 'soundSet', 'beats'];
-
   serialize () {
-    const data = this.#propsToSerialize.reduce((prev, item) => {
-      prev[item] = this[item];
-      return prev;
-    }, {});
-
+    const data = this.#propsToSerialize.reduce((prev, item) => Object.assign({ [item]: this[item] }, prev), {});
     localStorage.setItem('metronome', JSON.stringify(data));
   }
 
   deserialize () {
     try {
       const data = JSON.parse(localStorage.getItem('metronome'));
-      if (data) {
-        Object.keys(data).forEach(item => {
-          this[item] = data[item];
-        });
-      }
-    } catch {
-
-    }
+      Object.keys(data).forEach(item => (this[item] = data[item]));
+    } catch {}
   }
 
   constructor () {
     this.deserialize();
-  }
-}
-
-class Accent {
-  static value = {
-    SUBDIV: 'subdiv',
-    NONE: 'none',
-    LOW: 'low',
-    MEDIUM: 'medium',
-    HIGH: 'high'
-  };
-
-  static queue = [
-    this.value.NONE,
-    this.value.LOW,
-    this.value.MEDIUM,
-    this.value.HIGH
-  ];
-
-  static next (accent) {
-    let index = this.queue.indexOf(accent) + 1;
-    index = index >= this.queue.length ? 0 : index;
-    return this.queue[index];
   }
 }
 
