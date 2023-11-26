@@ -8,25 +8,53 @@ function limit (value, min, max) {
 
 class Model {
   #tempo = 120;
+  #taptempo = [];
+  #minTempo = 40;
+  #maxTempo = 280;
+  #tempoName = undefined;
   #subdivisions = 1;
   #volume = 0.8;
   #delay = 0.5;
-  #lastTime = undefined;
-  #taptempo = [];
   #wakeLock = undefined;
-  #maxTempo = 280;
-  #minTempo = 40;
+  #lastTime = undefined;
   #sound = undefined;
   #maxBeats = 9;
-  #tempoName = undefined;
   #soundSet = 'sticks';
   soundSource = {};
+  soundSets = ['sticks', 'drums', 'metronome', 'beeps'];
+  soundSources = {
+    [Accent.value.HIGH]: 'high',
+    [Accent.value.MEDIUM]: 'medium',
+    [Accent.value.LOW]: 'low',
+    [Accent.value.NONE]: 'low',
+    [Accent.value.SUBDIV]: 'subdiv'
+  };
+
+  #beats = [{
+    accent: Accent.value.HIGH
+  }, {
+    accent: Accent.value.LOW
+  }, {
+    accent: Accent.value.MEDIUM
+  }, {
+    accent: Accent.value.LOW
+  }];
+
+  get beats () {
+    return this.#beats;
+  }
+
+  set beats (data) {
+    this.#beats = data;
+    this.serialize();
+  }
 
   get subdivisions () { return this.#subdivisions; }
 
   set subdivisions (value) {
     this.#subdivisions = value;
-    document.querySelector('#selector').dispatchEvent(new CustomEvent('refresh', { detail: { beats: this.beats } }));
+    document.querySelector('#selector').dispatchEvent(new CustomEvent('refresh', { detail: { beats: this.#beats } }));
+    this.serialize();
   }
 
   get maxBeats () {
@@ -35,6 +63,7 @@ class Model {
 
   set soundSet (value) {
     this.#soundSet = value;
+    this.serialize();
   }
 
   get soundSet () {
@@ -68,6 +97,7 @@ class Model {
   set volume (value) {
     value = limit(value, 10, 100);
     this.#volume = (value * 0.02) - 1;
+    this.serialize();
   }
 
   set tempo (value) {
@@ -90,6 +120,7 @@ class Model {
     } else {
       this.#tempoName = 'Presto';
     }
+    this.serialize();
   }
 
   get tempo () {
@@ -103,15 +134,6 @@ class Model {
   get delay () {
     return this.#delay;
   }
-
-  soundSets = ['sticks', 'drums', 'metronome', 'beeps'];
-  soundSources = {
-    [Accent.value.HIGH]: 'high',
-    [Accent.value.MEDIUM]: 'medium',
-    [Accent.value.LOW]: 'low',
-    [Accent.value.NONE]: 'low',
-    [Accent.value.SUBDIV]: 'subdiv'
-  };
 
   async loadAudioData (audioContext) {
     for (const soundSet of Object.values(this.soundSets)) {
@@ -127,19 +149,10 @@ class Model {
   }
 
   setAccentAt (accent, index) {
-    model.beats[index].accent = accent;
-    document.querySelector('#selector').dispatchEvent(new CustomEvent('refresh', { detail: { beats: this.beats } }));
+    model.#beats[index].accent = accent;
+    document.querySelector('#selector').dispatchEvent(new CustomEvent('refresh', { detail: { beats: this.#beats } }));
+    this.serialize();
   }
-
-  beats = [{
-    accent: Accent.value.HIGH
-  }, {
-    accent: Accent.value.LOW
-  }, {
-    accent: Accent.value.MEDIUM
-  }, {
-    accent: Accent.value.LOW
-  }];
 
   async lock () {
     try {
@@ -158,18 +171,20 @@ class Model {
   }
 
   addBeat () {
-    const count = Math.min(this.beats.length + 1, this.maxBeats);
-    this.beats = Array(count).fill('').map((item, i) => this.beats[i] ? this.beats[i] : { accent: Accent.value.LOW });
+    const count = Math.min(this.#beats.length + 1, this.maxBeats);
+    this.beats = Array(count).fill('').map((item, i) => this.#beats[i] ? this.#beats[i] : { accent: Accent.value.LOW });
     document.querySelector('#selector').dispatchEvent(
-      new CustomEvent('refresh', { detail: { beats: this.beats } }));
+      new CustomEvent('refresh', { detail: { beats: this.#beats } }));
+    this.serialize();
   }
 
   removeBeat () {
-    if (this.beats.length > 1) {
-      this.beats.pop();
+    if (this.#beats.length > 1) {
+      this.#beats.pop();
       document.querySelector('#selector').dispatchEvent(
-        new CustomEvent('refresh', { detail: { beats: this.beats } }));
+        new CustomEvent('refresh', { detail: { beats: this.#beats } }));
     }
+    this.serialize();
   }
 
   tapTempo () {
@@ -192,6 +207,34 @@ class Model {
 
       return avg;
     }
+  }
+
+  #propsToSerialize = ['subdivisions', 'tempo', 'soundSet', 'beats'];
+
+  serialize () {
+    const data = this.#propsToSerialize.reduce((prev, item) => {
+      prev[item] = this[item];
+      return prev;
+    }, {});
+
+    localStorage.setItem('metronome', JSON.stringify(data));
+  }
+
+  deserialize () {
+    try {
+      const data = JSON.parse(localStorage.getItem('metronome'));
+      if (data) {
+        Object.keys(data).forEach(item => {
+          this[item] = data[item];
+        });
+      }
+    } catch {
+
+    }
+  }
+
+  constructor () {
+    this.deserialize();
   }
 }
 
@@ -238,6 +281,9 @@ class Controller {
 
     document.querySelector('#counter').innerHTML = this.model.beats.length;
     document.querySelector('#subcounter').innerHTML = this.model.subdivisions;
+    document.querySelector(`#sounds [value="${this.model.soundSet}"]`).checked = true;
+    document.querySelector(`#subdivisions-container [value="${this.model.subdivisions}"]`).checked = true;
+
     document.querySelector('#add').addEventListener('click', (event) => {
       this.model.addBeat();
       document.querySelector('#remove').classList.remove('disabled');
@@ -261,6 +307,7 @@ class Controller {
     document.querySelector('#tempo').addEventListener('change', (event) => {
       this.setTempo(parseInt(event.target.value, 10));
     });
+
     document.querySelector('#sounds').addEventListener('change', (event) => {
       this.model.soundSet = event.target.value;
     });
@@ -464,7 +511,7 @@ async function wait (interval) {
 const model = new Model();
 
 window.addEventListener('DOMContentLoaded', () => {
-  new Controller(model);
+  const controller = new Controller(model);
   model.loadAudioData();
 });
 
