@@ -1,4 +1,3 @@
-window.noSleep = new window.NoSleep();
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
 function limit (value, min, max) {
