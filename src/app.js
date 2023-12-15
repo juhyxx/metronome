@@ -139,7 +139,6 @@ class Model {
   async lock () {
     try {
       this.#wakeLock = await navigator.wakeLock.request('screen');
-      noSleep.enable();
     } catch (err) {}
   }
 
@@ -147,7 +146,6 @@ class Model {
     if (this.#wakeLock) {
       this.#wakeLock.release().then(() => (this.wakeLock = null));
     }
-    noSleep.disable();
   }
 
   addBeat () {
