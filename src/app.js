@@ -136,22 +136,15 @@ class Model {
   }
 
   async lock () {
-    // try {
-    //   this.#wakeLock = await navigator.wakeLock.request('screen');
-    // } catch (err) { }
-
-    // Ugly hack for non-functional API for Wake Lock on iOS PWA
-    this.#wakeLock = setInterval(function () {
-      location.href = location.href; // try refreshing
-      window.setTimeout(window.stop, 0); // stop it soon after
-    }, 3000);
+    try {
+      this.#wakeLock = await navigator.wakeLock.request('screen');
+    } catch (err) {}
   }
 
   unlock () {
-    // if (this.#wakeLock) {
-    //   this.#wakeLock.release().then(() => (this.wakeLock = null));
-    // }
-    clearInterval(this.#wakeLock);
+    if (this.#wakeLock) {
+      this.#wakeLock.release().then(() => (this.wakeLock = null));
+    }
   }
 
   addBeat () {
