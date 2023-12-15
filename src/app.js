@@ -1,3 +1,4 @@
+window.noSleep = new window.NoSleep();
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
 function limit (value, min, max) {
@@ -138,6 +139,7 @@ class Model {
   async lock () {
     try {
       this.#wakeLock = await navigator.wakeLock.request('screen');
+      noSleep.enable();
     } catch (err) {}
   }
 
@@ -145,6 +147,7 @@ class Model {
     if (this.#wakeLock) {
       this.#wakeLock.release().then(() => (this.wakeLock = null));
     }
+    noSleep.disable();
   }
 
   addBeat () {
