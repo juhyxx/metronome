@@ -52,6 +52,16 @@ class Model {
     accent: Accent.value.LOW
   }];
 
+  #tempoNames = [
+    { value: 60, name: "Largo" },
+    { value: 66, name: "Larghetto" },
+    { value: 76, name: "Adagio" },
+    { value: 108, name: "Andante" },
+    { value: 120, name: "Moderato" },
+    { value: 168, name: "Allegro" },
+  ].reverse()
+
+
   soundSource = {};
   soundSets = ['sticks', 'drums', 'metronome', 'beeps'];
   soundSources = {
@@ -88,29 +98,20 @@ class Model {
   set volume(value) { this.#volume = (limit(value, 10, 100) * 0.02) - 1; this.serialize(); }
 
   get tempo() { return this.#tempo; }
+
   set tempo(value) {
     this.#tempo = limit(value, this.#minTempo, this.#maxTempo);
     this.#delay = 60 / this.tempo;
+    this.tempoName = this.#tempo;
 
-    if (this.#tempo < 60) {
-      this.#tempoName = 'Largo';
-    } else if (this.#tempo < 66) {
-      this.#tempoName = 'Larghetto';
-    } else if (this.#tempo < 76) {
-      this.#tempoName = 'Adagio';
-    } else if (this.#tempo < 108) {
-      this.#tempoName = 'Andante';
-    } else if (this.#tempo < 120) {
-      this.#tempoName = 'Moderato';
-    } else if (this.#tempo < 168) {
-      this.#tempoName = 'Allegro';
-    } else {
-      this.#tempoName = 'Presto';
-    }
     this.serialize();
   }
 
   get tempoName() { return this.#tempoName; }
+
+  set tempoName(tempo) {
+    this.#tempoName = this.#tempoNames.reduce((prev, item) => tempo < item.value ? item.name : prev, "Presto")
+  }
 
   get delay() { return this.#delay; }
 
