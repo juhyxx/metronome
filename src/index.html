@@ -4,7 +4,10 @@
 <head>
     <title>Metronome 1.2.1</title>
     <meta charset="utf-8">
-    <script src="app.js?1.2.1" defer></script>
+    <script src="app.js" defer></script>
+    <script src="components/VolumeSelector.js?1.2.1" defer></script>
+    <script src="components/TapTempoButton.js?1.2.1" defer></script>
+
     <link rel="stylesheet" href="style.css?1.2.1">
     <link rel="manifest" href="manifest.json" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,38 +15,7 @@
 </head>
 
 <body>
-
-    <section id="volume">
-        <input type="radio" id=volume100 name="volume" value="100">
-        <label data-volume="100" for="volume100"></label>
-
-        <input type="radio" id=volume090 name="volume" value="90">
-        <label data-volume="90" for="volume090"></label>
-
-        <input type="radio" id=volume080 name="volume" value="80">
-        <label data-volume="80" for="volume080"></label>
-
-        <input type="radio" id=volume070 name="volume" value="70">
-        <label data-volume="70" for="volume070"></label>
-
-        <input type="radio" id=volume060 name="volume" value="60">
-        <label data-volume="60" for="volume060"></label>
-
-        <input type="radio" id=volume050 name="volume" value="50">
-        <label data-volume="50" for="volume050"></label>
-
-        <input type="radio" id=volume040 name="volume" value="40">
-        <label data-volume="40" for="volume040"></label>
-
-        <input type="radio" id=volume030 name="volume" value="30">
-        <label data-volume="30" for="volume030"></label>
-
-        <input type="radio" id=volume020 name="volume" value="20">
-        <label data-volume="20" for="volume020"></label>
-
-        <input type="radio" id=volume010 name="volume" value="10">
-        <label data-volume="10" for="volume010"></label>
-    </section>
+    <volume-selector></volume-selector>
 
     <div id="metronome">
         <header>
@@ -60,6 +32,8 @@
 
         <div id="metronome-inner">
             <section id=selector></section>
+
+            <beat-selector></beat-selector>
 
             <div id="controls">
                 <section id="tempo-knob">
@@ -108,7 +82,8 @@
                                 <div id="remove">−</div>
                             </div>
                         </div>
-                        <div id="tap-tempo">TAP</div>
+
+                        <tap-tempo min="40">TAP</tap-tempo>
                     </section>
 
                     <section id="sounds">

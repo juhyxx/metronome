@@ -1,6 +1,6 @@
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
-function limit (value, min, max) {
+function limit(value, min, max) {
   value = Math.max(value, min);
   value = Math.min(value, max);
   return value;
@@ -22,7 +22,7 @@ class Accent {
     this.value.HIGH
   ];
 
-  static next (accent) {
+  static next(accent) {
     const index = (this.queue.indexOf(accent) + 1) % this.queue.length;
 
     return this.queue[index];
@@ -31,7 +31,6 @@ class Accent {
 
 class Model {
   #tempo = 120;
-  #taptempo = [];
   #minTempo = 40;
   #maxTempo = 280;
   #tempoName = undefined;
@@ -39,7 +38,6 @@ class Model {
   #volume = 0.8;
   #delay = 0.5;
   #wakeLock = undefined;
-  #lastTime = undefined;
   #sound = undefined;
   #maxBeats = 9;
   #soundSet = 'sticks';
@@ -64,33 +62,33 @@ class Model {
     [Accent.value.SUBDIV]: 'subdiv'
   };
 
-  get beats () { return this.#beats; }
-  set beats (data) { this.#beats = data; this.serialize(); }
+  get beats() { return this.#beats; }
+  set beats(data) { this.#beats = data; this.serialize(); }
 
-  get maxBeats () { return this.#maxBeats; }
+  get maxBeats() { return this.#maxBeats; }
 
-  get subdivisions () { return this.#subdivisions; }
-  set subdivisions (value) {
+  get subdivisions() { return this.#subdivisions; }
+  set subdivisions(value) {
     this.#subdivisions = value;
     document.querySelector('#selector').dispatchEvent(new CustomEvent('refresh', { detail: { beats: this.#beats } }));
     this.serialize();
   }
 
-  get soundSet () { return this.#soundSet; }
-  set soundSet (value) { this.#soundSet = value; this.serialize(); }
+  get soundSet() { return this.#soundSet; }
+  set soundSet(value) { this.#soundSet = value; this.serialize(); }
 
-  set sound (item) { this.#sound = item; }
-  get sound () { return this.#sound; }
+  set sound(item) { this.#sound = item; }
+  get sound() { return this.#sound; }
 
-  get maxTempo () { return this.#maxTempo; }
-  get minTempo () { return this.#minTempo; }
+  get maxTempo() { return this.#maxTempo; }
+  get minTempo() { return this.#minTempo; }
 
-  get volumePercentage () { return Math.round((this.#volume + 1) / 0.02); }
-  get volume () { return this.#volume; }
-  set volume (value) { this.#volume = (limit(value, 10, 100) * 0.02) - 1; this.serialize(); }
+  get volumePercentage() { return Math.round((this.#volume + 1) / 0.02); }
+  get volume() { return this.#volume; }
+  set volume(value) { this.#volume = (limit(value, 10, 100) * 0.02) - 1; this.serialize(); }
 
-  get tempo () { return this.#tempo; }
-  set tempo (value) {
+  get tempo() { return this.#tempo; }
+  set tempo(value) {
     this.#tempo = limit(value, this.#minTempo, this.#maxTempo);
     this.#delay = 60 / this.tempo;
 
@@ -112,11 +110,11 @@ class Model {
     this.serialize();
   }
 
-  get tempoName () { return this.#tempoName; }
+  get tempoName() { return this.#tempoName; }
 
-  get delay () { return this.#delay; }
+  get delay() { return this.#delay; }
 
-  async loadAudioData (audioContext) {
+  async loadAudioData(audioContext) {
     for (const soundSet of Object.values(this.soundSets)) {
       for (const item of Object.entries(this.soundSources)) {
         const rsvp = await fetch(`sounds/${soundSet}/${item[1]}.wav`);
@@ -129,25 +127,25 @@ class Model {
     }
   }
 
-  setAccentAt (accent, index) {
+  setAccentAt(accent, index) {
     model.#beats[index].accent = accent;
     document.querySelector('#selector').dispatchEvent(new CustomEvent('refresh', { detail: { beats: this.#beats } }));
     this.serialize();
   }
 
-  async lock () {
+  async lock() {
     try {
       this.#wakeLock = await navigator.wakeLock.request('screen');
-    } catch (err) {}
+    } catch (err) { }
   }
 
-  unlock () {
+  unlock() {
     if (this.#wakeLock) {
       this.#wakeLock.release().then(() => (this.wakeLock = null));
     }
   }
 
-  addBeat () {
+  addBeat() {
     const count = Math.min(this.#beats.length + 1, this.maxBeats);
     this.beats = Array(count).fill('').map((item, i) => this.#beats[i] ? this.#beats[i] : { accent: Accent.value.LOW });
     document.querySelector('#selector').dispatchEvent(
@@ -155,7 +153,7 @@ class Model {
     this.serialize();
   }
 
-  removeBeat () {
+  removeBeat() {
     if (this.#beats.length > 1) {
       this.#beats.pop();
       document.querySelector('#selector').dispatchEvent(
@@ -164,39 +162,19 @@ class Model {
     this.serialize();
   }
 
-  tapTempo () {
-    const now = Date.now();
-    let lastTime = this.#lastTime || now;
-
-    if (now - lastTime > 2000) {
-      this.#taptempo = [];
-      lastTime = now;
-    }
-    if (this.#taptempo.length > 5) {
-      this.#taptempo.shift();
-    }
-
-    this.#lastTime = now;
-    const tempo = Math.round((60 / ((now - lastTime) / 1000)));
-    if (Number.isFinite(tempo) && tempo >= this.#minTempo) {
-      this.#taptempo.push(tempo);
-      return Math.round(this.#taptempo.reduce((prev, item) => prev + item, 0) / this.#taptempo.length);
-    }
-  }
-
-  serialize () {
+  serialize() {
     const data = this.#propsToSerialize.reduce((prev, item) => Object.assign({ [item]: this[item] }, prev), {});
     localStorage.setItem('metronome', JSON.stringify(data));
   }
 
-  deserialize () {
+  deserialize() {
     try {
       const data = JSON.parse(localStorage.getItem('metronome'));
       Object.keys(data).forEach(item => (this[item] = data[item]));
-    } catch {}
+    } catch { }
   }
 
-  constructor () {
+  constructor() {
     this.deserialize();
   }
 }
@@ -207,14 +185,14 @@ class Controller {
   #volume = undefined;
   #dndY = undefined;
 
-  get model () {
+  get model() {
     return this.#model;
   }
 
-  constructor (model) {
+  constructor(model) {
     this.#model = model;
     this.#beatSelector = document.querySelector('#selector');
-    this.#volume = document.querySelector('#volume');
+    this.#volume = document.querySelector('volume-selector');
     this.#beatSelector.addEventListener('refresh', (event) => {
       this.renderBeatSelector(event.detail.beats);
     });
@@ -238,11 +216,9 @@ class Controller {
         event.target.classList.add('disabled');
       }
     });
-    document.querySelector('#tap-tempo').addEventListener('click', () => {
-      const tap = this.model.tapTempo();
-      if (tap) {
-        this.setTempo(tap);
-      }
+
+    document.querySelector('tap-tempo').addEventListener('change', (event) => {
+      this.setTempo(event.detail.tempo);
     });
     document.querySelector('#tempo').addEventListener('change', (event) => {
       this.setTempo(parseInt(event.target.value, 10));
@@ -268,28 +244,14 @@ class Controller {
     });
     this.renderTempoSelector();
     this.renderBeatSelector(this.model.beats);
-    this.renderVolume();
-    this.setTempo(this.model.tempo);
-    document.querySelector('#volume input[name=volume]:nth-child(3)').click();
-  }
-
-  renderVolume () {
-    this.#volume.addEventListener('wheel', (event) => {
-      const inputs = [...document.querySelectorAll('#volume input[name=volume]')];
-      const selected = document.querySelector('#volume input[name=volume]:checked');
-      let index = inputs.indexOf(selected);
-      index = (event.deltaY < 0) ? index + 1 : index - 1;
-      index = limit(index, 0, inputs.length - 1);
-      inputs[index].click();
-      event.preventDefault();
-    });
-
     this.#volume.addEventListener('change', (event) => {
       this.model.volume = parseInt(event.target.value, 10);
     });
+    this.setTempo(this.model.tempo);
+    document.querySelector('volume-selector').setAttribute("volume", "80")
   }
 
-  setTempo (tempo) {
+  setTempo(tempo) {
     this.model.tempo = tempo;
     document.querySelector('#tempo-name').innerHTML = this.model.tempoName;
     document.querySelector('#tempo').value = this.model.tempo;
@@ -303,7 +265,7 @@ class Controller {
     }
   }
 
-  renderTempoSelector () {
+  renderTempoSelector() {
     const rangeAngle = 50;
     const range = ((this.model.maxTempo - this.model.minTempo) / 10);
     const angleSize = (180 + 2 * rangeAngle) / range;
@@ -394,7 +356,7 @@ class Controller {
     }, { passive: true });
   }
 
-  renderBeatSelector (beats) {
+  renderBeatSelector(beats) {
     document.querySelector('#counter').innerHTML = beats.length;
     this.#beatSelector.innerHTML = '';
     beats.forEach((item, index) => {
@@ -424,7 +386,7 @@ class Controller {
     });
   }
 
-  async moveHighlight (counter, waitingTime) {
+  async moveHighlight(counter, waitingTime) {
     await wait(waitingTime);
 
     const selector = document.querySelector('#selector');
@@ -442,10 +404,10 @@ class Controller {
   }
 }
 
-async function wait (interval) {
+async function wait(interval) {
   const until = Date.now() + interval;
 
-  while (Date.now() <= until) {}
+  while (Date.now() <= until) { }
 }
 
 const model = new Model();
@@ -460,16 +422,16 @@ class WaveSound {
   isPlaying = true;
   audioContext = undefined;
 
-  get counter () {
+  get counter() {
     return this.#counter;
   }
 
-  stop () {
+  stop() {
     this.isPlaying = false;
     this.model.unlock();
   }
 
-  constructor (controller) {
+  constructor(controller) {
     this.model = controller.model;
     this.controller = controller;
     this.model.lock();
@@ -484,7 +446,7 @@ class WaveSound {
     }
   }
 
-  planNextBeat (t) {
+  planNextBeat(t) {
     if (!this.isPlaying) return;
 
     const startTime = t + this.model.delay;
@@ -526,14 +488,14 @@ class WaveSound {
     this.increaseCounter();
   }
 
-  onBeatEnd (event) {
+  onBeatEnd(event) {
     const startTime = event.target.startTime;
 
     this.controller.moveHighlight(event.target.counter, this.audioContext.currentTime - startTime);
     this.planNextBeat(startTime);
   }
 
-  onSubDivisionEnd (event) {
+  onSubDivisionEnd(event) {
     setTimeout(() => {
       document.querySelector('#subcounter').innerHTML = event.target.subdivision + 1;
       const el = document.querySelector(`#selector>div:nth-child(${event.target.counter + 1}) .subdivisions >div:nth-child(${event.target.subdivision + 1})`);
@@ -543,7 +505,7 @@ class WaveSound {
     }, event.target.startTime - this.audioContext.currentTime);
   }
 
-  increaseCounter () {
+  increaseCounter() {
     this.#counter++;
     if (this.#counter >= this.model.beats.length) {
       this.#counter = 0;
