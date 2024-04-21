@@ -17,6 +17,9 @@
             rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.3) 70%,
             transparent 70%),
         radial-gradient(circle, transparent 49%, rgba(0, 0, 0, 1) 100%);
+    --bg-button: linear-gradient(0deg, rgba(0, 0, 0, 0.1) 49%, rgba(255, 255, 255, 0.03) 50%, transparent 100%);
+    --bg-button-active: linear-gradient(deg, rgba(0, 0, 0, 0.1) 49%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.005) 100%);
+
 
     color: rgba(255, 255, 255, 0.8);
     font-size: 5vh;
@@ -462,12 +465,13 @@ input#tempo {
                 flex: 1;
                 cursor: pointer;
                 box-shadow: var(--shadow);
-                background-color: rgba(255, 255, 255, 0.1);
+                background: var(--bg-button);
                 padding: 0.25rem;
                 text-align: center;
 
                 &:active {
                     box-shadow: var(--of-shadow);
+                    background: var(--bg-button-active);
                 }
             }
 
@@ -482,6 +486,7 @@ input#tempo {
 
             & input:checked+label {
                 box-shadow: var(--of-shadow);
+                background: var(--bg-button-active);
                 color: var(--main-color);
                 text-shadow: 0 0 5px var(--main-color);
             }
@@ -518,7 +523,7 @@ input#tempo {
                 cursor: pointer;
                 box-sizing: content-box;
                 box-shadow: var(--shadow);
-                background-color: rgba(255, 255, 255, 0.1);
+                background: var(--bg-button);
                 height: 1.5rem;
                 font-weight: bold;
                 font-size: 0.7rem;
@@ -531,10 +536,6 @@ input#tempo {
                     border-radius: 0rem 2rem 2rem 0rem;
                 }
 
-                &:hover {
-                    background-color: rgba(255, 255, 255, 0.08);
-                }
-
                 &.disabled {
                     box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.5);
                     pointer-events: none;
@@ -543,6 +544,7 @@ input#tempo {
 
                 &:active {
                     box-shadow: var(--of-shadow);
+                    background: var(--bg-button-active);
                     color: var(--main-color);
                     text-shadow: 0 0 5px var(--main-color);
                 }
@@ -561,12 +563,13 @@ tap-tempo {
     cursor: pointer;
     box-shadow: var(--shadow);
     border-radius: 2rem;
-    background-color: rgba(255, 255, 255, 0.1);
+    background: var(--bg-button);
     aspect-ratio: 1 / 1;
     text-align: center;
 
     &:active {
         box-shadow: var(--of-shadow);
+        background: var(--bg-button-active);
         color: var(--main-color);
         text-shadow: 0 0 5px var(--main-color);
     }
@@ -716,7 +719,7 @@ body.help {
         flex: 1;
         cursor: pointer;
         box-shadow: var(--shadow);
-        background-color: rgba(255, 255, 255, 0.1);
+        background: var(--bg-button);
         padding: 0.25rem;
         text-align: center;
 
@@ -727,6 +730,7 @@ body.help {
 
     & input:checked+label {
         box-shadow: var(--of-shadow);
+        background: var(--bg-button-active);
         color: var(--main-color);
         text-shadow: 0 0 5px var(--main-color);
     }
