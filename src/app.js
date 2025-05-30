@@ -196,6 +196,7 @@ class Controller {
         this.#volume = document.querySelector('volume-selector');
         this.#beatSelector.addEventListener('refresh', (event) => {
             this.renderBeatSelector(event.detail.beats);
+            document.querySelector('#play').setAttribute('beats', event.detail.beats.length);
         });
 
         document.querySelector('#counter').innerHTML = this.model.beats.length;
