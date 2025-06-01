@@ -685,6 +685,7 @@ volume-selector {
 }
 
 body.help {
+
     #help {
         display: flex;
     }
@@ -698,7 +699,7 @@ body.help {
     z-index: 200;
     box-shadow: 0 0 1rem rgba(0, 0, 0, 0.3);
     border-radius: 0.5rem;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.8);
     padding: 0.5rem;
 
 
@@ -712,6 +713,7 @@ body.help {
         padding: 0.25rem;
         color: black;
         text-shadow: none;
+        border: 4px outset ;
     }
 }
 

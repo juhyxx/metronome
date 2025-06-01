@@ -261,7 +261,8 @@ class Controller {
         document.querySelector('#wheel #tempo-value').innerHTML = this.model.tempo;
         document.querySelectorAll('#tempo-knob-inner .value').forEach(el => el.classList.remove('highlight'));
 
-        const el = [...document.querySelectorAll('#tempo-knob-inner .value')].find(el => parseInt(el.dataset.tempo, 10) === this.model.tempo);
+        const tempoRound = Math.round(Math.round(this.model.tempo / 10) * 10);
+        const el = [...document.querySelectorAll('#tempo-knob-inner .value')].find(el => parseInt(el.dataset.tempo, 10) === tempoRound);
         if (el) {
             el.classList.add('highlight');
         }
@@ -292,8 +293,13 @@ class Controller {
             document.querySelector('#tempo-knob-inner').appendChild(el);
         }
         document.querySelector('#tempo-knob').addEventListener('wheel', (event) => {
-            const tempo = Math.round(Math.round(model.tempo / 10) * 10);
-            this.setTempo((event.deltaY > 0) ? tempo + 10 : tempo - 10);
+            const difference = event.ctrlKey ? 1 : 10;
+            const tempo = event.ctrlKey ? model.tempo : Math.round(Math.round(model.tempo / 10) * 10);
+
+            this.setTempo((event.deltaY > 0) ? tempo + difference : tempo - difference);
+
+
+
             event.preventDefault();
         });
         document.querySelector('#wheel').addEventListener('click', () => {
@@ -306,6 +312,7 @@ class Controller {
             }
         });
         document.addEventListener('keydown', (event) => {
+            document.body.classList.remove('help');
             if (event.code === 'Space' || event.code === 'Enter') {
                 document.body.classList.toggle('is-playing');
                 if (this.model.sound) {
@@ -336,6 +343,11 @@ class Controller {
                 this.#dndY = event.clientY;
             }
         }, { passive: true });
+
+        
+
+
+
         document.body.addEventListener('mouseup', (event) => {
             document.body.classList.remove('dnd');
             this.#dndY = undefined;
@@ -466,14 +478,14 @@ class WaveSound {
         gainNode.connect(this.audioContext.destination);
 
         let volume = this.model.volume;
-        volume = parseFloat((Math.pow(volume, 2)).toFixed(2)) -1
-        console.log( volume);
+        volume = parseFloat((Math.pow(volume, 2)).toFixed(2)) - 1
+        console.log(volume);
         gainNode.gain.setValueAtTime(beat.accent === Accent.value.NONE ? -1 : volume, startTime);
 
         source.start(startTime);
 
         if (this.model.subdivisions > 1) {
-            for (let i = beat.accent === Accent.value.NONE ? 0 :1; i < this.model.subdivisions; i++) {
+            for (let i = beat.accent === Accent.value.NONE ? 0 : 1; i < this.model.subdivisions; i++) {
                 const subdivisionsStartTime = startTime + i * (this.model.delay / this.model.subdivisions);
                 const subSource = new AudioBufferSourceNode(this.audioContext);
                 const gainSubNode = new GainNode(this.audioContext);
