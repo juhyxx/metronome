@@ -1,5 +1,12 @@
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
+const memoryDefaults = {
+    "memory0": { "beats": [{ "accent": "high" }, { "accent": "low" }, { "accent": "medium" }, { "accent": "low" }], "soundSet": "drums", "tempo": 120, "subdivisions": 2 },
+    "memory1": { "beats": [{ "accent": "high" }, { "accent": "low" }], "soundSet": "sticks", "tempo": 110, "subdivisions": 2 },
+    "memory2": { "beats": [{ "accent": "high" }, { "accent": "low" }, { "accent": "medium" }, { "accent": "low" }, { "accent": "medium" }, { "accent": "low" }, { "accent": "low" }], "soundSet": "sticks", "tempo": 50, "subdivisions": 6 },
+    "memory3": { "beats": [{ "accent": "high" }, { "accent": "low" }, { "accent": "low" }, { "accent": "low" }], "soundSet": "beeps", "tempo": 60, "subdivisions": 6 }
+}
+
 function limit(value, min, max) {
     value = Math.max(value, min);
     value = Math.min(value, max);
@@ -163,15 +170,16 @@ class Model {
         this.serialize();
     }
 
-    serialize() {
+    serialize(memory = "default") {
         const data = this.#propsToSerialize.reduce((prev, item) => Object.assign({ [item]: this[item] }, prev), {});
-        localStorage.setItem('metronome', JSON.stringify(data));
+        localStorage.setItem(memory === "default" ? 'metronome' : 'memory' + memory, JSON.stringify(data));
     }
 
-    deserialize() {
+    deserialize(memory = "default") {
         try {
-            const data = JSON.parse(localStorage.getItem('metronome'));
-            Object.keys(data).forEach(item => (this[item] = data[item]));
+            const key = memory === "default" ? 'metronome' : 'memory' + memory;
+            const data = JSON.parse(localStorage.getItem(key)) || memoryDefaults[key];
+            if (data) Object.keys(data).forEach(item => (this[item] = data[item]));
         } catch { }
     }
 
@@ -221,6 +229,13 @@ class Controller {
 
         document.querySelector('tap-tempo').addEventListener('change', (event) => {
             this.setTempo(event.detail.tempo);
+        });
+        document.querySelector('mem-manager').addEventListener('load', (event) => {
+            this.model.deserialize(event.detail.memory);
+
+        });
+        document.querySelector('mem-manager').addEventListener('save', (event) => {
+            this.model.serialize(event.detail.memory);
         });
         document.querySelector('#tempo').addEventListener('change', (event) => {
             this.setTempo(parseInt(event.target.value, 10));
@@ -297,9 +312,6 @@ class Controller {
             const tempo = event.ctrlKey ? model.tempo : Math.round(Math.round(model.tempo / 10) * 10);
 
             this.setTempo((event.deltaY > 0) ? tempo + difference : tempo - difference);
-
-
-
             event.preventDefault();
         });
         document.querySelector('#wheel').addEventListener('click', () => {
@@ -343,10 +355,6 @@ class Controller {
                 this.#dndY = event.clientY;
             }
         }, { passive: true });
-
-        
-
-
 
         document.body.addEventListener('mouseup', (event) => {
             document.body.classList.remove('dnd');
