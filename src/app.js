@@ -193,6 +193,7 @@ class Controller {
     #beatSelector = undefined;
     #volume = undefined;
     #dndY = undefined;
+    #subdivisionsSelector = undefined;
 
     get model() {
         return this.#model;
@@ -202,6 +203,7 @@ class Controller {
         this.#model = model;
         this.#beatSelector = document.querySelector('#selector');
         this.#volume = document.querySelector('volume-selector');
+        this.#subdivisionsSelector = document.querySelector('subdivisions-selector');
         this.#beatSelector.addEventListener('refresh', (event) => {
             this.renderBeatSelector(event.detail.beats);
             document.querySelector('#play').setAttribute('beats', event.detail.beats.length);
@@ -210,7 +212,8 @@ class Controller {
         document.querySelector('#counter').innerHTML = this.model.beats.length;
         document.querySelector('#subcounter').innerHTML = this.model.subdivisions;
         document.querySelector(`#sounds [value="${this.model.soundSet}"]`).checked = true;
-        document.querySelector(`#subdivisions-container [value="${this.model.subdivisions}"]`).checked = true;
+        this.#subdivisionsSelector.setAttribute("division", this.model.subdivisions);
+        // document.querySelector(`#subdivisions-container [value="${this.model.subdivisions}"]`).checked = true;
 
         document.querySelector('#add').addEventListener('click', (event) => {
             this.model.addBeat();
@@ -232,7 +235,9 @@ class Controller {
         });
         document.querySelector('mem-manager').addEventListener('load', (event) => {
             this.model.deserialize(event.detail.memory);
-
+            document.querySelector(`#sounds [value="${this.model.soundSet}"]`).checked = true;
+            document.querySelector('#subcounter').innerHTML = this.model.subdivisions;
+            document.querySelector('subdivisions-selector').setAttribute("division", this.model.subdivisions);
         });
         document.querySelector('mem-manager').addEventListener('save', (event) => {
             this.model.serialize(event.detail.memory);
@@ -244,25 +249,13 @@ class Controller {
         document.querySelector('#sounds').addEventListener('change', (event) => {
             this.model.soundSet = event.target.value;
         });
-
-        document.querySelector('#subdivisions').addEventListener('change', (event) => {
-            this.model.subdivisions = parseInt(event.target.value, 10);
-            document.querySelector('#subcounter').innerHTML = this.model.subdivisions;
-        });
-
-        document.querySelector('#subdivisions').addEventListener('click', (event) => {
-            const value = event.target.closest('div').querySelector('input').value;
-            if (this.model.subdivisions === parseInt(value, 10)) {
-                this.model.subdivisions = 1;
-                event.preventDefault();
-                event.stopPropagation();
-                document.querySelector('#sub0').checked = true;
-            }
-        });
         this.renderTempoSelector();
         this.renderBeatSelector(this.model.beats);
         this.#volume.addEventListener('change', (event) => {
             this.model.volume = parseInt(event.target.value, 10);
+        });
+        this.#subdivisionsSelector.addEventListener('select', (event) => {
+            this.model.subdivisions = event.detail.subdivision;
         });
         this.setTempo(this.model.tempo);
         document.querySelector('volume-selector').setAttribute("volume", "80")
@@ -487,7 +480,6 @@ class WaveSound {
 
         let volume = this.model.volume;
         volume = parseFloat((Math.pow(volume, 2)).toFixed(2)) - 1
-        console.log(volume);
         gainNode.gain.setValueAtTime(beat.accent === Accent.value.NONE ? -1 : volume, startTime);
 
         source.start(startTime);

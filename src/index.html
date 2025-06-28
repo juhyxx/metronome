@@ -2,14 +2,15 @@
 <html lang="en">
 
 <head>
-    <title>Metronome 1.2.6</title>
+    <title>Metronome 1.2.7</title>
     <meta charset="utf-8">
-    <script src="app.js?1.2.6" defer></script>
-    <script src="components/VolumeSelector.js?1.2.6" defer></script>
-    <script src="components/TapTempoButton.js?1.2.6" defer></script>
-    <script src="components/MemManager.js?1.2.6" defer></script>
+    <script src="app.js?1.2.7" defer></script>
+    <script src="components/VolumeSelector.js?1.2.7" defer></script>
+    <script src="components/TapTempoButton.js?1.2.7" defer></script>
+    <script src="components/MemManager.js?1.2.7" defer></script>
+    <script src="components/SubdivisionsSelector.js?1.2.7" defer></script>
 
-    <link rel="stylesheet" href="style.css?1.2.6">
+    <link rel="stylesheet" href="style.css?1.2.7">
     <link rel="manifest" href="manifest.json" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
@@ -20,7 +21,7 @@
 
     <div id="metronome">
         <header>
-            <h1>Metronome 1.2.6 <span id="help-trigger">?</span></h1>
+            <h1>Metronome 1.2.7 <span id="help-trigger">?</span></h1>
             <div id="tempoview">
                 <label>Tempo<input id="tempo" type="number" value="120" min="40" max="260">BPM</label>
             </div>
@@ -48,32 +49,7 @@
                 </section>
 
                 <div id="buttons">
-                    <section id="subdivisions-container">
-                        <h2>Subdivisions</h2>
-                        <input type="radio" id="sub0" name="sublabel" value="1">
-                        <div id="subdivisions">
-                            <div>
-                                <input type="radio" id="sub2" name="sublabel" value="2">
-                                <label for="sub2">2<br></label>
-                            </div>
-                            <div>
-                                <input type="radio" id="sub3" name="sublabel" value="3">
-                                <label for="sub3">3</label>
-                            </div>
-                            <div>
-                                <input type="radio" id="sub4" name="sublabel" value="4">
-                                <label for="sub4">4</label>
-                            </div>
-                            <div>
-                                <input type="radio" id="sub5" name="sublabel" value="5">
-                                <label for="sub5">5</label>
-                            </div>
-                            <div>
-                                <input type="radio" id="sub6" name="sublabel" value="6">
-                                <label for="sub6">6</label>
-                            </div>
-                        </div>
-                    </section>
+                    <subdivisions-selector></subdivisions-selector>
 
                     <section id="beat-container">
                         <div id="beat-subcontainer">

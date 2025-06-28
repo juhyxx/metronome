@@ -474,6 +474,7 @@ input#tempo {
     background-color: transparent;
 }
 
+subdivisions-selector,
 #subdivisions-container {
     display: flex;
     flex: 1;
@@ -486,9 +487,11 @@ input#tempo {
     }
 
     #subdivisions {
+        color: rgba(255, 255, 255, 0.8);
         display: flex;
         flex: 1;
         justify-content: space-between;
+        font-size: 0.4rem;
 
 
         & div {

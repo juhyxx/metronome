@@ -17,20 +17,19 @@ class VolumeSelector extends HTMLElement {
     }
 
     connectedCallback() {
-        const items = [...Array(10)].map((item, index) => {
-            const el = document.createElement('input');
-            const value = (index + 1) * 10;
-            el.type = 'radio';
-            el.value = value;
-            el.id = 'volume' + value;
-            el.name = 'volume';
+        const template = document.createElement('template');
+        let html = '';
 
-            const label = document.createElement('label');
-            label.dataset.volume = value;
-            label.setAttribute('for', 'volume' + value);
-            return [el, label];
-        }).reverse().flat();
-        this.append(...items);
+        for (let i = 10; i >= 1; i--) {
+            const value = i * 10;
+            html += `
+            <input type="radio" id="volume${value}" name="volume" value="${value}">
+            <label for="volume${value}" data-volume="${value}"></label>
+        `;
+        }
+
+        template.innerHTML = html;
+        this.appendChild(template.content.cloneNode(true));
         this.addEventListener('wheel', this.onWheel);
     }
 
