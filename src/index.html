@@ -2,15 +2,16 @@
 <html lang="en">
 
 <head>
-    <title>Metronome 1.2.7</title>
+    <title>Metronome 1.2.8</title>
     <meta charset="utf-8">
-    <script src="app.js?1.2.7" defer></script>
-    <script src="components/VolumeSelector.js?1.2.7" defer></script>
-    <script src="components/TapTempoButton.js?1.2.7" defer></script>
-    <script src="components/MemManager.js?1.2.7" defer></script>
-    <script src="components/SubdivisionsSelector.js?1.2.7" defer></script>
+    <script src="app.js?1.2.8" defer></script>
+    <script src="components/VolumeSelector.js?1.2.8" defer></script>
+    <script src="components/TapTempoButton.js?1.2.8" defer></script>
+    <script src="components/MemManager.js?1.2.8" defer></script>
+    <script src="components/SubdivisionsSelector.js?1.2.8" defer></script>
+    <script src="components/SoundSelector.js?1.2.8" defer></script>
 
-    <link rel="stylesheet" href="style.css?1.2.7">
+    <link rel="stylesheet" href="style.css?1.2.8">
     <link rel="manifest" href="manifest.json" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
@@ -21,7 +22,7 @@
 
     <div id="metronome">
         <header>
-            <h1>Metronome 1.2.7 <span id="help-trigger">?</span></h1>
+            <h1>Metronome 1.2.8 <span id="help-trigger">?</span></h1>
             <div id="tempoview">
                 <label>Tempo<input id="tempo" type="number" value="120" min="40" max="260">BPM</label>
             </div>
@@ -34,7 +35,6 @@
 
         <div id="metronome-inner">
             <section id=selector></section>
-
             <beat-selector></beat-selector>
 
             <div id="controls">
@@ -50,38 +50,17 @@
 
                 <div id="buttons">
                     <subdivisions-selector></subdivisions-selector>
-
                     <section id="beat-container">
                         <div id="beat-subcontainer">
                             <h2>Beats</h2>
-                            <div id="beat-edit">
-                                <div id="add">+</div>
-                                <div id="remove">−</div>
+                            <div class="bar">
+                                <div id="add" class="btn">+</div>
+                                <div id="remove" class="btn">−</div>
                             </div>
                         </div>
-
                         <tap-tempo min="40">TAP</tap-tempo>
                     </section>
-
-                    <section id="sounds">
-                        <div>
-                            <input type="radio" id="sound-sticks" name="sounds" value="sticks">
-                            <label for="sound-sticks">Sticks</label>
-                        </div>
-                        <div>
-                            <input type="radio" id="sound-drums" name="sounds" value="drums">
-                            <label for="sound-drums">Drums</label>
-                        </div>
-                        <div>
-                            <input type="radio" id="sound-metronome" name="sounds" value="metronome">
-                            <label for="sound-metronome">Metronome</label>
-                        </div>
-                        <div>
-                            <input type="radio" id="sound-beeps" name="sounds" value="beeps">
-                            <label for="sound-beeps">Beeps</label>
-                        </div>
-                    </section>
-
+                    <sound-selector></sound-selector>
                     <mem-manager></mem-manager>
                 </div>
             </div>

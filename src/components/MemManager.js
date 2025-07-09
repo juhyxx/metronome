@@ -18,7 +18,6 @@ class MemManager extends HTMLElement {
             el.addEventListener('mouseout', (event) => {
                 timer && clearTimeout(timer);
                 el.classList.remove('active');
-
             });
             el.addEventListener('mousedown', (event) => {
                 el.classList.add('active');

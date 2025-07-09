@@ -1,11 +1,11 @@
 class TapTempoButton extends HTMLElement {
     #lastTime = null;
-    #taptempo = [];
+    #tapTempo = [];
     #minTempo = 40;
 
     constructor() {
         super();
-
+        this.className = 'btn';
         this.#minTempo = this.getAttribute('min');
     }
 
@@ -23,18 +23,18 @@ class TapTempoButton extends HTMLElement {
         let lastTime = this.#lastTime || now;
 
         if (now - lastTime > 2000) {
-            this.#taptempo = [];
+            this.#tapTempo = [];
             lastTime = now;
         }
-        if (this.#taptempo.length > 5) {
-            this.#taptempo.shift();
+        if (this.#tapTempo.length > 5) {
+            this.#tapTempo.shift();
         }
 
         this.#lastTime = now;
         const tempo = Math.round((60 / ((now - lastTime) / 1000)));
         if (Number.isFinite(tempo) && tempo >= this.#minTempo) {
-            this.#taptempo.push(tempo);
-            return Math.round(this.#taptempo.reduce((prev, item) => prev + item, 0) / this.#taptempo.length);
+            this.#tapTempo.push(tempo);
+            return Math.round(this.#tapTempo.reduce((prev, item) => prev + item, 0) / this.#tapTempo.length);
         }
     }
 }
