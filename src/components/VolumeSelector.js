@@ -1,4 +1,4 @@
-class VolumeSelector extends HTMLElement {
+export class VolumeSelector extends HTMLElement {
     static observedAttributes = ["volume"];
 
     constructor() {
@@ -42,4 +42,3 @@ class VolumeSelector extends HTMLElement {
     }
 }
 
-customElements.define('volume-selector', VolumeSelector);

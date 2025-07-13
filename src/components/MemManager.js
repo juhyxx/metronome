@@ -1,4 +1,4 @@
-class MemManager extends HTMLElement {
+export class MemManager extends HTMLElement {
     constructor() {
         super();
     }
@@ -35,4 +35,3 @@ class MemManager extends HTMLElement {
 
 }
 
-customElements.define('mem-manager', MemManager);

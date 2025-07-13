@@ -1,4 +1,4 @@
-class TapTempoButton extends HTMLElement {
+export class TapTempoButton extends HTMLElement {
     #lastTime = null;
     #tapTempo = [];
     #minTempo = 40;
@@ -39,4 +39,4 @@ class TapTempoButton extends HTMLElement {
     }
 }
 
-customElements.define('tap-tempo', TapTempoButton);
+

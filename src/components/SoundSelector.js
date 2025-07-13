@@ -1,4 +1,4 @@
-class SoundSelector extends HTMLElement {
+export class SoundSelector extends HTMLElement {
     static observedAttributes = ["sound"];
     static data = ["sticks", "drums", "metronome", "beeps"];
     #selected = SoundSelector.data[0];
@@ -38,5 +38,3 @@ class SoundSelector extends HTMLElement {
     }
 
 }
-
-customElements.define('sound-selector', SoundSelector);

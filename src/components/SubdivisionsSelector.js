@@ -1,4 +1,4 @@
-class SubdivisionsSelector extends HTMLElement {
+export class SubdivisionsSelector extends HTMLElement {
     static observedAttributes = ["division"];
     #selected = 1;
 
@@ -43,5 +43,3 @@ class SubdivisionsSelector extends HTMLElement {
     }
 
 }
-
-customElements.define('subdivisions-selector', SubdivisionsSelector);

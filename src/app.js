@@ -1,3 +1,18 @@
+import  {SubdivisionsSelector} from "./components/SubdivisionsSelector.js"
+import {SoundSelector} from "./components/SoundSelector.js";
+import {MemManager} from "./components/MemManager.js";
+import {TapTempoButton} from "./components/TapTempoButton.js";
+import {VolumeSelector} from "./components/VolumeSelector.js";
+
+import { Accent } from "./accent.js";
+import { Model } from "./model.js";
+
+customElements.define('subdivisions-selector', SubdivisionsSelector);
+customElements.define('sound-selector', SoundSelector);
+customElements.define('mem-manager', MemManager);
+customElements.define('tap-tempo', TapTempoButton);
+customElements.define('volume-selector', VolumeSelector);
+
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
 const memoryDefaults = {
@@ -7,186 +22,7 @@ const memoryDefaults = {
     "memory3": { "beats": [{ "accent": "high" }, { "accent": "low" }, { "accent": "low" }, { "accent": "low" }], "soundSet": "beeps", "tempo": 60, "subdivisions": 6 }
 }
 
-function limit(value, min, max) {
-    value = Math.max(value, min);
-    value = Math.min(value, max);
-    return value;
-}
 
-class Accent {
-    static value = {
-        SUBDIV: 'subdiv',
-        NONE: 'none',
-        LOW: 'low',
-        MEDIUM: 'medium',
-        HIGH: 'high'
-    };
-
-    static queue = [
-        this.value.NONE,
-        this.value.LOW,
-        this.value.MEDIUM,
-        this.value.HIGH
-    ];
-
-    static next(accent) {
-        const index = (this.queue.indexOf(accent) + 1) % this.queue.length;
-
-        return this.queue[index];
-    }
-}
-
-class Model {
-    #tempo = 120;
-    #minTempo = 40;
-    #maxTempo = 280;
-    #tempoName = undefined;
-    #subdivisions = 1;
-    #volume = 0.8;
-    #delay = 0.5;
-    #wakeLock = undefined;
-    #sound = undefined;
-    #maxBeats = 9;
-    #soundSet = 'sticks';
-    #propsToSerialize = ['subdivisions', 'tempo', 'soundSet', 'beats'];
-    #beats = [{
-        accent: Accent.value.HIGH
-    }, {
-        accent: Accent.value.LOW
-    }, {
-        accent: Accent.value.MEDIUM
-    }, {
-        accent: Accent.value.LOW
-    }];
-
-    #tempoNames = [
-        { value: 60, name: "Largo" },
-        { value: 66, name: "Larghetto" },
-        { value: 76, name: "Adagio" },
-        { value: 108, name: "Andante" },
-        { value: 120, name: "Moderato" },
-        { value: 168, name: "Allegro" },
-    ].reverse()
-
-
-    soundSource = {};
-    soundSets = ['sticks', 'drums', 'metronome', 'beeps'];
-    soundSources = {
-        [Accent.value.HIGH]: 'high',
-        [Accent.value.MEDIUM]: 'medium',
-        [Accent.value.LOW]: 'low',
-        [Accent.value.NONE]: 'low',
-        [Accent.value.SUBDIV]: 'subdiv'
-    };
-
-    get beats() { return this.#beats; }
-    set beats(data) { this.#beats = data; this.serialize(); }
-
-    get maxBeats() { return this.#maxBeats; }
-
-    get subdivisions() { return this.#subdivisions; }
-    set subdivisions(value) {
-        this.#subdivisions = value;
-        document.querySelector('#selector').dispatchEvent(new CustomEvent('refresh', { detail: { beats: this.#beats } }));
-        this.serialize();
-    }
-
-    get soundSet() { return this.#soundSet; }
-    set soundSet(value) { this.#soundSet = value; this.serialize(); }
-
-    set sound(item) { this.#sound = item; }
-    get sound() { return this.#sound; }
-
-    get maxTempo() { return this.#maxTempo; }
-    get minTempo() { return this.#minTempo; }
-
-    get volumePercentage() { return Math.round((this.#volume + 1) / 0.02); }
-    get volume() { return this.#volume; }
-    set volume(value) { this.#volume = (limit(value, 10, 100) * 0.02); this.serialize(); }
-
-    get tempo() { return this.#tempo; }
-
-    set tempo(value) {
-        this.#tempo = limit(value, this.#minTempo, this.#maxTempo);
-        this.#delay = 60 / this.tempo;
-        this.tempoName = this.#tempo;
-
-        this.serialize();
-    }
-
-    get tempoName() { return this.#tempoName; }
-
-    set tempoName(tempo) {
-        this.#tempoName = this.#tempoNames.reduce((prev, item) => tempo < item.value ? item.name : prev, "Presto")
-    }
-
-    get delay() { return this.#delay; }
-
-    async loadAudioData(audioContext) {
-        for (const soundSet of Object.values(this.soundSets)) {
-            for (const item of Object.entries(this.soundSources)) {
-                const rsvp = await fetch(`sounds/${soundSet}/${item[1]}.wav`);
-                if (audioContext) {
-                    const buff = await rsvp.arrayBuffer();
-                    this.soundSource[soundSet] = this.soundSource[soundSet] || {};
-                    this.soundSource[soundSet][item[0]] = await audioContext.decodeAudioData(buff);
-                }
-            }
-        }
-    }
-
-    setAccentAt(accent, index) {
-        model.#beats[index].accent = accent;
-        document.querySelector('#selector').dispatchEvent(new CustomEvent('refresh', { detail: { beats: this.#beats } }));
-        this.serialize();
-    }
-
-    async lock() {
-        try {
-            this.#wakeLock = await navigator.wakeLock.request('screen');
-        } catch (err) { }
-    }
-
-    unlock() {
-        if (this.#wakeLock) {
-            this.#wakeLock.release().then(() => (this.wakeLock = null));
-        }
-    }
-
-    addBeat() {
-        const count = Math.min(this.#beats.length + 1, this.maxBeats);
-        this.beats = Array(count).fill('').map((item, i) => this.#beats[i] ? this.#beats[i] : { accent: Accent.value.LOW });
-        document.querySelector('#selector').dispatchEvent(
-            new CustomEvent('refresh', { detail: { beats: this.#beats } }));
-        this.serialize();
-    }
-
-    removeBeat() {
-        if (this.#beats.length > 1) {
-            this.#beats.pop();
-            document.querySelector('#selector').dispatchEvent(
-                new CustomEvent('refresh', { detail: { beats: this.#beats } }));
-        }
-        this.serialize();
-    }
-
-    serialize(memory = "default") {
-        const data = this.#propsToSerialize.reduce((prev, item) => Object.assign({ [item]: this[item] }, prev), {});
-        localStorage.setItem(memory === "default" ? 'metronome' : 'memory' + memory, JSON.stringify(data));
-    }
-
-    deserialize(memory = "default") {
-        try {
-            const key = memory === "default" ? 'metronome' : 'memory' + memory;
-            const data = JSON.parse(localStorage.getItem(key)) || memoryDefaults[key];
-            if (data) Object.keys(data).forEach(item => (this[item] = data[item]));
-        } catch { }
-    }
-
-    constructor() {
-        this.deserialize();
-    }
-}
 
 class Controller {
     #model = undefined;
