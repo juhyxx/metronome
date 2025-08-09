@@ -24,14 +24,12 @@ export class VolumeSelector extends HTMLElement {
             <label for="volume${value}" data-volume="${value}"></label>
             `;
         }).join('');
-        this.addEventListener('wheel', this.onWheel);
+        this.addEventListener('wheel', this.onWheel, { passive: true });
     }
 
     onWheel(event) {
         let value = this.volume;
-
         this.volume = (event.deltaY < 0) ? value - 10 : value + 10;
-        event.preventDefault();
     }
 
 

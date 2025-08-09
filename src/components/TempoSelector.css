@@ -1,0 +1,167 @@
+tempo-selector {
+    display: flex;
+    position: relative;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+
+    #wheel {
+        display: flex;
+        position: absolute;
+        top: calc(50% - var(--diameter) / 2);
+        left: calc(50% - var(--diameter) / 2);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        cursor: pointer;
+        box-shadow: 0 5px 40px 10px black,
+            inset 0 5px 5px rgba(255, 255, 255, 0.2),
+            inset 0 0 2px rgba(0, 0, 0, 0.4),
+            inset 0 0 1px 0.11rem rgba(255, 255, 255, 0.2),
+            inset 0 5px 5px 0.11rem rgba(0, 0, 0, 0.4),
+            inset 0 5px 50px 0.11rem rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        background: var(--bg-grad);
+        width: var(--diameter);
+        height: var(--diameter);
+        font-size: 1rem;
+        text-shadow: 0 -1px 1px black;
+
+        .dnd & {
+            color: var(--main-color);
+        }
+
+        #tempo-name {
+            font-size: 0.3rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        & #play {
+            position: absolute;
+            top: calc(50% - (var(--diameter) - 8rem) / 2);
+            left: calc(50% - (var(--diameter) - 5rem) / 2);
+            transform: rotate(0deg);
+            z-index: -2;
+            clip-path: polygon(0% 0%,
+                    100% 50%,
+                    0% 100%,
+                    0% 100%,
+                    0% 100%,
+                    0% 100%,
+                    0% 100%,
+                    0% 100%,
+                    0% 100%);
+            transition: all 1s;
+            background: rgba(255, 255, 255, 0.2);
+            width: calc(var(--diameter) - 5rem);
+            height: calc(var(--diameter) - 5rem);
+            pointer-events: none;
+        }
+
+        &:hover #play {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+
+
+        &.is-playing #play {
+            animation: spin 4s linear infinite;
+            animation-delay: 0.5s;
+            clip-path: polygon(50% 0%,
+                    100% 50%,
+                    50% 100%,
+                    0% 50%,
+                    0% 50%,
+                    0% 50%,
+                    0% 50%,
+                    0% 50%,
+                    0% 50%);
+        }
+    }
+
+    #tempo-knob-inner {
+        display: flex;
+        position: relative;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        background-color: transparent;
+        width: calc(var(--diameter) + 1rem);
+        height: calc(var(--diameter) + 1rem);
+
+        .value-container {
+            position: absolute;
+            transform-origin: 50% right;
+            width: calc(var(--diameter) + 1rem);
+            height: 0.15rem;
+
+            .value {
+                position: absolute;
+                z-index: 100;
+                cursor: pointer;
+                box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.2);
+                background-color: rgba(255, 255, 255, 0.1);
+                width: 0.5rem;
+                height: 0.15rem;
+
+                &::before {
+                    position: absolute;
+                    left: 0.8rem;
+                    content: attr(data-tempo);
+                    color: rgba(255, 255, 255, 0.3);
+                    font-size: 0.23rem;
+                }
+
+                &:hover,
+                &.highlight {
+                    box-shadow: 0 0 10px var(--main-color);
+                    background-color: var(--main-color);
+
+                    &::before {
+                        color: white;
+                    }
+
+                    &.v0 {
+                        background-color: var(--main-color);
+                    }
+
+                    &.v1 {
+                        background-color: hsla(84, 100%, 59%, 0.8);
+                        box-shadow: 0 0 6px var(--main-color);
+                    }
+
+                    &.v2 {
+                        background-color: hsla(84, 100%, 59%, 0.6);
+                        box-shadow: 0 0 4px var(--main-color);
+                    }
+
+                    &.v3 {
+                        background-color: hsla(84, 100%, 59%, 0.4);
+                        box-shadow: 0 0 2px var(--main-color);
+                    }
+                }
+
+                &.v4 {
+                    background-color: hsla(84, 100%, 59%, 0.2);
+                    box-shadow: 0 0 0 var(--main-color);
+                }
+
+                &.v5 {
+                    background-color: hsla(84, 100%, 59%, 0.1);
+                    box-shadow: 0 0 0 var(--main-color);
+                }
+            }
+        }
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}

@@ -1,5 +1,5 @@
 import { Accent } from "./accent.js";
-import { limit } from "./limit.js";
+import { limit } from "./utils/limit.js";
 
 const memoryDefaults = {
     "memory0": { "beats": [{ "accent": "high" }, { "accent": "low" }, { "accent": "medium" }, { "accent": "low" }], "soundSet": "drums", "tempo": 120, "subdivisions": 2 },
@@ -12,7 +12,6 @@ export class Model {
     #tempo = 120;
     #minTempo = 40;
     #maxTempo = 300;
-    #tempoName = undefined;
     #subdivisions = 1;
     #volume = 0.8;
     #delay = 0.5;
@@ -31,16 +30,6 @@ export class Model {
         accent: Accent.value.LOW
     }];
     #propertyChangedCallback = (property, value) => { };
-
-    #tempoNames = [
-        { value: 60, name: "Largo" },
-        { value: 66, name: "Larghetto" },
-        { value: 76, name: "Adagio" },
-        { value: 108, name: "Andante" },
-        { value: 120, name: "Moderato" },
-        { value: 168, name: "Allegro" },
-    ].reverse()
-
 
     soundSource = {};
     soundSets = ['sticks', 'drums', 'metronome', 'beeps'];
@@ -86,16 +75,12 @@ export class Model {
     set tempo(value) {
         this.#tempo = limit(value, this.#minTempo, this.#maxTempo);
         this.#delay = 60 / this.tempo;
-        this.tempoName = this.#tempo;
+        this.#propertyChangedCallback('tempo', this.#tempo);
 
         this.serialize();
     }
 
-    get tempoName() { return this.#tempoName; }
 
-    set tempoName(tempo) {
-        this.#tempoName = this.#tempoNames.reduce((prev, item) => tempo < item.value ? item.name : prev, "Presto")
-    }
 
     get delay() { return this.#delay; }
 
