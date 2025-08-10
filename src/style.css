@@ -3,6 +3,8 @@
 @import url(./components/MemManager.css);
 @import url(./components/TapTempoButton.css);
 @import url(./components/TempoSelector.css);
+@import url(./components/BeatSelector.css);
+@import url(./components/BeatItem.css);
 
 :root {
     --main-color: hsl(84, 100%, 59%);
@@ -29,7 +31,7 @@
             rgba(0, 0, 0, 0.1) 49%,
             rgba(255, 255, 255, 0.1) 50%,
             rgba(255, 255, 255, 0.005) 100%);
-
+    --selector-gap: 0.2rem;
     color: rgba(255, 255, 255, 0.8);
     font-size: 5vh;
 
@@ -183,7 +185,7 @@ input {
 }
 
 #selector {
-    --selector-gap: 0.2rem;
+
     display: flex;
     flex: 2;
     justify-content: space-between;
@@ -210,6 +212,7 @@ input {
         }
 
         &[accent] {
+
             &>div {
                 display: flex;
                 flex: 1;

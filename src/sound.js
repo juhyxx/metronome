@@ -1,4 +1,4 @@
-import { Accent } from "./accent.js";
+import { Accent } from "./Accent.js";
 
 
 export class WaveSound {
@@ -12,13 +12,11 @@ export class WaveSound {
 
     stop() {
         this.isPlaying = false;
-        this.model.unlock();
     }
 
     constructor(controller) {
         this.model = controller.model;
         this.controller = controller;
-        this.model.lock();
         this.audioContext = new AudioContext();
 
         if (Object.keys(this.model.soundSource).length > 0) {
@@ -78,12 +76,13 @@ export class WaveSound {
     onBeatEnd(event) {
         const startTime = event.target.startTime;
 
-        this.controller.moveHighlight(event.target.counter, this.audioContext.currentTime - startTime);
+        this.controller.onBeatEnd(event.target.counter, this.audioContext.currentTime - startTime);
         this.planNextBeat(startTime);
     }
 
     onSubDivisionEnd(event) {
         setTimeout(() => {
+            this.controller.onSubDivisionEnd(event.target.subdivision);
             document.querySelector('#subcounter').innerHTML = event.target.subdivision + 1;
             const el = document.querySelector(`#selector>div:nth-child(${event.target.counter + 1}) .subdivisions >div:nth-child(${event.target.subdivision + 1})`);
             if (el) {

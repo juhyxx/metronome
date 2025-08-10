@@ -1,0 +1,6 @@
+beat-selector::part(container) {
+    display: flex;
+    flex-direction: row;
+    gap: var(--selector-gap);
+    min-height: 4rem;
+}

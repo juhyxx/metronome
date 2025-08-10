@@ -1,4 +1,4 @@
-import { Accent } from "./accent.js";
+import { Accent } from "./Accent.js";
 import { limit } from "./utils/limit.js";
 
 const memoryDefaults = {
@@ -7,6 +7,7 @@ const memoryDefaults = {
     "memory2": { "beats": [{ "accent": "high" }, { "accent": "low" }, { "accent": "medium" }, { "accent": "low" }, { "accent": "medium" }, { "accent": "low" }, { "accent": "low" }], "soundSet": "sticks", "tempo": 50, "subdivisions": 6 },
     "memory3": { "beats": [{ "accent": "high" }, { "accent": "low" }, { "accent": "low" }, { "accent": "low" }], "soundSet": "beeps", "tempo": 60, "subdivisions": 6 }
 }
+export const defaultMemory = memoryDefaults["memory0"].beats;
 
 export class Model {
     #tempo = 120;
@@ -15,20 +16,11 @@ export class Model {
     #subdivisions = 1;
     #volume = 0.8;
     #delay = 0.5;
-    #wakeLock = undefined;
     #sound = undefined;
     #maxBeats = 9;
     #soundSet = 'sticks';
     #propsToSerialize = ['subdivisions', 'tempo', 'soundSet', 'beats'];
-    #beats = [{
-        accent: Accent.value.HIGH
-    }, {
-        accent: Accent.value.LOW
-    }, {
-        accent: Accent.value.MEDIUM
-    }, {
-        accent: Accent.value.LOW
-    }];
+    #beats = [];
     #propertyChangedCallback = (property, value) => { };
 
     soundSource = {};
@@ -46,14 +38,17 @@ export class Model {
     }
 
     get beats() { return this.#beats; }
-    set beats(data) { this.#beats = data; this.serialize(); }
+    set beats(data) {
+        this.#beats = data;
+        this.serialize();
+    }
 
     get maxBeats() { return this.#maxBeats; }
 
     get subdivisions() { return this.#subdivisions; }
     set subdivisions(value) {
         this.#subdivisions = value;
-        this.#propertyChangedCallback('subdivisions', this.#beats);
+        this.#propertyChangedCallback('sub-divisions', value);
         this.serialize();
     }
 
@@ -80,8 +75,6 @@ export class Model {
         this.serialize();
     }
 
-
-
     get delay() { return this.#delay; }
 
     async loadAudioData(audioContext) {
@@ -95,39 +88,6 @@ export class Model {
                 }
             }
         }
-    }
-
-    setAccentAt(accent, index) {
-        this.#beats[index].accent = accent;
-        this.#propertyChangedCallback('beats', this.#beats);
-        this.serialize();
-    }
-
-    async lock() {
-        try {
-            this.#wakeLock = await navigator.wakeLock.request('screen');
-        } catch (err) { }
-    }
-
-    unlock() {
-        if (this.#wakeLock) {
-            this.#wakeLock.release().then(() => (this.wakeLock = null));
-        }
-    }
-
-    addBeat() {
-        const count = Math.min(this.#beats.length + 1, this.maxBeats);
-        this.beats = Array(count).fill('').map((item, i) => this.#beats[i] ? this.#beats[i] : { accent: Accent.value.LOW });
-        this.#propertyChangedCallback('beats', this.#beats);
-        this.serialize();
-    }
-
-    removeBeat() {
-        if (this.#beats.length > 1) {
-            this.#beats.pop();
-            this.#propertyChangedCallback('beats', this.#beats);
-        }
-        this.serialize();
     }
 
     serialize(memory = "default") {
@@ -144,7 +104,7 @@ export class Model {
     }
 
     constructor() {
-        this.deserialize();
+        //this.deserialize();
     }
 
 

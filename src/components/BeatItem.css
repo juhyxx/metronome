@@ -1,0 +1,129 @@
+beat-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--selector-gap);
+    cursor: pointer;
+
+
+
+    &[accent] {
+        &[accent="high"] {
+            color: #404040;
+        }
+
+        &[accent="medium"] {
+            & div:nth-child(1) {
+                background-color: transparent;
+            }
+        }
+
+        &[accent="low"] {
+
+            & div:nth-child(1),
+            & div:nth-child(2) {
+                background-color: transparent;
+            }
+        }
+
+        &[accent="none"] {
+
+            & div:nth-child(1),
+            & div:nth-child(2),
+            & div:nth-child(3) {
+                background-color: transparent;
+            }
+        }
+
+        div {
+            flex: 1;
+            opacity: 0.5;
+            text-shadow: none;
+
+            &:nth-child(1) {
+                background-color: var(--main-color);
+                text-align: center;
+                font-size: 0.5rem;
+            }
+
+            &:nth-child(2) {
+                background-color: hsl(63, 100%, 59%);
+            }
+
+            &:nth-child(3) {
+                background-color: hsl(0, 100%, 59%);
+            }
+
+
+        }
+    }
+
+    &[highlight] {
+
+        background-color: rgba(255, 255, 255, 0.1);
+
+        >div {
+            opacity: 1;
+
+            &:nth-child(1) {
+                box-shadow: 0 0 10px var(--main-color);
+            }
+
+            &:nth-child(2) {
+                box-shadow: 0 0 10px hsl(63, 100%, 59%);
+            }
+
+            &:nth-child(3) {
+                box-shadow: 0 0 10px hsl(0, 100%, 59%);
+            }
+        }
+
+        &[accent="medium"] {
+            & div:nth-child(1) {
+                box-shadow: none;
+            }
+        }
+
+        &[accent="low"] {
+
+            & div:nth-child(1),
+            & div:nth-child(2) {
+                box-shadow: none;
+            }
+        }
+
+        &[accent="none"] {
+
+            & div:nth-child(1),
+            & div:nth-child(2),
+            & div:nth-child(3) {
+                box-shadow: none;
+            }
+        }
+
+
+        .subdivisions {
+            div {
+                opacity: 1;
+            }
+
+            .highlight {
+                box-shadow: 0 0 10px hsl(0, 100%, 59%);
+                background-color: hsl(0, 100%, 59%) !important;
+            }
+        }
+    }
+
+
+    div.subdivisions {
+        display: flex;
+        gap: calc(var(--selector-gap)/2);
+        flex: 0.25;
+
+        div {
+            background-color: gray !important;
+        }
+    }
+
+}

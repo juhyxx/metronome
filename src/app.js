@@ -4,10 +4,10 @@ import { MemManager } from "./components/MemManager.js";
 import { TapTempoButton } from "./components/TapTempoButton.js";
 import { VolumeSelector } from "./components/VolumeSelector.js";
 import { TempoSelector } from "./components/TempoSelector.js";
-
-
-import { Model } from "./model.js";
-import { Controller } from "./controller.js";
+import { BeatSelector } from "./components/BeatSelector.js";
+import { BeatItem } from "./components/BeatItem.js";
+import { Model, defaultMemory } from "./Model.js";
+import { Controller } from "./Controller.js";
 
 customElements.define('subdivisions-selector', SubdivisionsSelector);
 customElements.define('sound-selector', SoundSelector);
@@ -15,6 +15,8 @@ customElements.define('mem-manager', MemManager);
 customElements.define('tap-tempo', TapTempoButton);
 customElements.define('volume-selector', VolumeSelector);
 customElements.define('tempo-selector', TempoSelector);
+customElements.define('beat-selector', BeatSelector);
+customElements.define('beat-item', BeatItem);
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
@@ -25,4 +27,6 @@ window.addEventListener('DOMContentLoaded', () => {
     model.propertyChangedCallback = (property, value) => {
         controller.updateProperty(property, value);
     };
+    controller.updateProperty('beats', defaultMemory);
+
 });

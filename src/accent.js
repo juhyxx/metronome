@@ -1,4 +1,3 @@
-
 export class Accent {
     static value = {
         SUBDIV: 'subdiv',

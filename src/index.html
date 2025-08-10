@@ -28,19 +28,19 @@
         </header>
 
         <div id="metronome-inner">
-            <section id=selector></section>
+            <beat-selector></beat-selector>
 
             <div id="controls">
                 <tempo-selector></tempo-selector>
 
                 <div id="buttons">
                     <subdivisions-selector></subdivisions-selector>
-                    <section id="beat-container">
-                        <div id="beat-subcontainer">
+                    <section id="beat-container" style="justify-content: space-between;">
+                        <div id="beat-subcontainer"  style="max-width: 3rem;">
                             <h2>Beats</h2>
-                            <div class="bar">
+                            <div class="bar" >
                                 <div id="add" class="btn">+</div>
-                                <div id="remove" class="btn">−</div>
+                                <div id="remove" class="btn" >−</div>
                             </div>
                         </div>
                         <tap-tempo min="40">TAP</tap-tempo>
