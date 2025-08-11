@@ -34,15 +34,18 @@ export class BeatSelector extends HTMLElement {
     }
 
     clear() {
+        this.#beats = [];
         this.querySelectorAll('beat-item').forEach(item => item.remove());
     }
 
-    addBeat(accent) {
+    addBeat(accent, silent = false) {
         const item = document.createElement('beat-item');
         this.#setupBeat(item, accent);
         this.appendChild(item);
         this.#beats = this.querySelectorAll('beat-item')
-        this.dispatchEvent(new CustomEvent('add', { detail: { accent: accent || Accent.value.LOW, index: item.getAttribute('index') } }));
+        if (!silent) {
+            this.dispatchEvent(new CustomEvent('add', { detail: { accent: accent || Accent.value.LOW, index: item.getAttribute('index') } }));
+        }
     }
 
     #setupBeat(item, accent = Accent.value.LOW, index = this.#beats.length + 1) {
@@ -51,7 +54,7 @@ export class BeatSelector extends HTMLElement {
         item.setAttribute('accent', accent);
         item.addEventListener('select', (event) => {
             this.dispatchEvent(new CustomEvent('select', {
-                detail: { accent: accent, index: (parseInt(item.getAttribute('index'), 10) - 1) }
+                detail: { accent: event.detail.accent, index: (parseInt(item.getAttribute('index'), 10) - 1) }
             }));
         });
     }

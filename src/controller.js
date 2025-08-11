@@ -1,5 +1,4 @@
 import { WaveSound } from "./Sound.js";
-import { Accent } from "./Accent.js";
 import { wait } from "./utils/wait.js";
 
 export class Controller {
@@ -51,9 +50,7 @@ export class Controller {
         });
         this.#beats.addEventListener('add', (event) => {
             const beats = [...this.#model.beats];
-            beats.push({
-                accent: event.detail.accent
-            });
+            beats.push({ accent: event.detail.accent });
             this.#model.beats = beats;
         });
         this.#beats.addEventListener('remove', (event) => {
@@ -105,9 +102,11 @@ export class Controller {
 
         // Memory Manager
         this.#memoryManager.addEventListener('load', (event) => {
+            // this.#beats.clear();
             this.model.deserialize(event.detail.memory);
-            this.#sound.setAttribute("sound", this.model.soundSet);
+
             document.querySelector('#subcounter').innerHTML = this.model.subdivisions;
+            this.#sound.setAttribute("sound", this.model.soundSet);
             this.#subdivisions.setAttribute("division", this.model.subdivisions);
             this.#tempo.setAttribute("tempo", this.model.tempo);
         });
@@ -139,8 +138,9 @@ export class Controller {
                 document.querySelector('#tempo').value = value;
                 break;
             case "beats":
+
                 this.#beats.clear();
-                value.forEach((item) => (this.#beats.addBeat(item.accent)));
+                value.forEach((item) => (this.#beats.addBeat(item.accent, true)));
                 break;
         }
     }
