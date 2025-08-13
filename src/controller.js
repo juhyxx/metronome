@@ -102,12 +102,11 @@ export class Controller {
 
         // Memory Manager
         this.#memoryManager.addEventListener('load', (event) => {
-            // this.#beats.clear();
             this.model.deserialize(event.detail.memory);
 
             document.querySelector('#subcounter').innerHTML = this.model.subdivisions;
-            this.#sound.setAttribute("sound", this.model.soundSet);
             this.#subdivisions.setAttribute("division", this.model.subdivisions);
+            this.#sound.setAttribute("sound", this.model.soundSet);
             this.#tempo.setAttribute("tempo", this.model.tempo);
         });
         this.#memoryManager.addEventListener('save', (event) => {
@@ -133,12 +132,15 @@ export class Controller {
         switch (property) {
             case 'sub-divisions':
                 this.#beats.setAttribute('sub-divisions', value);
+                this.#subdivisions.setAttribute('division', value);
                 break;
             case "tempo":
                 document.querySelector('#tempo').value = value;
                 break;
+            case "sound-set":
+                this.#sound.setAttribute("sound", value);
+                break;
             case "beats":
-
                 this.#beats.clear();
                 value.forEach((item) => (this.#beats.addBeat(item.accent, true)));
                 break;

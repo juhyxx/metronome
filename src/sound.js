@@ -14,6 +14,10 @@ export class WaveSound {
         this.isPlaying = false;
     }
 
+    reset() {
+        this.#counter = 0;
+    }
+
     constructor(controller) {
         this.model = controller.model;
         this.controller = controller;

@@ -6,7 +6,7 @@ import { VolumeSelector } from "./components/VolumeSelector.js";
 import { TempoSelector } from "./components/TempoSelector.js";
 import { BeatSelector } from "./components/BeatSelector.js";
 import { BeatItem } from "./components/BeatItem.js";
-import { Model, defaultMemory } from "./Model.js";
+import { Model } from "./Model.js";
 import { Controller } from "./Controller.js";
 
 customElements.define('subdivisions-selector', SubdivisionsSelector);
@@ -27,6 +27,6 @@ window.addEventListener('DOMContentLoaded', () => {
     model.propertyChangedCallback = (property, value) => {
         controller.updateProperty(property, value);
     };
-    controller.updateProperty('beats', defaultMemory);
+    model.deserialize();
 
 });

@@ -2,7 +2,19 @@ import { Accent } from "./Accent.js";
 import { limit } from "./utils/limit.js";
 
 const memoryDefaults = {
+
     "MEM0": {
+        "beats": [
+            { "accent": "high" },
+            { "accent": "low" },
+            { "accent": "medium" },
+            { "accent": "low" }],
+        "soundSet": "sticks",
+        "tempo": 120,
+        "subdivisions": 2
+    },
+
+    "MEM1": {
         "beats": [
             { "accent": "high" },
             { "accent": "low" },
@@ -10,10 +22,10 @@ const memoryDefaults = {
             { "accent": "low" }],
         "soundSet": "drums",
         "tempo": 120,
-        "subdivisions": 2
+        "subdivisions": 4
     },
 
-    "MEM1": {
+    "MEM2": {
         "beats": [
             { "accent": "high" },
             { "accent": "low" },
@@ -24,7 +36,7 @@ const memoryDefaults = {
         "subdivisions": 3
     },
 
-    "MEM2": {
+    "MEM3": {
         "beats": [
             { "accent": "high" },
             { "accent": "low" },
@@ -32,12 +44,15 @@ const memoryDefaults = {
             { "accent": "low" },
             { "accent": "medium" },
             { "accent": "low" },
+            { "accent": "medium" },
+            { "accent": "low" },
             { "accent": "high" }],
         "soundSet": "sticks",
-        "tempo": 50,
-        "subdivisions": 6
+        "tempo": 100,
+        "subdivisions": 8
     },
-    "MEM3": {
+
+    "MEM4": {
         "beats": [{ "accent": "high" },
         { "accent": "low" },
         { "accent": "low" },
@@ -47,7 +62,7 @@ const memoryDefaults = {
         "subdivisions": 6
     }
 }
-export const defaultMemory = memoryDefaults["MEM0"].beats;
+
 
 export class Model {
     #tempo = 120;
@@ -94,7 +109,11 @@ export class Model {
     }
 
     get soundSet() { return this.#soundSet; }
-    set soundSet(value) { this.#soundSet = value; this.serialize(); }
+    set soundSet(value) {
+        this.#soundSet = value;
+        this.#propertyChangedCallback('sound-set', value);
+        this.serialize();
+    }
 
     set sound(item) { this.#sound = item; }
     get sound() { return this.#sound; }
@@ -104,7 +123,9 @@ export class Model {
 
     get volumePercentage() { return Math.round((this.#volume + 1) / 0.02); }
     get volume() { return this.#volume; }
-    set volume(value) { this.#volume = (limit(value, 10, 100) * 0.02); this.serialize(); }
+    set volume(value) {
+        this.#volume = (limit(value, 10, 100) * 0.02); this.serialize();
+    }
 
     get tempo() { return this.#tempo; }
 
@@ -112,7 +133,6 @@ export class Model {
         this.#tempo = limit(value, this.#minTempo, this.#maxTempo);
         this.#delay = 60 / this.tempo;
         this.#propertyChangedCallback('tempo', this.#tempo);
-
         this.serialize();
     }
 
@@ -131,24 +151,27 @@ export class Model {
         }
     }
 
-    serialize(memory = "default") {
+    serialize(memory = 0) {
         const data = this.#propsToSerialize.reduce((prev, item) => Object.assign({ [item]: this[item] }, prev), {});
+
         localStorage.setItem("MEM" + memory, JSON.stringify(data));
     }
 
-    deserialize(memory = "default") {
+    deserialize(memory = 0) {
         try {
             const key = "MEM" + memory;
             const data = JSON.parse(localStorage.getItem(key)) || memoryDefaults[key];
+
             this.beats = data.beats || [];
             this.tempo = data.tempo || this.tempo;
             this.subdivisions = data.subdivisions || this.subdivisions;
             this.soundSet = data.soundSet || this.soundSet;
+            this.sound.reset()
         } catch { }
     }
 
     constructor() {
-        this.deserialize();
+
     }
 
 

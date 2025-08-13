@@ -4,7 +4,8 @@ export class MemManager extends HTMLElement {
     }
 
     connectedCallback() {
-        const items = [...Array(4)].map((item, index) => {
+        const items = [...Array(4)].map((item, i) => {
+            const index = i + 1;
             const el = document.createElement('div');
             el.className = 'mem-item';
             var timer = null;

@@ -43,19 +43,6 @@
         --diameter: 35vh;
         font-size: 8vh;
     }
-
-    /* @media (prefers-color-scheme: light) {
-        --bg: hsl(170, 1%, 40%);
-        --bg-metronome: hsl(170, 0%, 90%);
-        --bg-grad: radial-gradient(farthest-corner at right bottom,
-                rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.05) 70%,
-                transparent 70%),
-            radial-gradient(circle, transparent 49%, rgba(0, 0, 0, 0.1) 100%);
-        --of-shadow: inset 0px 0px 1px 1px rgba(0, 0, 0, 0.2),
-            inset -1px -1px 2px 1px rgba(255, 255, 255, 0.3),
-            inset 0px 0px 60px rgba(0, 0, 0, 0.2);
-        color: rgba(0, 0, 0, 0.6);
-    } */
 }
 
 
@@ -184,146 +171,6 @@ input {
     }
 }
 
-#selector {
-
-    display: flex;
-    flex: 2;
-    justify-content: space-between;
-    gap: var(--selector-gap);
-
-    >div {
-        display: flex;
-        flex: 1;
-        flex-direction: column;
-        justify-content: center;
-        gap: var(--selector-gap);
-        opacity: 0.5;
-
-        cursor: pointer;
-        min-width: 0.5rem;
-
-        min-height: 4rem;
-        font-size: 0.5rem;
-        text-align: center;
-        text-shadow: none;
-
-        @media screen and (pointer: coarse) and (orientation: landscape) {
-            min-width: 0.5rem;
-        }
-
-        &[accent] {
-
-            &>div {
-                display: flex;
-                flex: 1;
-                justify-content: center;
-                align-items: center;
-            }
-
-            &>div:nth-child(1) {
-                background-color: var(--main-color);
-            }
-
-            &>div:nth-child(2) {
-                background-color: hsl(63, 100%, 59%);
-            }
-
-            &>div:nth-child(3) {
-                background-color: hsl(0, 100%, 59%);
-            }
-
-            &[accent="high"] {
-                color: #404040;
-            }
-
-            &[accent="medium"] {
-                & div:nth-child(1) {
-                    background-color: transparent;
-                }
-            }
-
-            &[accent="low"] {
-
-                & div:nth-child(1),
-                & div:nth-child(2) {
-                    background-color: transparent;
-                }
-            }
-
-            &[accent="none"] {
-
-                & div:nth-child(1),
-                & div:nth-child(2),
-                & div:nth-child(3) {
-                    background-color: transparent;
-                }
-            }
-        }
-
-        &.highlight {
-            opacity: 1;
-            background-color: rgba(255, 255, 255, 0.1);
-
-            &>div:nth-child(1) {
-                box-shadow: 0 0 10px var(--main-color);
-            }
-
-            &>div:nth-child(2) {
-                box-shadow: 0 0 10px hsl(63, 100%, 59%);
-            }
-
-            &>div:nth-child(3) {
-                box-shadow: 0 0 10px hsl(0, 100%, 59%);
-            }
-
-            &[accent="medium"] {
-                & div:nth-child(1) {
-                    box-shadow: none;
-                }
-            }
-
-            &[accent="low"] {
-
-                & div:nth-child(1),
-                & div:nth-child(2) {
-                    box-shadow: none;
-                }
-            }
-
-            &[accent="none"] {
-
-                & div:nth-child(1),
-                & div:nth-child(2),
-                & div:nth-child(3) {
-                    box-shadow: none;
-                }
-            }
-
-            .subdivisions {
-                .highlight {
-                    box-shadow: 0 0 10px hsl(0, 100%, 59%);
-                    background-color: hsl(0, 100%, 59%) !important;
-                }
-            }
-        }
-    }
-
-    .subdivisions {
-        display: flex;
-        justify-content: space-between;
-        gap: 0.1rem;
-        max-height: 0.25rem;
-
-        &>div {
-            display: flex;
-            flex: 1;
-            background-color: gray !important;
-            height: 0.25rem;
-        }
-    }
-}
-
-
 
 input#tempo {
     background-color: transparent;
@@ -331,7 +178,6 @@ input#tempo {
 
 #beat-container {
     display: flex;
-
     gap: 0.5rem;
 
     &> :first-child {
