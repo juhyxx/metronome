@@ -53,11 +53,11 @@ mem-manager {
         }
 
         &:nth-child(3) {
-            box-shadow: 0 0 5px 2px green;
+            box-shadow: 0 0 5px 2px var(--main-color);
 
             &:before {
 
-                background-color: green;
+                background-color: var(--main-color);
             }
         }
 
