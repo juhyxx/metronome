@@ -1,5 +1,5 @@
-import { WaveSound } from "./Sound.js";
-import { wait } from "./utils/wait.js";
+import { WaveSound } from './Sound.js';
+import { wait } from './utils/wait.js';
 
 export class Controller {
     #model = undefined;
@@ -11,6 +11,7 @@ export class Controller {
     #tempo = undefined;
     #beats = undefined;
     #wakeLock = undefined;
+    #monitor = undefined;
 
     get model() {
         return this.#model;
@@ -25,17 +26,18 @@ export class Controller {
         this.#removeButton = document.querySelector('#remove');
         this.#tempo = document.querySelector('tempo-selector');
         this.#beats = document.querySelector('beat-selector');
+        this.#monitor = document.querySelector('beat-monitor');
 
-        this.#sound.setAttribute("sound", this.model.soundSet);
-        this.#tempo.setAttribute("tempo", this.model.tempo);
-        this.#tempo.setAttribute("min", this.model.minTempo);
-        this.#tempo.setAttribute("max", this.model.maxTempo);
-        this.#beats.setAttribute("sub-divisions", this.model.subdivisions);
-        this.#subdivisions.setAttribute("division", this.model.subdivisions);
-        this.#volume.setAttribute("volume", "80");
+        this.#sound.setAttribute('sound', this.model.soundSet);
+        this.#tempo.setAttribute('tempo', this.model.tempo);
+        this.#tempo.setAttribute('min', this.model.minTempo);
+        this.#tempo.setAttribute('max', this.model.maxTempo);
+        this.#beats.setAttribute('sub-divisions', this.model.subdivisions);
+        this.#subdivisions.setAttribute('division', this.model.subdivisions);
+        this.#volume.setAttribute('volume', '80');
 
-        document.querySelector('#counter').innerHTML = this.model.beats.length;
-        document.querySelector('#subcounter').innerHTML = this.model.subdivisions;
+        this.#monitor.counter = 1;
+        this.#monitor.subCounter = 1;
 
         this.#addBeatSelectorListeners();
         this.#addEventListeners();
@@ -45,7 +47,8 @@ export class Controller {
     #addBeatSelectorListeners() {
         this.#beats.addEventListener('select', (event) => {
             const beats = [...this.#model.beats];
-            beats[parseInt(event.detail.index, 10)].accent = event.detail.accent;
+            beats[parseInt(event.detail.index, 10)].accent =
+                event.detail.accent;
             this.#model.beats = beats;
         });
         this.#beats.addEventListener('add', (event) => {
@@ -75,12 +78,17 @@ export class Controller {
             }
         });
         document.querySelector('#tempo').addEventListener('change', (event) => {
-            this.#tempo.setAttribute("tempo", parseInt(document.querySelector('#tempo').value, 10));
+            this.#tempo.setAttribute(
+                'tempo',
+                parseInt(document.querySelector('#tempo').value, 10)
+            );
         });
-        document.querySelector('tap-tempo').addEventListener('change', (event) => {
-            this.model.tempo = event.detail.tempo;
-            this.#tempo.setAttribute("tempo", this.model.tempo);
-        });
+        document
+            .querySelector('tap-tempo')
+            .addEventListener('change', (event) => {
+                this.model.tempo = event.detail.tempo;
+                this.#tempo.setAttribute('tempo', this.model.tempo);
+            });
     }
 
     #addEventListeners() {
@@ -103,11 +111,13 @@ export class Controller {
         // Memory Manager
         this.#memoryManager.addEventListener('load', (event) => {
             this.model.deserialize(event.detail.memory);
-
-            document.querySelector('#subcounter').innerHTML = this.model.subdivisions;
-            this.#subdivisions.setAttribute("division", this.model.subdivisions);
-            this.#sound.setAttribute("sound", this.model.soundSet);
-            this.#tempo.setAttribute("tempo", this.model.tempo);
+            this.#monitor.subdivision = this.model.subdivisions;
+            this.#subdivisions.setAttribute(
+                'division',
+                this.model.subdivisions
+            );
+            this.#sound.setAttribute('sound', this.model.soundSet);
+            this.#tempo.setAttribute('tempo', this.model.tempo);
         });
         this.#memoryManager.addEventListener('save', (event) => {
             this.model.serialize(event.detail.memory);
@@ -123,9 +133,13 @@ export class Controller {
         this.#subdivisions.addEventListener('select', (event) => {
             this.model.subdivisions = event.detail.subdivision;
         });
-        document.querySelector('#help-trigger').addEventListener('mousedown', (event) => {
-            document.body.classList.toggle('help');
-        }, { passive: true });
+        document.querySelector('#help-trigger').addEventListener(
+            'mousedown',
+            (event) => {
+                document.body.classList.toggle('help');
+            },
+            { passive: true }
+        );
     }
 
     updateProperty(property, value) {
@@ -134,37 +148,36 @@ export class Controller {
                 this.#beats.setAttribute('sub-divisions', value);
                 this.#subdivisions.setAttribute('division', value);
                 break;
-            case "tempo":
+            case 'tempo':
                 document.querySelector('#tempo').value = value;
                 break;
-            case "sound-set":
-                this.#sound.setAttribute("sound", value);
+            case 'sound-set':
+                this.#sound.setAttribute('sound', value);
                 break;
-            case "beats":
+            case 'beats':
                 this.#beats.clear();
-                value.forEach((item) => (this.#beats.addBeat(item.accent, true)));
+                value.forEach((item) => this.#beats.addBeat(item.accent, true));
                 break;
         }
     }
 
     onSubDivisionEnd(subdivision) {
         this.#beats.subBeat = subdivision;
+        this.#monitor.subCounter = subdivision;
     }
 
     async onBeatEnd(counter, waitingTime) {
         await wait(waitingTime);
 
         this.#beats.beat = counter;
-        this.#beats.subBeat = 0;
-
-        document.querySelector('#counter').innerHTML = counter + 1;
-        document.querySelector('#subcounter').innerHTML = 1;
+        this.#monitor.subCounter = 0;
+        this.#monitor.counter = counter;
     }
 
     async lock() {
         try {
             this.#wakeLock = await navigator.wakeLock.request('screen');
-        } catch (err) { }
+        } catch (err) {}
     }
 
     unlock() {
@@ -172,5 +185,4 @@ export class Controller {
             this.#wakeLock.release().then(() => (this.wakeLock = null));
         }
     }
-
 }

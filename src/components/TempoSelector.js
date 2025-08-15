@@ -1,21 +1,20 @@
 export class TempoSelector extends HTMLElement {
-
-    static observedAttributes = ["min", "max", "tempo"];
+    static observedAttributes = ['min', 'max', 'tempo'];
 
     #maxValue = 200;
     #minValue = 100;
     #dndY = 0;
     #tempo = 120;
-    #tempoName = "Moderato";
+    #tempoName = 'Moderato';
     #isPlaying = false;
     static #tempoNames = [
-        { value: 60, name: "Largo" },
-        { value: 66, name: "Larghetto" },
-        { value: 76, name: "Adagio" },
-        { value: 108, name: "Andante" },
-        { value: 120, name: "Moderato" },
-        { value: 168, name: "Allegro" },
-    ].reverse()
+        { value: 60, name: 'Largo' },
+        { value: 66, name: 'Larghetto' },
+        { value: 76, name: 'Adagio' },
+        { value: 108, name: 'Andante' },
+        { value: 120, name: 'Moderato' },
+        { value: 168, name: 'Allegro' }
+    ].reverse();
 
     set min(value) {
         this.#minValue = value;
@@ -49,32 +48,41 @@ export class TempoSelector extends HTMLElement {
     }
 
     set tempo(value) {
-        const newValue = Math.min(this.#maxValue, Math.max(this.#minValue, value));
+        const newValue = Math.min(
+            this.#maxValue,
+            Math.max(this.#minValue, value)
+        );
 
         this.#tempo = Math.round(newValue);
         this.tempoName = this.#tempo;
 
-        this.querySelectorAll('.value').forEach(el => {
+        this.querySelectorAll('.value').forEach((el) => {
             const tempoMatch = parseInt(el.dataset.tempo) === this.#tempo;
             el.classList.toggle('highlight', tempoMatch);
-            el.classList.remove("v0", "v1", "v2", "v3", "v4", "v5");
+            el.classList.remove('v0', 'v1', 'v2', 'v3', 'v4', 'v5');
 
             if (!tempoMatch) {
                 const roundedTempo = Math.round(this.#tempo / 10) * 10;
                 if (roundedTempo === parseInt(el.dataset.tempo)) {
-                    el.classList.toggle('highlight', roundedTempo === parseInt(el.dataset.tempo));
+                    el.classList.toggle(
+                        'highlight',
+                        roundedTempo === parseInt(el.dataset.tempo)
+                    );
                     const value = this.#tempo - roundedTempo;
-                    el.classList.add("v" + Math.abs(value));
+                    el.classList.add('v' + Math.abs(value));
                 }
             }
         });
-        this.querySelector('#play').style.animationDuration = (4 * 60 / this.#tempo) + 's';
+        this.querySelector('#play').style.animationDuration =
+            (4 * 60) / this.#tempo + 's';
         this.querySelector('#tempo-value').textContent = this.#tempo;
         this.dispatchEvent(new CustomEvent('change', { detail: this.#tempo }));
-
     }
     set tempoName(value) {
-        this.#tempoName = TempoSelector.#tempoNames.reduce((prev, item) => value <= item.value ? item.name : prev, "Presto");
+        this.#tempoName = TempoSelector.#tempoNames.reduce(
+            (prev, item) => (value <= item.value ? item.name : prev),
+            'Presto'
+        );
         this.querySelector('#tempo-name').textContent = this.#tempoName;
     }
 
@@ -82,16 +90,15 @@ export class TempoSelector extends HTMLElement {
         return this.#tempo;
     }
 
-
     #render() {
         const rangeAngle = 50;
-        const range = ((this.#maxValue - this.#minValue) / 10);
+        const range = (this.#maxValue - this.#minValue) / 10;
         const angleSize = (180 + 2 * rangeAngle) / range;
         const tempoKnobInner = this.querySelector('#tempo-knob-inner');
 
         tempoKnobInner.innerHTML = Array.from({ length: range + 1 }, (_, i) => {
-            const angle = Math.round((i * angleSize) - rangeAngle);
-            const tempo2select = (i * 10) + this.#minValue;
+            const angle = Math.round(i * angleSize - rangeAngle);
+            const tempo2select = i * 10 + this.#minValue;
             return `<div class="value-container" style="transform: rotate(${angle}deg)">
                             <div class="value" data-tempo="${tempo2select}"></div>
                         </div>
@@ -99,28 +106,38 @@ export class TempoSelector extends HTMLElement {
         }).join('');
 
         const onClickItem = (event) => {
-            this.tempo = (parseInt(event.target.dataset.tempo, 10) || null);
+            this.tempo = parseInt(event.target.dataset.tempo, 10) || null;
             event.stopPropagation();
         };
-        this.querySelectorAll('.value').forEach(el => el.addEventListener('click', onClickItem));
+        this.querySelectorAll('.value').forEach((el) =>
+            el.addEventListener('click', onClickItem)
+        );
         this.tempo = this.#tempo; //set tempo after render
     }
 
     #toggleIsPlaying() {
         this.#isPlaying = !this.#isPlaying;
-        this.querySelector('#wheel').classList.toggle('is-playing', this.#isPlaying);
-        this.dispatchEvent(new CustomEvent('onPlay', { detail: this.#isPlaying }));
+        this.querySelector('#wheel').classList.toggle(
+            'is-playing',
+            this.#isPlaying
+        );
+        this.dispatchEvent(
+            new CustomEvent('onPlay', { detail: this.#isPlaying })
+        );
     }
 
     #registerEvents() {
         const onClick = (event) => {
             event.stopPropagation();
-            this.#toggleIsPlaying()
+            this.#toggleIsPlaying();
         };
         const onMouseWheel = (event) => {
             const difference = event.ctrlKey ? 1 : 10;
 
-            this.tempo = (event.deltaY > 0) ? this.tempo + difference : this.tempo - difference;
+            this.tempo =
+                event.deltaY > 0
+                    ? this.tempo + difference
+                    : this.tempo - difference;
         };
         const onKeyDown = (event) => {
             if (event.code === 'ArrowUp') {
@@ -131,7 +148,7 @@ export class TempoSelector extends HTMLElement {
             }
         };
 
-        this.addEventListener("click", onClick);
+        this.addEventListener('click', onClick);
         this.addEventListener('wheel', onMouseWheel, { passive: true });
         document.addEventListener('keydown', onKeyDown);
     }
@@ -153,8 +170,12 @@ export class TempoSelector extends HTMLElement {
             document.body.classList.remove('dnd');
             this.#dndY = undefined;
         };
-        document.querySelector('#wheel').addEventListener('mousedown', onMouseDown, { passive: true });
-        document.body.addEventListener('mousemove', onMouseMove, { passive: true });
+        document
+            .querySelector('#wheel')
+            .addEventListener('mousedown', onMouseDown, { passive: true });
+        document.body.addEventListener('mousemove', onMouseMove, {
+            passive: true
+        });
         document.body.addEventListener('mouseup', onMouseUp, { passive: true });
     }
 
@@ -165,7 +186,9 @@ export class TempoSelector extends HTMLElement {
         };
         const onTouchMove = (event) => {
             if (this.#dndY) {
-                const diff = Math.round((this.#dndY - event.touches[0].clientY) / 4);
+                const diff = Math.round(
+                    (this.#dndY - event.touches[0].clientY) / 4
+                );
                 this.tempo += diff;
                 this.#dndY = event.touches[0].clientY;
             }
@@ -175,32 +198,36 @@ export class TempoSelector extends HTMLElement {
             this.#dndY = undefined;
         };
 
-        document.querySelector('#wheel').addEventListener('touchstart', onTouchStart, { passive: true });
-        document.body.addEventListener('touchmove', onTouchMove, { passive: true });
-        document.body.addEventListener('touchend', onTouchEnd, { passive: true });
+        document
+            .querySelector('#wheel')
+            .addEventListener('touchstart', onTouchStart, { passive: true });
+        document.body.addEventListener('touchmove', onTouchMove, {
+            passive: true
+        });
+        document.body.addEventListener('touchend', onTouchEnd, {
+            passive: true
+        });
     }
 
     disconnectedCallback() {
-        console.log("Custom element removed from page.");
+        console.log('Custom element removed from page.');
     }
 
     adoptedCallback() {
-        console.log("Custom element moved to new page.");
+        console.log('Custom element moved to new page.');
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
         switch (name) {
-            case "max":
+            case 'max':
                 this.max = parseInt(newValue, 10);
                 break;
-            case "min":
+            case 'min':
                 this.min = parseInt(newValue, 10);
                 break;
-            case "tempo":
+            case 'tempo':
                 this.tempo = parseInt(newValue, 10);
                 break;
         }
     }
-
 }
-

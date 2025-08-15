@@ -1,0 +1,13 @@
+beat-monitor {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    #beat-counter {
+        width: 0.2rem;
+    }
+
+    #beat-sub-counter {
+        width: 0.2rem;
+    }
+}

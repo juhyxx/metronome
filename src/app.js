@@ -8,6 +8,7 @@ import { BeatSelector } from "./components/BeatSelector.js";
 import { BeatItem } from "./components/BeatItem.js";
 import { Model } from "./Model.js";
 import { Controller } from "./Controller.js";
+import { BeatMonitor } from "./components/BeatMonitor.js";
 
 customElements.define('subdivisions-selector', SubdivisionsSelector);
 customElements.define('sound-selector', SoundSelector);
@@ -17,6 +18,7 @@ customElements.define('volume-selector', VolumeSelector);
 customElements.define('tempo-selector', TempoSelector);
 customElements.define('beat-selector', BeatSelector);
 customElements.define('beat-item', BeatItem);
+customElements.define('beat-monitor', BeatMonitor);
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
@@ -28,5 +30,4 @@ window.addEventListener('DOMContentLoaded', () => {
         controller.updateProperty(property, value);
     };
     model.deserialize();
-
 });

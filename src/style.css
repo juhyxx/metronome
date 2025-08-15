@@ -5,6 +5,7 @@
 @import url(./components/TempoSelector.css);
 @import url(./components/BeatSelector.css);
 @import url(./components/BeatItem.css);
+@import url(./components/BeatMonitor.css);
 
 :root {
     --main-color: hsl(84, 100%, 59%);

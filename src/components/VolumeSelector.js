@@ -1,5 +1,5 @@
 export class VolumeSelector extends HTMLElement {
-    static observedAttributes = ["volume"];
+    static observedAttributes = ['volume'];
 
     constructor() {
         super();
@@ -9,11 +9,11 @@ export class VolumeSelector extends HTMLElement {
         value = Math.max(Math.min(value, 100), 10);
 
         let input = this.querySelector(`input[value="${value}"]`);
-        input.click()
+        input.click();
     }
 
     get volume() {
-        return parseInt(document.querySelector("input:checked").value, 10);
+        return parseInt(document.querySelector('input:checked').value, 10);
     }
 
     connectedCallback() {
@@ -29,14 +29,12 @@ export class VolumeSelector extends HTMLElement {
 
     onWheel(event) {
         let value = this.volume;
-        this.volume = (event.deltaY < 0) ? value - 10 : value + 10;
+        this.volume = event.deltaY < 0 ? value - 10 : value + 10;
     }
 
-
     attributeChangedCallback(name, oldValue, newValue) {
-        if (name === "volume") {
+        if (name === 'volume') {
             this.volume = newValue;
         }
     }
 }
-
