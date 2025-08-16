@@ -35,7 +35,6 @@ export class Controller {
         this.#beats.setAttribute('sub-divisions', this.model.subdivisions);
         this.#subdivisions.setAttribute('division', this.model.subdivisions);
         this.#volume.setAttribute('volume', '80');
-
         this.#monitor.counter = 1;
         this.#monitor.subCounter = 1;
 
@@ -63,7 +62,6 @@ export class Controller {
         });
     }
     #addTempoSelectors() {
-        // Tempo Selector
         this.#tempo.addEventListener('change', (event) => {
             this.model.tempo = event.detail;
         });

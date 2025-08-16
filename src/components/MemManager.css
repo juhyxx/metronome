@@ -47,7 +47,6 @@ mem-manager {
             box-shadow: 0 0 5px 2px red;
 
             &:before {
-
                 background-color: red;
             }
         }

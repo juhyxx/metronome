@@ -112,17 +112,6 @@ export class WaveSound {
     onSubDivisionEnd(event) {
         setTimeout(() => {
             this.controller.onSubDivisionEnd(event.target.subdivision);
-            //document.querySelector('#subcounter').innerHTML = event.target.subdivision + 1;
-            const el = document.querySelector(
-                `#selector>div:nth-child(${
-                    event.target.counter + 1
-                }) .subdivisions >div:nth-child(${
-                    event.target.subdivision + 1
-                })`
-            );
-            if (el) {
-                el.classList = 'highlight';
-            }
         }, event.target.startTime - this.audioContext.currentTime);
     }
 
