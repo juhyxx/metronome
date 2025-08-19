@@ -42,21 +42,28 @@ export class WaveSound {
             ? this.model.beats[this.counter]
             : this.model.beats[0];
         const source = new AudioBufferSourceNode(this.audioContext);
+        const panNode = this.audioContext.createStereoPanner();
+        const delay = this.audioContext.createDelay();
+        const feedback = this.audioContext.createGain();
+
+        panNode.pan.value = beat.accent === Accent.value.HIGH ? 0 : -1;
+        panNode.pan.value =
+            beat.accent === Accent.value.MEDIUM ? 1 : panNode.pan.value;
 
         source.buffer =
             this.model.soundSource[this.model.soundSet][beat.accent];
         source.counter = this.counter;
         source.startTime = startTime;
-        source.connect(this.audioContext.destination);
-        source.connect(gainNode);
-        source.addEventListener('ended', this.onBeatEnd.bind(this));
 
-        gainNode.connect(this.audioContext.destination);
+        source.connect(gainNode);
+        gainNode.connect(panNode);
+        panNode.connect(this.audioContext.destination);
 
         let volume = this.model.volume;
-        volume = parseFloat(Math.pow(volume, 2).toFixed(2)) - 1;
+
+        source.addEventListener('ended', this.onBeatEnd.bind(this));
         gainNode.gain.setValueAtTime(
-            beat.accent === Accent.value.NONE ? -1 : volume,
+            beat.accent === Accent.value.NONE ? 0 : volume,
             startTime
         );
 
@@ -82,16 +89,19 @@ export class WaveSound {
                 subSource.subdivision = i;
                 subSource.startTime = startTime;
                 subSource.connect(gainSubNode);
-                subSource.connect(this.audioContext.destination);
+                gainSubNode.connect(this.audioContext.destination);
+                panNode.connect(this.audioContext.destination);
+
                 subSource.addEventListener(
                     'ended',
                     this.onSubDivisionEnd.bind(this)
                 );
                 subSource.start(subdivisionsStartTime);
 
-                gainSubNode.connect(this.audioContext.destination);
+                const subVolume = i % 2 === 0 ? volume - 0.1 : volume - 0.2;
+
                 gainSubNode.gain.setValueAtTime(
-                    Math.max(volume - 0.4, -0.95),
+                    Math.max(subVolume, 0),
                     subdivisionsStartTime
                 );
             }

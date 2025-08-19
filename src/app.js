@@ -1,14 +1,14 @@
-import { SubdivisionsSelector } from "./components/SubdivisionsSelector.js"
-import { SoundSelector } from "./components/SoundSelector.js";
-import { MemManager } from "./components/MemManager.js";
-import { TapTempoButton } from "./components/TapTempoButton.js";
-import { VolumeSelector } from "./components/VolumeSelector.js";
-import { TempoSelector } from "./components/TempoSelector.js";
-import { BeatSelector } from "./components/BeatSelector.js";
-import { BeatItem } from "./components/BeatItem.js";
-import { Model } from "./Model.js";
-import { Controller } from "./Controller.js";
-import { BeatMonitor } from "./components/BeatMonitor.js";
+import { SubdivisionsSelector } from './components/SubdivisionsSelector.js';
+import { SoundSelector } from './components/SoundSelector.js';
+import { MemManager } from './components/MemManager.js';
+import { TapTempoButton } from './components/TapTempoButton.js';
+import { VolumeSelector } from './components/VolumeSelector.js';
+import { TempoSelector } from './components/TempoSelector.js';
+import { BeatSelector } from './components/BeatSelector.js';
+import { BeatItem } from './components/BeatItem.js';
+import { Model } from './Model.js';
+import { Controller } from './Controller.js';
+import { BeatMonitor } from './components/BeatMonitor.js';
 
 customElements.define('subdivisions-selector', SubdivisionsSelector);
 customElements.define('sound-selector', SoundSelector);

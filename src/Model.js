@@ -143,7 +143,7 @@ export class Model {
         return this.#volume;
     }
     set volume(value) {
-        this.#volume = limit(value, 10, 100) * 0.02;
+        this.#volume = limit(value, 10, 100) * 0.01;
         this.serialize();
     }
 
