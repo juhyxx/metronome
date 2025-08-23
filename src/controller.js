@@ -1,6 +1,3 @@
-import { WaveSound } from './Sound.js';
-import { wait } from './utils/wait.js';
-
 export class Controller {
     #model = undefined;
     #volume = undefined;
@@ -46,8 +43,7 @@ export class Controller {
     #addBeatSelectorListeners() {
         this.#beats.addEventListener('select', (event) => {
             const beats = [...this.#model.beats];
-            beats[parseInt(event.detail.index, 10)].accent =
-                event.detail.accent;
+            beats[parseInt(event.detail.index, 10)].accent = event.detail.accent;
             this.#model.beats = beats;
         });
         this.#beats.addEventListener('add', (event) => {
@@ -66,27 +62,15 @@ export class Controller {
             this.model.tempo = event.detail;
         });
         this.#tempo.addEventListener('onPlay', (event) => {
-            if (this.model.sound) {
-                this.model.sound.stop();
-                this.model.sound = undefined;
-                this.unlock();
-            } else {
-                this.lock();
-                this.model.sound = new WaveSound(this);
-            }
+            this.model.togglePlay();
         });
         document.querySelector('#tempo').addEventListener('change', (event) => {
-            this.#tempo.setAttribute(
-                'tempo',
-                parseInt(document.querySelector('#tempo').value, 10)
-            );
+            this.#tempo.setAttribute('tempo', parseInt(document.querySelector('#tempo').value, 10));
         });
-        document
-            .querySelector('tap-tempo')
-            .addEventListener('change', (event) => {
-                this.model.tempo = event.detail.tempo;
-                this.#tempo.setAttribute('tempo', this.model.tempo);
-            });
+        document.querySelector('tap-tempo').addEventListener('change', (event) => {
+            this.model.tempo = event.detail.tempo;
+            this.#tempo.setAttribute('tempo', this.model.tempo);
+        });
     }
 
     #addEventListeners() {
@@ -110,10 +94,7 @@ export class Controller {
         this.#memoryManager.addEventListener('load', (event) => {
             this.model.deserialize(event.detail.memory);
             this.#monitor.subdivision = this.model.subdivisions;
-            this.#subdivisions.setAttribute(
-                'division',
-                this.model.subdivisions
-            );
+            this.#subdivisions.setAttribute('division', this.model.subdivisions);
             this.#sound.setAttribute('sound', this.model.soundSet);
             this.#tempo.setAttribute('tempo', this.model.tempo);
         });
@@ -156,20 +137,16 @@ export class Controller {
                 this.#beats.clear();
                 value.forEach((item) => this.#beats.addBeat(item.accent, true));
                 break;
+            case 'play':
+                value == true ? this.lock() : this.unlock();
+                break;
+            case 'current-beat':
+                this.#beats.beat = value.beat;
+                this.#beats.subBeat = value.subBeat;
+                this.#monitor.counter = value.beat;
+                this.#monitor.subCounter = value.subBeat;
+                break;
         }
-    }
-
-    onSubDivisionEnd(subdivision) {
-        this.#beats.subBeat = subdivision;
-        this.#monitor.subCounter = subdivision;
-    }
-
-    async onBeatEnd(counter, waitingTime) {
-        await wait(waitingTime);
-
-        this.#beats.beat = counter;
-        this.#monitor.subCounter = 0;
-        this.#monitor.counter = counter;
     }
 
     async lock() {

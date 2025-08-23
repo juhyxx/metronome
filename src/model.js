@@ -1,26 +1,17 @@
 import { Accent } from './Accent.js';
 import { limit } from './utils/limit.js';
+import { WaveSound } from './Sound.js';
 
 const memoryDefaults = {
     MEM0: {
-        beats: [
-            { accent: 'high' },
-            { accent: 'low' },
-            { accent: 'medium' },
-            { accent: 'low' }
-        ],
+        beats: [{ accent: 'high' }, { accent: 'low' }, { accent: 'medium' }, { accent: 'low' }],
         soundSet: 'sticks',
         tempo: 120,
         subdivisions: 2
     },
 
     MEM1: {
-        beats: [
-            { accent: 'high' },
-            { accent: 'low' },
-            { accent: 'medium' },
-            { accent: 'low' }
-        ],
+        beats: [{ accent: 'high' }, { accent: 'low' }, { accent: 'medium' }, { accent: 'low' }],
         soundSet: 'drums',
         tempo: 120,
         subdivisions: 4
@@ -51,12 +42,7 @@ const memoryDefaults = {
     },
 
     MEM4: {
-        beats: [
-            { accent: 'high' },
-            { accent: 'low' },
-            { accent: 'low' },
-            { accent: 'low' }
-        ],
+        beats: [{ accent: 'high' }, { accent: 'low' }, { accent: 'low' }, { accent: 'low' }],
         soundSet: 'beeps',
         tempo: 60,
         subdivisions: 6
@@ -76,6 +62,9 @@ export class Model {
     #propsToSerialize = ['subdivisions', 'tempo', 'soundSet', 'beats'];
     #beats = [];
     #propertyChangedCallback = (property, value) => {};
+    #currentBeat = 1;
+    #currentSubBeat = 1;
+    #isPlaying = false;
 
     soundSource = {};
     soundSets = ['sticks', 'drums', 'metronome', 'beeps'];
@@ -89,6 +78,22 @@ export class Model {
 
     set propertyChangedCallback(callback) {
         this.#propertyChangedCallback = callback;
+    }
+
+    getCurrentBeat() {
+        return {
+            beat: this.#currentBeat,
+            subBeat: this.#currentSubBeat
+        };
+    }
+
+    setCurrentBeat(beat, subBeat = 1) {
+        this.#currentBeat = beat;
+        this.#currentSubBeat = subBeat;
+        this.#propertyChangedCallback('current-beat', {
+            beat: this.#currentBeat,
+            subBeat: this.#currentSubBeat
+        });
     }
 
     get beats() {
@@ -162,26 +167,44 @@ export class Model {
         return this.#delay;
     }
 
+    get isPlaying() {
+        return this.#isPlaying;
+    }
+
+    set isPlaying(value) {
+        this.#isPlaying = value;
+    }
+
+    stop() {
+        this.sound.stop();
+        this.#propertyChangedCallback('play', false);
+    }
+
+    play() {
+        this.sound = this.sound || new WaveSound(this);
+        this.sound.play();
+        this.#propertyChangedCallback('play', true);
+    }
+
+    togglePlay() {
+        this.isPlaying ? this.stop() : this.play();
+    }
+
     async loadAudioData(audioContext) {
         for (const soundSet of Object.values(this.soundSets)) {
             for (const item of Object.entries(this.soundSources)) {
                 const rsvp = await fetch(`sounds/${soundSet}/${item[1]}.wav`);
                 if (audioContext) {
                     const buff = await rsvp.arrayBuffer();
-                    this.soundSource[soundSet] =
-                        this.soundSource[soundSet] || {};
-                    this.soundSource[soundSet][item[0]] =
-                        await audioContext.decodeAudioData(buff);
+                    this.soundSource[soundSet] = this.soundSource[soundSet] || {};
+                    this.soundSource[soundSet][item[0]] = await audioContext.decodeAudioData(buff);
                 }
             }
         }
     }
 
     serialize(memory = 0) {
-        const data = this.#propsToSerialize.reduce(
-            (prev, item) => Object.assign({ [item]: this[item] }, prev),
-            {}
-        );
+        const data = this.#propsToSerialize.reduce((prev, item) => Object.assign({ [item]: this[item] }, prev), {});
 
         localStorage.setItem('MEM' + memory, JSON.stringify(data));
     }
@@ -189,8 +212,7 @@ export class Model {
     deserialize(memory = 0) {
         try {
             const key = 'MEM' + memory;
-            const data =
-                JSON.parse(localStorage.getItem(key)) || memoryDefaults[key];
+            const data = JSON.parse(localStorage.getItem(key)) || memoryDefaults[key];
 
             this.beats = data.beats || [];
             this.tempo = data.tempo || this.tempo;

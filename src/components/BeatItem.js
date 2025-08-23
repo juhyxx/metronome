@@ -12,7 +12,7 @@ export class BeatItem extends HTMLElement {
 
     set subBeat(value) {
         this.querySelectorAll('.subdivisions div').forEach((el, index) =>
-            el.classList.toggle('highlight', index <= value)
+            el.classList.toggle('highlight', index === value)
         );
     }
 

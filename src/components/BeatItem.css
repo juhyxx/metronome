@@ -126,4 +126,11 @@ beat-item {
         }
     }
 
+    &[sub-divisions="1"] {
+        div.subdivisions {
+            opacity: 0.0;
+            background-color: gray !important;
+        }
+    }
+
 }
