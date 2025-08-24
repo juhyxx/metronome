@@ -127,7 +127,7 @@ input {
         border-radius: 0;
         padding: 0.5rem;
         min-width: auto;
-        background-color: black;
+
     }
 
     @media screen and (pointer: coarse) and (orientation: landscape) {

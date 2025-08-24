@@ -40,7 +40,7 @@ export class WaveSound {
         this.audioContext = new AudioContext();
     }
 
-    #getNodes(startTime, beatVolume, buffer, panning) {
+    #createNode({ startTime, beatVolume, buffer, panning }) {
         const source = this.audioContext.createBufferSource();
         const gainNode = this.audioContext.createGain();
         const panNode = this.audioContext.createStereoPanner();
@@ -77,42 +77,38 @@ export class WaveSound {
 
         const startTime = t + this.model.delay;
         const beat = this.model.beats[this.counter] ? this.model.beats[this.counter] : this.model.beats[0];
+        const nodeData = {
+            startTime: t + this.model.delay,
+            beatVolume: beat.accent === Accent.value.NONE ? 0 : this.model.volume,
+            buffer: this.model.soundSource[this.model.soundSet][beat.accent],
+            panning: this.#getPanning(beat.accent)
+        };
+        const source = this.#createNode(nodeData);
         let counter = this.counter;
-        const buffer = this.model.soundSource[this.model.soundSet][beat.accent];
-        const beatVolume = beat.accent === Accent.value.NONE ? 0 : this.model.volume;
-        let panning = this.#getPanning(beat.accent);
-        const source = this.#getNodes(startTime, beatVolume, buffer, panning);
 
         source.addEventListener('ended', () => {
             this.#nodes = this.#nodes.filter((node) => node !== source);
-
-            if (this.model.isPlaying) {
-                this.model.setCurrentBeat(counter, 0);
-            }
+            this.model.isPlaying && this.model.setCurrentBeat(counter, 0);
             this.planNextBeat(startTime);
         });
 
         if (this.model.subdivisions > 1) {
             for (let i = 0; i < this.model.subdivisions; i++) {
-                const subdivisionsStartTime = startTime + i * (this.model.delay / this.model.subdivisions);
                 const subVolume = i % 2 === 0 ? this.model.volume - 0.1 : this.model.volume - 0.2;
-                const buffer = this.model.soundSource[this.model.soundSet][Accent.value.SUBDIV];
-                const panning = i % 2 === 0 ? -0.3 : 0.3;
-                const subBeatVolume = Math.max(subVolume, 0);
-                const subSource = this.#getNodes(subdivisionsStartTime, subBeatVolume, buffer, panning);
+                const subNodeData = {
+                    startTime: startTime + i * (this.model.delay / this.model.subdivisions),
+                    beatVolume: Math.max(subVolume, 0),
+                    buffer: this.model.soundSource[this.model.soundSet][Accent.value.SUBDIV],
+                    panning: i % 2 === 0 ? -0.3 : 0.3
+                };
+                const subSource = this.#createNode(subNodeData);
 
                 subSource.addEventListener('ended', () => {
                     this.#nodes = this.#nodes.filter((node) => node !== subSource);
-                    if (this.model.isPlaying) {
-                        this.model.setCurrentBeat(counter, i);
-                    }
+                    this.model.isPlaying && this.model.setCurrentBeat(counter, i);
                 });
             }
         }
-        this.increaseCounter();
-    }
-
-    increaseCounter() {
         this.#counter = (this.#counter + 1) % this.model.beats.length;
     }
 }

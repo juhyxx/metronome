@@ -221,6 +221,4 @@ export class Model {
             this.sound.reset();
         } catch {}
     }
-
-    constructor() {}
 }
