@@ -48,10 +48,7 @@ export class TempoSelector extends HTMLElement {
     }
 
     set tempo(value) {
-        const newValue = Math.min(
-            this.#maxValue,
-            Math.max(this.#minValue, value)
-        );
+        const newValue = Math.min(this.#maxValue, Math.max(this.#minValue, value));
 
         this.#tempo = Math.round(newValue);
         this.tempoName = this.#tempo;
@@ -64,17 +61,13 @@ export class TempoSelector extends HTMLElement {
             if (!tempoMatch) {
                 const roundedTempo = Math.round(this.#tempo / 10) * 10;
                 if (roundedTempo === parseInt(el.dataset.tempo)) {
-                    el.classList.toggle(
-                        'highlight',
-                        roundedTempo === parseInt(el.dataset.tempo)
-                    );
+                    el.classList.toggle('highlight', roundedTempo === parseInt(el.dataset.tempo));
                     const value = this.#tempo - roundedTempo;
                     el.classList.add('v' + Math.abs(value));
                 }
             }
         });
-        this.querySelector('#play').style.animationDuration =
-            (4 * 60) / this.#tempo + 's';
+        this.querySelector('#play').style.animationDuration = (4 * 60) / this.#tempo + 's';
         this.querySelector('#tempo-value').textContent = this.#tempo;
         this.dispatchEvent(new CustomEvent('change', { detail: this.#tempo }));
     }
@@ -109,21 +102,14 @@ export class TempoSelector extends HTMLElement {
             this.tempo = parseInt(event.target.dataset.tempo, 10) || null;
             event.stopPropagation();
         };
-        this.querySelectorAll('.value').forEach((el) =>
-            el.addEventListener('click', onClickItem)
-        );
+        this.querySelectorAll('.value').forEach((el) => el.addEventListener('click', onClickItem));
         this.tempo = this.#tempo; //set tempo after render
     }
 
     #toggleIsPlaying() {
         this.#isPlaying = !this.#isPlaying;
-        this.querySelector('#wheel').classList.toggle(
-            'is-playing',
-            this.#isPlaying
-        );
-        this.dispatchEvent(
-            new CustomEvent('onPlay', { detail: this.#isPlaying })
-        );
+        this.querySelector('#wheel').classList.toggle('is-playing', this.#isPlaying);
+        this.dispatchEvent(new CustomEvent('onPlay', { detail: this.#isPlaying }));
     }
 
     #registerEvents() {
@@ -134,10 +120,7 @@ export class TempoSelector extends HTMLElement {
         const onMouseWheel = (event) => {
             const difference = event.ctrlKey ? 1 : 10;
 
-            this.tempo =
-                event.deltaY > 0
-                    ? this.tempo + difference
-                    : this.tempo - difference;
+            this.tempo = event.deltaY > 0 ? this.tempo + difference : this.tempo - difference;
         };
         const onKeyDown = (event) => {
             if (event.code === 'ArrowUp') {
@@ -170,9 +153,7 @@ export class TempoSelector extends HTMLElement {
             document.body.classList.remove('dnd');
             this.#dndY = undefined;
         };
-        document
-            .querySelector('#wheel')
-            .addEventListener('mousedown', onMouseDown, { passive: true });
+        document.querySelector('#wheel').addEventListener('mousedown', onMouseDown, { passive: true });
         document.body.addEventListener('mousemove', onMouseMove, {
             passive: true
         });
@@ -186,9 +167,7 @@ export class TempoSelector extends HTMLElement {
         };
         const onTouchMove = (event) => {
             if (this.#dndY) {
-                const diff = Math.round(
-                    (this.#dndY - event.touches[0].clientY) / 4
-                );
+                const diff = Math.round((this.#dndY - event.touches[0].clientY) / 4);
                 this.tempo += diff;
                 this.#dndY = event.touches[0].clientY;
             }
@@ -198,9 +177,7 @@ export class TempoSelector extends HTMLElement {
             this.#dndY = undefined;
         };
 
-        document
-            .querySelector('#wheel')
-            .addEventListener('touchstart', onTouchStart, { passive: true });
+        document.querySelector('#wheel').addEventListener('touchstart', onTouchStart, { passive: true });
         document.body.addEventListener('touchmove', onTouchMove, {
             passive: true
         });

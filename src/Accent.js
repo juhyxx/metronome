@@ -7,12 +7,7 @@ export class Accent {
         HIGH: 'high'
     };
 
-    static queue = [
-        this.value.NONE,
-        this.value.LOW,
-        this.value.MEDIUM,
-        this.value.HIGH
-    ];
+    static queue = [this.value.NONE, this.value.LOW, this.value.MEDIUM, this.value.HIGH];
 
     static next(accent) {
         const index = (this.queue.indexOf(accent) + 1) % this.queue.length;

@@ -9,9 +9,7 @@ export class SoundSelector extends HTMLElement {
     }
 
     connectedCallback() {
-        this.innerHTML = SoundSelector.data
-            .map((i) => `<div class="btn" data-sound="${i}">${i}</div>`)
-            .join('');
+        this.innerHTML = SoundSelector.data.map((i) => `<div class="btn" data-sound="${i}">${i}</div>`).join('');
         this.querySelectorAll('.btn').forEach((el) => {
             el.addEventListener('click', () => {
                 this.select(el.dataset.sound);
@@ -27,10 +25,7 @@ export class SoundSelector extends HTMLElement {
     select(value) {
         this.#selected = value;
         this.querySelectorAll('.btn').forEach((el) => {
-            el.classList.toggle(
-                'selected',
-                el.dataset.sound === this.#selected
-            );
+            el.classList.toggle('selected', el.dataset.sound === this.#selected);
         });
     }
 

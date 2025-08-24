@@ -13,9 +13,7 @@ export class TapTempoButton extends HTMLElement {
         this.addEventListener('click', () => {
             const tempo = this.tapTempo();
             if (tempo) {
-                this.dispatchEvent(
-                    new CustomEvent('change', { detail: { tempo } })
-                );
+                this.dispatchEvent(new CustomEvent('change', { detail: { tempo } }));
             }
         });
     }
@@ -36,10 +34,7 @@ export class TapTempoButton extends HTMLElement {
         const tempo = Math.round(60 / ((now - lastTime) / 1000));
         if (Number.isFinite(tempo) && tempo >= this.#minTempo) {
             this.#tapTempo.push(tempo);
-            return Math.round(
-                this.#tapTempo.reduce((prev, item) => prev + item, 0) /
-                    this.#tapTempo.length
-            );
+            return Math.round(this.#tapTempo.reduce((prev, item) => prev + item, 0) / this.#tapTempo.length);
         }
     }
 }

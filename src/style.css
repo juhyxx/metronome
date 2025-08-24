@@ -17,7 +17,7 @@
         inset 1px -1px 20px rgba(0, 0, 0, 0.3), 1px 1px 1px rgba(255, 255, 255, 0.2),
         1px 1px 4px rgba(0, 0, 0, 0.3);
     --of-shadow: inset 0px 0px 1px 1px rgba(0, 0, 0, 0.5),
-        inset -1px -1px 2px 1px rgba(255, 255, 255, 0.3),
+        inset -1px -1px 1px 0px rgba(255, 255, 255, 0.3),
         inset 0px 0px 60px rgba(0, 0, 0, 0.5);
     --bg-grad: radial-gradient(farthest-corner at right bottom,
             rgba(0, 0, 0, 0.967) 0%,
@@ -25,8 +25,8 @@
             transparent 70%),
         radial-gradient(circle, transparent 49%, rgba(0, 0, 0, 1) 100%);
     --bg-button: linear-gradient(0deg,
-            rgba(0, 0, 0, 0.1) 49%,
-            rgba(255, 255, 255, 0.03) 50%,
+            rgba(0, 0, 0, 0.2) 49%,
+            rgba(255, 255, 255, 0.05) 50%,
             transparent 100%);
     --bg-button-active: linear-gradient(deg,
             rgba(0, 0, 0, 0.1) 49%,
@@ -253,7 +253,7 @@ body.help {
 
 .btn {
     flex: 1;
-    box-shadow: var(--shadow);
+
     background: var(--bg-button);
     text-align: center;
     cursor: pointer;
@@ -262,6 +262,9 @@ body.help {
     align-items: center;
     align-content: center;
     justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+
 
     &:first-child {
         border-radius: 2rem 0rem 0rem 2rem;
@@ -282,19 +285,15 @@ body.help {
         background: var(--bg-button-active);
         color: var(--main-color);
         text-shadow: 0 0 5px var(--main-color);
-    }
-
-    &:active {
         color: var(--main-color);
-    }
 
-    &.selected.switchable:hover {
-        box-shadow: var(--shadow);
-        background-color: rgb(42, 42, 42);
+        &:not(.toggle) {
+            cursor: default;
+        }
     }
 
     &:not(.selected):hover {
-        box-shadow: var(--of-shadow);
-        background-color: rgb(42, 42, 42);
+        box-shadow: none;
+        background-color: rgba(0, 0, 0, 0.5);
     }
 }

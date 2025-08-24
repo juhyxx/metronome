@@ -54,11 +54,7 @@ export class BeatSelector extends HTMLElement {
         }
     }
 
-    #setupBeat(
-        item,
-        accent = Accent.value.LOW,
-        index = this.#beats.length + 1
-    ) {
+    #setupBeat(item, accent = Accent.value.LOW, index = this.#beats.length + 1) {
         item.setAttribute('sub-divisions', this.#subdivisions);
         item.setAttribute('index', this.#beats.length + 1);
         item.setAttribute('accent', accent);
@@ -90,9 +86,7 @@ export class BeatSelector extends HTMLElement {
 
     connectedCallback() {
         this.#beats = this.querySelectorAll('beat-item');
-        this.#beats.forEach((item, index) =>
-            this.#setupBeat(item, accent, index + 1)
-        );
+        this.#beats.forEach((item, index) => this.#setupBeat(item, accent, index + 1));
         this.shadowRoot.innerHTML = '<div part="container"><slot></slot></div>';
         this.beat = this.#beat;
     }

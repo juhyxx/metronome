@@ -27,16 +27,13 @@ export class BeatItem extends HTMLElement {
         this.addEventListener('click', () => {
             this.#accent = Accent.next(this.#accent);
             this.setAttribute('accent', this.#accent);
-            this.dispatchEvent(
-                new CustomEvent('select', { detail: { accent: this.#accent } })
-            );
+            this.dispatchEvent(new CustomEvent('select', { detail: { accent: this.#accent } }));
         });
     }
 
     #renderSubdivisions() {
         if (this.querySelector('.subdivisions')) {
-            this.querySelector('.subdivisions').innerHTML =
-                '<div></div>'.repeat(this.#subdivisions);
+            this.querySelector('.subdivisions').innerHTML = '<div></div>'.repeat(this.#subdivisions);
         }
     }
 

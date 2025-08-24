@@ -10,9 +10,7 @@ export class SubdivisionsSelector extends HTMLElement {
         this.innerHTML = `
             <h2>Subdivisions</h2>
             <div class="bar">
-            ${[2, 3, 4, 5, 6, 7, 8]
-                .map((i) => `<div class="btn switchable">${i}</div>`)
-                .join('')}
+            ${[2, 3, 4, 5, 6, 7, 8].map((i) => `<div class="btn switchable toggle">${i}</div>`).join('')}
             </div>
         `;
 
