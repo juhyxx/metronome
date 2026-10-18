@@ -1,114 +1,167 @@
 import { Accent } from './Accent.js';
+import { SOUND_SETS } from './config.js';
 
+const { HIGH, MEDIUM, LOW, NONE } = Accent.value;
+
+const SAMPLES = ['high', 'medium', 'low', 'subdiv'];
+
+// silent beats still play a (muted) sample, its `ended` event drives the scheduling
+const SAMPLE_FOR_ACCENT = { [HIGH]: 'high', [MEDIUM]: 'medium', [LOW]: 'low', [NONE]: 'low' };
+const PANNING = { [HIGH]: 0, [MEDIUM]: 1, [LOW]: -1 };
+
+// subdivision clicks alternate between these values (relative to the beat)
+const SUBDIVISION_GAIN = [0.85, 0.7];
+const SUBDIVISION_PANNING = [-0.3, 0.3];
+
+const START_DELAY = 0.05; // s, so the first beat is not cut off
+
+function fetchSamples() {
+    return Promise.all(
+        SOUND_SETS.flatMap((soundSet) =>
+            SAMPLES.map(async (sample) => {
+                const response = await fetch(`sounds/${soundSet}/${sample}.wav`);
+                return { soundSet, sample, data: await response.arrayBuffer() };
+            })
+        )
+    );
+}
+
+// Plays the beats of the model and reports which one is heard through `model.position`.
 export class WaveSound {
+    #model;
+    #context = null;
+    #output = null; // master gain, follows the model volume
+    #downloads; // raw samples, fetched right away so the first start is fast
+    #buffers = null; // decoded samples: { [soundSet]: { [sample]: AudioBuffer } }
+    #sources = new Set();
     #counter = 0;
-    audioContext = undefined;
-    #nodes = [];
+    #run = 0; // bumped on every start and stop, callbacks of older runs are ignored
 
-    get counter() {
-        return this.#counter;
+    constructor(model) {
+        this.#model = model;
+        this.#downloads = fetchSamples();
+        this.#downloads.catch(() => {}); // reported when playback starts
+
+        model.addEventListener('change', ({ detail: { property, value } }) => {
+            if (property === 'isPlaying') {
+                value ? this.#start() : this.#stop();
+            }
+            if (property === 'volume') {
+                this.#applyVolume();
+            }
+        });
+        model.addEventListener('load', () => (this.#counter = 0));
     }
 
-    play() {
-        this.model.isPlaying = true;
+    async #start() {
+        const run = ++this.#run;
 
-        if (Object.keys(this.model.soundSource).length > 0) {
-            this.planNextBeat(this.audioContext.currentTime - this.model.delay);
-        } else {
-            this.model.loadAudioData(this.audioContext).then(() => {
-                this.planNextBeat(this.audioContext.currentTime - this.model.delay);
-            });
+        // created on the first start, which comes from a user gesture as browsers require
+        if (!this.#context) {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            this.#context = new AudioContextClass();
+            this.#output = this.#context.createGain();
+            this.#output.connect(this.#context.destination);
+            this.#applyVolume();
+        }
+
+        try {
+            await this.#context.resume();
+            this.#buffers = this.#buffers || this.#decode();
+            const buffers = await this.#buffers;
+            if (run !== this.#run) return; // stopped while loading
+
+            this.#scheduleBeat(buffers, this.#context.currentTime + START_DELAY, run);
+        } catch (error) {
+            console.error('Metronome sounds could not be loaded', error);
+            this.#downloads = fetchSamples();
+            this.#buffers = null;
+            this.#model.isPlaying = false;
         }
     }
 
-    stop() {
-        const currentBeat = this.model.getCurrentBeat();
+    #stop() {
+        this.#run++;
+        this.#sources.forEach((source) => source.stop());
+        this.#sources.clear();
+        // the next start continues with the beat that was playing
+        this.#counter = this.#model.position.beat;
+    }
 
-        this.#nodes.forEach((source) => {
-            source.stop(this.audioContext.currentTime);
+    async #decode() {
+        const files = await this.#downloads;
+        const buffers = {};
+
+        await Promise.all(
+            files.map(async ({ soundSet, sample, data }) => {
+                buffers[soundSet] = buffers[soundSet] || {};
+                buffers[soundSet][sample] = await this.#context.decodeAudioData(data);
+            })
+        );
+        return buffers;
+    }
+
+    #applyVolume() {
+        if (!this.#output) return;
+
+        const gain = (this.#model.volume / 100) ** 2; // perceived loudness is closer to quadratic
+        this.#output.gain.setTargetAtTime(gain, this.#context.currentTime, 0.02);
+    }
+
+    #scheduleBeat(buffers, time, run) {
+        const model = this.#model;
+        const beat = this.#counter < model.beats.length ? this.#counter : 0;
+        const accent = model.beats[beat];
+        const samples = buffers[model.soundSet];
+        const delay = model.delay;
+        const subdivisions = model.subdivisions;
+
+        const source = this.#play(samples[SAMPLE_FOR_ACCENT[accent]], time, accent === NONE ? 0 : 1, PANNING[accent]);
+        // `ended` comes right after the short sample, long before the next beat, and keeps firing in background tabs
+        source.addEventListener('ended', () => {
+            if (run === this.#run) {
+                this.#scheduleBeat(buffers, time + delay, run);
+            }
         });
-        this.#counter = currentBeat.beat;
-        this.model.isPlaying = false;
+        this.#showPosition(time, { beat, subBeat: 0 }, run);
+
+        if (subdivisions > 1) {
+            for (let i = 0; i < subdivisions; i++) {
+                const subTime = time + (i * delay) / subdivisions;
+                this.#play(samples.subdiv, subTime, SUBDIVISION_GAIN[i % 2], SUBDIVISION_PANNING[i % 2]);
+                if (i > 0) {
+                    this.#showPosition(subTime, { beat, subBeat: i }, run);
+                }
+            }
+        }
+        this.#counter = (beat + 1) % model.beats.length;
     }
 
-    reset() {
-        this.#counter = 0;
-    }
+    #play(buffer, time, gain, pan = 0) {
+        const source = this.#context.createBufferSource();
+        const gainNode = this.#context.createGain();
+        const panNode = this.#context.createStereoPanner();
 
-    constructor(model) {
-        this.model = model;
-        this.audioContext = new AudioContext();
-    }
-
-    #createNode({ startTime, beatVolume, buffer, panning }) {
-        const source = this.audioContext.createBufferSource();
-        const gainNode = this.audioContext.createGain();
-        const panNode = this.audioContext.createStereoPanner();
-
-        source.connect(gainNode);
-        gainNode.connect(panNode);
-        panNode.connect(this.audioContext.destination);
-
-        panNode.pan.value = panning;
         source.buffer = buffer;
-
-        source.start(startTime);
-        gainNode.gain.setValueAtTime(beatVolume, startTime);
-
-        this.#nodes.push(source);
+        gainNode.gain.value = gain;
+        panNode.pan.value = pan;
+        source.connect(gainNode).connect(panNode).connect(this.#output);
+        source.addEventListener('ended', () => this.#sources.delete(source));
+        source.start(time);
+        this.#sources.add(source);
 
         return source;
     }
-    #getPanning(accent) {
-        switch (accent) {
-            case Accent.value.HIGH:
-                return 0;
-            case Accent.value.MEDIUM:
-                return 1;
-            case Accent.value.LOW:
-                return -1;
-            default:
-                return 0;
-        }
-    }
 
-    planNextBeat(t) {
-        if (!this.model.isPlaying) return;
+    // updates the model once the sound at `time` is actually heard
+    #showPosition(time, position, run) {
+        const latency = this.#context.outputLatency || 0;
+        const wait = (time + latency - this.#context.currentTime) * 1000;
 
-        const startTime = t + this.model.delay;
-        const beat = this.model.beats[this.counter] ? this.model.beats[this.counter] : this.model.beats[0];
-        const nodeData = {
-            startTime: t + this.model.delay,
-            beatVolume: beat.accent === Accent.value.NONE ? 0 : this.model.volume,
-            buffer: this.model.soundSource[this.model.soundSet][beat.accent],
-            panning: this.#getPanning(beat.accent)
-        };
-        const source = this.#createNode(nodeData);
-        let counter = this.counter;
-
-        source.addEventListener('ended', () => {
-            this.#nodes = this.#nodes.filter((node) => node !== source);
-            this.model.isPlaying && this.model.setCurrentBeat(counter, 0);
-            this.planNextBeat(startTime);
-        });
-
-        if (this.model.subdivisions > 1) {
-            for (let i = 0; i < this.model.subdivisions; i++) {
-                const subVolume = i % 2 === 0 ? this.model.volume - 0.1 : this.model.volume - 0.2;
-                const subNodeData = {
-                    startTime: startTime + i * (this.model.delay / this.model.subdivisions),
-                    beatVolume: Math.max(subVolume, 0),
-                    buffer: this.model.soundSource[this.model.soundSet][Accent.value.SUBDIV],
-                    panning: i % 2 === 0 ? -0.3 : 0.3
-                };
-                const subSource = this.#createNode(subNodeData);
-
-                subSource.addEventListener('ended', () => {
-                    this.#nodes = this.#nodes.filter((node) => node !== subSource);
-                    this.model.isPlaying && this.model.setCurrentBeat(counter, i);
-                });
+        setTimeout(() => {
+            if (run === this.#run) {
+                this.#model.position = position;
             }
-        }
-        this.#counter = (this.#counter + 1) % this.model.beats.length;
+        }, Math.max(wait, 0));
     }
 }

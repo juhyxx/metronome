@@ -1,156 +1,132 @@
+/* The knob sits in its grid cell: it is a size container and the dial takes 77 % of the shorter side.
+   Everything inside is measured in --u, a hundredth of the dial. */
 tempo-selector {
-    display: flex;
-    position: relative;
-    flex: 1;
-    justify-content: center;
-    align-items: center;
+    display: grid;
+    grid-area: dial;
+    place-items: center;
+    min-height: 0;
+    container-type: size;
 
-    #wheel {
+    .dial {
+        --size: calc(100cqmin * 0.77);
+        --u: calc(var(--size) / 100);
+
+        position: relative;
+        width: var(--size);
+        height: var(--size);
+    }
+
+    .wheel {
         display: flex;
         position: absolute;
-        top: calc(50% - var(--diameter) / 2);
-        left: calc(50% - var(--diameter) / 2);
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        z-index: 100;
-        cursor: pointer;
+        z-index: 1;
+        inset: calc(var(--u) * 8);
         box-shadow: 0 5px 40px 10px black,
             inset 0 5px 5px rgba(255, 255, 255, 0.2),
             inset 0 0 2px rgba(0, 0, 0, 0.4),
-            inset 0 0 1px 0.11rem rgba(255, 255, 255, 0.2),
-            inset 0 5px 5px 0.11rem rgba(0, 0, 0, 0.4),
-            inset 0 5px 50px 0.11rem rgba(0, 0, 0, 0.5);
+            inset 0 0 1px calc(var(--u) * 1.6) rgba(255, 255, 255, 0.2),
+            inset 0 5px 5px calc(var(--u) * 1.6) rgba(0, 0, 0, 0.4),
+            inset 0 5px 50px calc(var(--u) * 1.6) rgba(0, 0, 0, 0.5);
         border-radius: 50%;
         background: var(--bg-grad);
-        width: var(--diameter);
-        height: var(--diameter);
-        font-size: 1rem;
-        text-shadow: 0 -1px 1px black;
+        font-size: calc(var(--u) * 15);
+        cursor: pointer;
+        touch-action: none;
 
         .dnd & {
-            color: var(--main-color);
-        }
-
-        #tempo-name {
-            font-size: 0.3rem;
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        & #play {
-            position: absolute;
-            top: calc(50% - (var(--diameter) - 8rem) / 2);
-            left: calc(50% - (var(--diameter) - 5rem) / 2);
-            transform: rotate(0deg);
-            z-index: -2;
-            clip-path: polygon(0% 0%,
-                    100% 50%,
-                    0% 100%,
-                    0% 100%,
-                    0% 100%,
-                    0% 100%,
-                    0% 100%,
-                    0% 100%,
-                    0% 100%);
-            transition: all 1s;
-            background: rgba(255, 255, 255, 0.2);
-            width: calc(var(--diameter) - 5rem);
-            height: calc(var(--diameter) - 5rem);
-            pointer-events: none;
-        }
-
-        &:hover #play {
-            background: rgba(255, 255, 255, 0.8);
-        }
-
-
-
-        &.is-playing #play {
-            animation: spin 4s linear infinite;
-            animation-delay: 0.5s;
-            clip-path: polygon(50% 0%,
-                    100% 50%,
-                    50% 100%,
-                    0% 50%,
-                    0% 50%,
-                    0% 50%,
-                    0% 50%,
-                    0% 50%,
-                    0% 50%);
+            color: var(--led);
         }
     }
 
-    #tempo-knob-inner {
-        display: flex;
-        position: relative;
-        justify-content: center;
-        align-items: center;
-        border-radius: 50%;
-        background-color: transparent;
-        width: calc(var(--diameter) + 1rem);
-        height: calc(var(--diameter) + 1rem);
+    .tempo-name {
+        color: var(--muted);
+        font-size: calc(var(--u) * 4);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
 
-        .value-container {
+    .tempo-value {
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+
+        #metronome.playing & {
+            color: var(--led);
+            text-shadow: var(--lit-text);
+        }
+    }
+
+    /* play triangle, a spinning diamond while playing (one turn per four beats) */
+    .play {
+        position: absolute;
+        top: calc(50% + var(--u) * 12);
+        left: calc(50% - var(--u) * 6);
+        z-index: -1;
+        clip-path: polygon(0% 0%, 100% 50%, 0% 100%, 0% 100%);
+        transition: all 1s;
+        background: var(--faint);
+        width: calc(var(--u) * 12);
+        height: calc(var(--u) * 12);
+        pointer-events: none;
+
+        #metronome.playing & {
+            animation: spin 4s linear infinite;
+            animation-delay: 0.5s;
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            background: hsla(84, 100%, 59%, 0.6);
+        }
+    }
+
+    .wheel:hover .play {
+        background: var(--text);
+    }
+
+    /* the scale: an LED per tick, lit next to the current tempo */
+    .tick {
+        position: absolute;
+        top: calc(50% - var(--u));
+        left: 0;
+        z-index: 2;
+        transform: rotate(var(--angle));
+        width: 100%;
+        height: calc(var(--u) * 2);
+        pointer-events: none;
+    }
+
+    .mark {
+        position: absolute;
+        inset: 0 auto 0 0;
+        box-shadow: var(--led-shadow);
+        border-radius: 1px;
+        background: var(--led-off);
+        width: calc(var(--u) * 6);
+        cursor: pointer;
+        pointer-events: auto;
+
+        &::before {
             position: absolute;
-            transform-origin: 50% right;
-            width: calc(var(--diameter) + 1rem);
-            height: 0.15rem;
+            top: 50%;
+            left: calc(var(--u) * 11);
+            translate: 0 -50%;
+            color: var(--faint);
+            font-size: calc(var(--u) * 3.2);
+            content: attr(data-tempo);
+            pointer-events: none;
+        }
 
-            .value {
-                position: absolute;
-                z-index: 100;
-                cursor: pointer;
-                box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.2);
-                background-color: rgba(255, 255, 255, 0.1);
-                width: 0.5rem;
-                height: 0.15rem;
+        &:hover {
+            --strength: 1;
+        }
 
-                &::before {
-                    position: absolute;
-                    left: 0.8rem;
-                    content: attr(data-tempo);
-                    color: rgba(255, 255, 255, 0.3);
-                    font-size: 0.23rem;
-                }
+        &:hover,
+        &.highlight {
+            box-shadow: 0 0 calc(var(--u) * 2 * var(--strength)) var(--led);
+            background: hsla(84, 100%, 59%, var(--strength));
 
-                &:hover,
-                &.highlight {
-                    box-shadow: 0 0 10px var(--main-color);
-                    background-color: var(--main-color);
-
-                    &::before {
-                        color: white;
-                    }
-
-                    &.v0 {
-                        background-color: var(--main-color);
-                    }
-
-                    &.v1 {
-                        background-color: hsla(84, 100%, 59%, 0.8);
-                        box-shadow: 0 0 6px var(--main-color);
-                    }
-
-                    &.v2 {
-                        background-color: hsla(84, 100%, 59%, 0.6);
-                        box-shadow: 0 0 4px var(--main-color);
-                    }
-
-                    &.v3 {
-                        background-color: hsla(84, 100%, 59%, 0.4);
-                        box-shadow: 0 0 2px var(--main-color);
-                    }
-                }
-
-                &.v4 {
-                    background-color: hsla(84, 100%, 59%, 0.2);
-                    box-shadow: 0 0 0 var(--main-color);
-                }
-
-                &.v5 {
-                    background-color: hsla(84, 100%, 59%, 0.1);
-                    box-shadow: 0 0 0 var(--main-color);
-                }
+            &::before {
+                color: var(--text);
             }
         }
     }

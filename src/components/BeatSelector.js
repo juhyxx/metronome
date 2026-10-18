@@ -1,105 +1,69 @@
 import { Accent } from '../Accent.js';
 
+// The bar: one beat-item per beat. Clicking a beat cycles its accent.
+// Emits `change` with the new beats as `{ value }`.
 export class BeatSelector extends HTMLElement {
-    static observedAttributes = ['sub-divisions', 'beat'];
-
-    #beat = 0;
     #beats = [];
-    #subdivisions = 0;
+    #subdivisions = 1;
+    #position = { beat: 0, subBeat: 0 };
 
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
+        this.addEventListener('click', (event) => {
+            const item = event.target.closest('beat-item');
+            if (!item) return;
+
+            const index = [...this.children].indexOf(item);
+            const beats = this.#beats.map((accent, i) => (i === index ? Accent.next(accent) : accent));
+            this.dispatchEvent(new CustomEvent('change', { detail: { value: beats } }));
+        });
+    }
+
+    get beats() {
+        return this.#beats;
+    }
+    set beats(value) {
+        this.#beats = value;
+        this.#render();
     }
 
     set subdivisions(value) {
-        this.#subdivisions = parseInt(value, 10);
-        this.querySelectorAll('beat-item').forEach((item) => {
-            item.setAttribute('sub-divisions', value);
-        });
+        this.#subdivisions = value;
+        this.#render();
     }
 
-    set beat(value) {
-        this.#beat = parseInt(value, 10);
-        this.#beats.forEach((item, index) => {
-            item.toggleAttribute('highlight', index === this.#beat);
-        });
-    }
-
-    set subBeat(value) {
-        const beat = this.querySelector('beat-item[highlight]');
-        if (!beat) return;
-        beat.subBeat = value;
-    }
-
-    clear() {
-        this.#beats = [];
-        this.querySelectorAll('beat-item').forEach((item) => item.remove());
-    }
-
-    addBeat(accent, silent = false) {
-        const item = document.createElement('beat-item');
-        this.#setupBeat(item, accent);
-        this.appendChild(item);
-        this.#beats = this.querySelectorAll('beat-item');
-        if (!silent) {
-            this.dispatchEvent(
-                new CustomEvent('add', {
-                    detail: {
-                        accent: accent || Accent.value.LOW,
-                        index: item.getAttribute('index')
-                    }
-                })
-            );
-        }
-    }
-
-    #setupBeat(item, accent = Accent.value.LOW, index = this.#beats.length + 1) {
-        item.setAttribute('sub-divisions', this.#subdivisions);
-        item.setAttribute('index', this.#beats.length + 1);
-        item.setAttribute('accent', accent);
-        item.addEventListener('select', (event) => {
-            this.dispatchEvent(
-                new CustomEvent('select', {
-                    detail: {
-                        accent: event.detail.accent,
-                        index: parseInt(item.getAttribute('index'), 10) - 1
-                    }
-                })
-            );
-        });
-    }
-
-    removeBeat() {
-        if (this.#beats.length > 0) {
-            const lastBeat = this.#beats[this.#beats.length - 1];
-
-            this.removeChild(lastBeat);
-            this.#beats = this.querySelectorAll('beat-item'); // update beats list
-            this.dispatchEvent(
-                new CustomEvent('remove', {
-                    detail: { index: lastBeat.getAttribute('index') }
-                })
-            );
-        }
+    set position(value) {
+        this.#position = value;
+        this.#highlight();
     }
 
     connectedCallback() {
-        this.#beats = this.querySelectorAll('beat-item');
-        this.#beats.forEach((item, index) => this.#setupBeat(item, accent, index + 1));
-        this.shadowRoot.innerHTML = '<div part="container"><slot></slot></div>';
-        this.beat = this.#beat;
+        this.#render();
     }
 
-    attributeChangedCallback(name, oldValue, newValue) {
-        switch (name) {
-            case 'sub-divisions':
-                this.subdivisions = newValue;
-                break;
-
-            case 'beat':
-                this.beat = newValue;
-                break;
+    #render() {
+        while (this.children.length > this.#beats.length) {
+            this.lastElementChild.remove();
         }
+        while (this.children.length < this.#beats.length) {
+            this.append(document.createElement('beat-item'));
+        }
+        [...this.children].forEach((item, index) => {
+            item.setAttribute('index', index + 1);
+            item.setAttribute('accent', this.#beats[index]);
+            item.setAttribute('subdivisions', this.#subdivisions);
+        });
+        this.#highlight();
+    }
+
+    #highlight() {
+        const { beat, subBeat } = this.#position;
+
+        [...this.children].forEach((item, index) => {
+            item.toggleAttribute('highlight', index === beat);
+            if (index === beat) {
+                item.subBeat = subBeat;
+            }
+        });
     }
 }

@@ -2,59 +2,91 @@
 <html lang="en">
 
 <head>
-    <title>Metronome 1.3.9</title>
+    <title>Metronome 1.4.0</title>
     <meta charset="utf-8">
-    <script src="app.js?1.3.9" type="module" defer></script>
-    <link rel="stylesheet" href="style.css?1.3.9">
-    <link rel="manifest" href="manifest.json" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <meta name="theme-color" content="#262626">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon" sizes="any">
+    <link rel="icon" href="images/icon-32.png" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="images/icon-144.png">
+    <link rel="preload" href="fonts/Silkscreen-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="style.css?1.4.0">
+    <script src="app.js?1.4.0" type="module"></script>
 </head>
 
 <body>
-    <volume-selector></volume-selector>
-
-    <div id="metronome">
+    <main id="metronome">
         <header>
-            <h1>Metronome 1.3.9 <span id="help-trigger" style="margin-left:0.5rem;">?</span></h1>
-            <div id="tempoview">
-                <label>Tempo<input id="tempo" type="number" value="120" min="40" max="260">BPM</label>
+            <h1 class="brand">
+                <img class="brand-mark" src="images/icon-72.png" srcset="images/icon-144.png 2x" alt="">
+                <svg class="brand-word" viewBox="0 20 694 86" role="img" aria-label="Metronome">
+                    <g fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 100V44M6 72a20 28 0 0 1 40 0V100M46 72a20 28 0 0 1 40 0V100" />
+                        <path d="M110 72H166A28 28 0 1 0 157.8 91.8" />
+                        <path d="M190 26V84a16 16 0 0 0 16 16M178 48H204" />
+                        <path d="M230 100V44M230 72a28 28 0 0 1 28-28H264" />
+                        <circle cx="316" cy="72" r="28" />
+                        <path d="M368 100V44M368 72a28 28 0 0 1 56 0V100" />
+                        <circle cx="476" cy="72" r="28" />
+                        <path d="M528 100V44M528 72a20 28 0 0 1 40 0V100M568 72a20 28 0 0 1 40 0V100" />
+                        <path d="M632 72H688A28 28 0 1 0 679.8 91.8" />
+                    </g>
+                    <circle class="brand-dot" cx="316" cy="72" r="10" />
+                </svg>
+                <span id="help-trigger" title="Help">?</span>
+            </h1>
+            <div class="readout">
+                <label class="lcd" title="Tempo"><input id="tempo" type="number" value="120"><small>BPM</small></label>
+                <beat-monitor class="lcd" title="Beat : subdivision"></beat-monitor>
             </div>
-            <beat-monitor></beat-monitor>
         </header>
 
-        <div id="metronome-inner">
+        <div id="beats">
             <beat-selector></beat-selector>
-
-            <div id="controls">
-                <tempo-selector></tempo-selector>
-
-                <div id="buttons">
+            <div class="control-row beat-tools">
+                <section class="control subdivisions">
+                    <h2>Subdivisions</h2>
                     <subdivisions-selector></subdivisions-selector>
-                    <section id="beat-container" style="justify-content: space-between;">
-                        <div id="beat-subcontainer"  style="max-width: 3rem;">
-                            <h2>Beats</h2>
-                            <div class="bar" >
-                                <div id="add" class="btn">+</div>
-                                <div id="remove" class="btn" >−</div>
-                            </div>
-                        </div>
-                        <tap-tempo min="40">TAP</tap-tempo>
-                    </section>
-                    <sound-selector></sound-selector>
-                    <mem-manager></mem-manager>
-                </div>
+                </section>
+                <section class="control beat-count">
+                    <h2>Beats</h2>
+                    <div class="bar">
+                        <div id="add-beat" class="btn">+</div>
+                        <div id="remove-beat" class="btn">−</div>
+                    </div>
+                </section>
             </div>
         </div>
-    </div>
+
+        <tempo-selector></tempo-selector>
+
+        <div id="controls">
+            <tap-tempo>Tap</tap-tempo>
+            <section class="control sound">
+                <h2>Sound</h2>
+                <sound-selector></sound-selector>
+            </section>
+            <section class="control volume">
+                <h2>Volume <output id="volume-value"></output></h2>
+                <volume-selector></volume-selector>
+            </section>
+            <section class="control memory">
+                <h2>Memory</h2>
+                <mem-manager></mem-manager>
+            </section>
+        </div>
+    </main>
 
     <div id="help">
-        <div><span class="key">Enter</span> or <span class="key">Space</span> Play/Stop </div>
-        <div> <span class="key">⬆</span> tempo+1 BPM </div>
-        <div><span class="key">⬆</span> + <span class="key">⌥Alt</span> tempo+10 BPM</div>
-        <div> <span class="key">⬇</span> tempo-1 BPM</div>
-        <div><span class="key">⬇</span> + <span class="key">⌥Alt</span> tempo-10 BPM</div>
-        <div><span class="key">⇧ Shift</span> + <span class="key">Mouse Wheel</span> tempo±1 BPM</div>
+        <div><span class="key">Enter</span> or <span class="key">Space</span> play / stop</div>
+        <div><span class="key">⬆</span> <span class="key">⬇</span> tempo ±1 BPM</div>
+        <div><span class="key">⌥ Alt</span> + <span class="key">⬆</span> <span class="key">⬇</span> tempo ±10 BPM</div>
+        <div><span class="key">Mouse wheel</span> tempo ±10 BPM</div>
+        <div><span class="key">⇧ Shift</span> + <span class="key">Mouse wheel</span> tempo ±1 BPM</div>
+        <div>Drag the knob up / down to fine tune the tempo</div>
+        <div>Memory: click to load, hold 2 s to save</div>
+        <div class="version">Metronome 1.4.0</div>
     </div>
 </body>
 

@@ -1,136 +1,82 @@
+/* A column of LEDs: the accent level (high lights all three) and the subdivisions below.
+   Lit LEDs glow at full strength on the beat being played. */
 beat-item {
-    flex: 1;
+    --lit: 40%;
+    --glow: 0px;
+
     display: flex;
+    flex: 1;
     flex-direction: column;
-    justify-content: space-between;
-    gap: var(--selector-gap);
+    gap: var(--beat-gap);
+    min-width: 0;
     cursor: pointer;
 
+    .number {
+        color: var(--faint);
+        font-size: 0.3rem;
+        line-height: 1;
+        text-align: center;
+    }
 
+    .level {
+        flex: 1;
+        border-radius: 2px;
+        background: var(--led-off);
+    }
 
-    &[accent] {
-        &[accent="high"] {
-            color: #404040;
-        }
+    .high {
+        --c: var(--led);
+    }
 
-        &[accent="medium"] {
-            & div:nth-child(1) {
-                background-color: transparent;
-            }
-        }
+    .medium {
+        --c: var(--led-medium);
+    }
 
-        &[accent="low"] {
+    .low {
+        --c: var(--led-low);
+    }
 
-            & div:nth-child(1),
-            & div:nth-child(2) {
-                background-color: transparent;
-            }
-        }
+    &[accent="high"] .level,
+    &[accent="medium"] :is(.medium, .low),
+    &[accent="low"] .low {
+        box-shadow: 0 0 var(--glow) var(--c);
+        background: color-mix(in srgb, var(--c) var(--lit), transparent);
+    }
 
-        &[accent="none"] {
+    .subdivisions {
+        display: flex;
+        flex: 0 0 0.12rem;
+        gap: 2px;
 
-            & div:nth-child(1),
-            & div:nth-child(2),
-            & div:nth-child(3) {
-                background-color: transparent;
-            }
-        }
-
-        div {
+        i {
             flex: 1;
-            opacity: 0.5;
-            text-shadow: none;
+            border-radius: 1px;
+            background: var(--led-off);
+        }
+    }
 
-            &:nth-child(1) {
-                background-color: var(--main-color);
-                text-align: center;
-                font-size: 0.5rem;
-            }
+    &[subdivisions="1"] .subdivisions {
+        visibility: hidden;
+    }
 
-            &:nth-child(2) {
-                background-color: hsl(63, 100%, 59%);
-            }
-
-            &:nth-child(3) {
-                background-color: hsl(0, 100%, 59%);
-            }
-
-
+    @media (hover: hover) {
+        &:hover .number {
+            color: var(--text);
         }
     }
 
     &[highlight] {
+        --lit: 100%;
+        --glow: 8px;
 
-        background-color: rgba(255, 255, 255, 0.1);
-
-        >div {
-            opacity: 1;
-
-            &:nth-child(1) {
-                box-shadow: 0 0 10px var(--main-color);
-            }
-
-            &:nth-child(2) {
-                box-shadow: 0 0 10px hsl(63, 100%, 59%);
-            }
-
-            &:nth-child(3) {
-                box-shadow: 0 0 10px hsl(0, 100%, 59%);
-            }
+        .number {
+            color: var(--led);
+            text-shadow: 0 0 5px var(--led);
         }
 
-        &[accent="medium"] {
-            & div:nth-child(1) {
-                box-shadow: none;
-            }
-        }
-
-        &[accent="low"] {
-
-            & div:nth-child(1),
-            & div:nth-child(2) {
-                box-shadow: none;
-            }
-        }
-
-        &[accent="none"] {
-
-            & div:nth-child(1),
-            & div:nth-child(2),
-            & div:nth-child(3) {
-                box-shadow: none;
-            }
-        }
-
-
-        .subdivisions {
-            div {
-                opacity: 1;
-            }
-
-            .highlight {
-                box-shadow: 0 0 10px hsl(0, 100%, 59%);
-                background-color: hsl(0, 100%, 59%) !important;
-            }
+        .subdivisions .highlight {
+            box-shadow: 0 0 6px var(--led);
+            background: var(--led);
         }
     }
-
-
-    div.subdivisions {
-        display: flex;
-        gap: calc(var(--selector-gap)/2);
-        flex: 0.25;
-
-        div {
-            background-color: gray !important;
-        }
-    }
-
-    &[sub-divisions="1"] {
-        div.subdivisions {
-            opacity: 0.0;
-            background-color: gray !important;
-        }
-    }
-
 }

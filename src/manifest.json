@@ -51,13 +51,13 @@
         {
             "src": "images/sshot.png",
             "type": "image/png",
-            "sizes": "540x720",
+            "sizes": "780x1688",
             "form_factor": "narrow"
         },
         {
-            "src": "images/sshot.png",
+            "src": "images/sshot-wide.png",
             "type": "image/png",
-            "sizes": "540x720",
+            "sizes": "1920x1080",
             "form_factor": "wide"
         }
     ]

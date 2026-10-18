@@ -1,7 +1,8 @@
-tap-tempo {
-    flex: 0.4;
-    border-radius: 50% !important;
-    max-height: 1.5rem;
-    max-width: 1.5rem;
-    aspect-ratio: 1 / 1;
+tap-tempo.btn {
+    flex: none;
+    box-shadow: var(--raised);
+    border-radius: 50%;
+    width: 2.4rem;
+    height: 2.4rem;
+    font-size: 0.45rem;
 }

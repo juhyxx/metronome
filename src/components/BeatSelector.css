@@ -1,6 +1,44 @@
-beat-selector::part(container) {
+/* the beats with the subdivisions and the + / − buttons below, + / − at the end where beats are added */
+#beats {
     display: flex;
-    flex-direction: row;
-    gap: var(--selector-gap);
-    min-height: 4rem;
+    grid-area: beats;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-height: 0;
+
+    .beat-tools {
+        flex: none;
+    }
+
+    .control.subdivisions {
+        flex: 1;
+    }
+
+    .control.beat-count {
+        flex: 0 0 2.2rem;
+
+        .btn {
+            font-size: 0.45rem;
+        }
+    }
+}
+
+beat-selector {
+    --beat-gap: 0.2rem;
+
+    display: flex;
+    position: relative;
+    flex: 1;
+    gap: var(--beat-gap);
+    background: transparent;
+    min-height: 0;
+
+    /* faint scanlines */
+    &::after {
+        position: absolute;
+        inset: 0;
+        background: repeating-linear-gradient(transparent 0 2px, rgba(0, 0, 0, 0.12) 2px 3px);
+        content: "";
+        pointer-events: none;
+    }
 }

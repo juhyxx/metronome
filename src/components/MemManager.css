@@ -1,82 +1,66 @@
+/* one coloured LED per slot; holding fills it up until the slot is saved */
 mem-manager {
     display: flex;
-    flex: 0.5;
-    justify-content: space-between;
+    gap: 0.3rem;
+    height: 0.3rem;
 
-
-    div {
-        align-items: center;
-        display: flex;
-        cursor: pointer;
+    .mem-item {
+        flex: 1;
+        position: relative;
+        box-shadow: var(--led-shadow);
         border-radius: 1rem;
-        height: 0.5rem;
-        width: 1.5rem;
-        text-align: center;
+        background: color-mix(in srgb, var(--c) 30%, transparent);
         overflow: hidden;
+        cursor: pointer;
 
-        &:before {
-            display: block;
+        &::before {
+            position: absolute;
+            inset: 0;
+            transform: scaleX(0);
+            transform-origin: left;
+            background: var(--c);
             content: "";
-            width: 100%;
-            height: 1rem;
-            opacity: 0.5;
-            transition: opacity 0.4s ease-in-out;
         }
 
-        &:hover:before {
-            opacity: 1;
+        @media (hover: hover) {
+            &:hover {
+                background: color-mix(in srgb, var(--c) 55%, transparent);
+            }
+        }
+
+        &.active,
+        &.saved {
+            box-shadow: 0 0 6px var(--c);
         }
 
         &.active::before {
-            animation: width 2s linear;
+            animation: hold var(--hold-duration) linear forwards;
         }
 
-        &:not(.active) {
-            box-shadow: none !important;
+        &.saved {
+            background: var(--c);
         }
 
         &:nth-child(1) {
-            box-shadow: 0 0 5px 2px blue;
-
-            &:before {
-                background-color: blue;
-            }
+            --c: hsl(220, 100%, 62%);
         }
 
         &:nth-child(2) {
-            box-shadow: 0 0 5px 2px red;
-
-            &:before {
-                background-color: red;
-            }
+            --c: var(--led-low);
         }
 
         &:nth-child(3) {
-            box-shadow: 0 0 5px 2px var(--main-color);
-
-            &:before {
-
-                background-color: var(--main-color);
-            }
+            --c: var(--led);
         }
 
         &:nth-child(4) {
-            box-shadow: 0 0 5px 2px yellow;
-
-            &:before {
-                background-color: yellow;
-            }
+            --c: var(--led-medium);
         }
     }
 }
 
-
-@keyframes width {
-    from {
-        width: 100%;
-    }
-
+@keyframes hold {
     to {
-        width: 0%;
+        transform: scaleX(1);
     }
 }

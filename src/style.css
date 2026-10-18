@@ -1,299 +1,390 @@
-@import url("https://fonts.googleapis.com/css2?family=Silkscreen&display=swap");
-@import url(./components/VolumeSelector.css);
-@import url(./components/MemManager.css);
-@import url(./components/TapTempoButton.css);
-@import url(./components/TempoSelector.css);
+/* Dark hardware panel, pixel font, recessed screens and glowing LEDs; the same look as ../pitcher. */
+
 @import url(./components/BeatSelector.css);
 @import url(./components/BeatItem.css);
 @import url(./components/BeatMonitor.css);
+@import url(./components/TempoSelector.css);
+@import url(./components/VolumeSelector.css);
+@import url(./components/TapTempoButton.css);
+@import url(./components/MemManager.css);
+
+@font-face {
+    font-family: "Silkscreen";
+    src: url(fonts/Silkscreen-Regular.woff2) format("woff2");
+    font-display: swap;
+}
 
 :root {
-    --main-color: hsl(84, 100%, 59%);
-    --diameter: 6rem;
-    --bg: hsl(170, 1%, 25%);
-    --bg-metronome: hsl(170, 0%, 15%);
-    --shadow: inset 2px 2px 2px rgba(255, 255, 255, 0.2),
-        inset -2px -2px 2px rgba(0, 0, 0, 0.3),
-        inset 1px -1px 20px rgba(0, 0, 0, 0.3), 1px 1px 1px rgba(255, 255, 255, 0.2),
-        1px 1px 4px rgba(0, 0, 0, 0.3);
-    --of-shadow: inset 0px 0px 1px 1px rgba(0, 0, 0, 0.5),
-        inset -1px -1px 1px 0px rgba(255, 255, 255, 0.3),
-        inset 0px 0px 60px rgba(0, 0, 0, 0.5);
-    --bg-grad: radial-gradient(farthest-corner at right bottom,
-            rgba(0, 0, 0, 0.967) 0%,
-            rgba(0, 0, 0, 0.3) 70%,
-            transparent 70%),
+    --led: hsl(84, 100%, 59%);
+    --led-medium: hsl(63, 100%, 59%);
+    --led-low: hsl(0, 100%, 59%);
+    --led-off: rgba(255, 255, 255, 0.07);
+    --led-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.6);
+
+    --panel: hsl(170, 0%, 15%);
+    --screen: #0e0f0d;
+    --text: rgba(255, 255, 255, 0.8);
+    --muted: rgba(255, 255, 255, 0.5);
+    --faint: rgba(255, 255, 255, 0.3);
+
+    --bg-grad: radial-gradient(farthest-corner at right bottom, rgba(0, 0, 0, 0.967) 0%, rgba(0, 0, 0, 0.3) 70%, transparent 70%),
         radial-gradient(circle, transparent 49%, rgba(0, 0, 0, 1) 100%);
-    --bg-button: linear-gradient(0deg,
-            rgba(0, 0, 0, 0.2) 49%,
-            rgba(255, 255, 255, 0.05) 50%,
-            transparent 100%);
-    --bg-button-active: linear-gradient(deg,
-            rgba(0, 0, 0, 0.1) 49%,
-            rgba(255, 255, 255, 0.1) 50%,
-            rgba(255, 255, 255, 0.005) 100%);
-    --selector-gap: 0.2rem;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 5vh;
+    --bg-button: linear-gradient(0deg, rgba(0, 0, 0, 0.2) 49%, rgba(255, 255, 255, 0.05) 50%, transparent 100%);
+    --raised: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 1px 1px rgba(255, 255, 255, 0.05), 0 2px 6px rgba(0, 0, 0, 0.5);
+    --sunken: inset 0 0 1px 1px rgba(0, 0, 0, 0.5), inset -1px -1px 1px 0 rgba(255, 255, 255, 0.15),
+        inset 0 0 30px rgba(0, 0, 0, 0.5);
+    --screen-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.6), inset -1px -1px 1px 0 rgba(255, 255, 255, 0.2),
+        inset 0 0 60px rgba(0, 0, 0, 0.6);
+    --lit-text: 0 0 6px var(--led), 0 0 22px hsla(84, 100%, 59%, 0.45);
 
-    @media only screen and (max-device-width: 800px) {
-        --diameter: 50vw;
-    }
+    /* Everything is sized in rem. The root font size is the largest that still fits the layout
+       (--panel-width × --panel-height rem) into the window, capped so controls stay compact on
+       big screens, where the knob and the beats take the extra room. */
+    --panel-width: 9.6;
+    --panel-height: 18;
+    --padding: 0.4rem;
+    --gap: 0.3rem;
+    --control-height: 0.8rem;
 
-    @media screen and (pointer: coarse) and (orientation: landscape) {
-        --diameter: 35vh;
-        font-size: 8vh;
+    color-scheme: dark;
+    font-size: min(46px, 100vh / var(--panel-height), 100vw / var(--panel-width));
+    font-size: min(46px, 100dvh / var(--panel-height), 100dvw / var(--panel-width));
+}
+
+/* landscape windows: the knob on the left, the rest next to it */
+@media (min-aspect-ratio: 1/1) {
+    :root {
+        --panel-width: 20;
+        --panel-height: 9.4;
     }
 }
 
+* {
+    box-sizing: border-box;
+}
+
 body {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     margin: 0;
-    background-color: var(--bg);
     height: 100vh;
-
-    font-size: 0.25rem;
-    font-family: "Silkscreen", sans-serif;
-    text-shadow: 0px -1px 1px black;
-
-    @media only screen and (max-device-width: 800px),
-    only screen and (max-device-height: 800px) {
-        align-items: stretch;
-        background-color: #151515;
-        padding: 0rem;
-    }
-
+    height: 100dvh;
+    overflow: hidden;
+    background-color: var(--panel);
+    background-image: var(--bg-grad);
+    color: var(--text);
+    font: 0.26rem/1.4 "Silkscreen", ui-monospace, monospace;
+    text-shadow: 0 -1px 1px black;
     touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
 
     &.dnd * {
         cursor: grabbing !important;
     }
 }
 
-
-* {
-    -webkit-user-select: none;
-    font-family: "Silkscreen", sans-serif;
-    user-select: none;
-}
-
-h1 {
-    margin: 0;
-    padding: 0;
-    font-size: 0.25rem;
-    color: rgba(255, 255, 255, 0.5);
-}
-
+h1,
 h2 {
     margin: 0;
-    margin-bottom: 0.1rem;
-    padding: 0;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 0.25rem;
-    text-align: center;
+    font-size: inherit;
+    font-weight: inherit;
 }
 
-input {
-    cursor: pointer;
-    border: 0;
-    background-color: #505050;
-    width: 1rem;
-    color: white;
-    font-size: 0.25rem;
-    text-align: center;
+input,
+output {
+    font: inherit;
 }
 
 #metronome {
-    display: flex;
-    position: relative;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    box-shadow: inset 0px 0px 0px 1px rgba(255, 255, 255, 0.2),
-        0px 3px 5px rgba(0, 0, 0, 0.7), 5px 5px 20px 10px rgba(0, 0, 0, 0.4);
-    border-radius: 0.5rem;
-    background: var(--bg-grad);
-    background-color: var(--bg-metronome);
-    padding: 0.5rem;
-    min-width: 8rem;
-    overflow: hidden;
+    display: grid;
+    grid-template:
+        "header" auto
+        "beats" minmax(3.4rem, 0.6fr)
+        "dial" minmax(0, 1fr)
+        "controls" auto
+        / minmax(0, 1fr);
+    gap: var(--gap);
+    height: 100%;
+    padding: var(--padding);
 
-    @media only screen and (max-device-width: 800px) {
-        flex: 1;
-        justify-content: space-between;
-        box-shadow: none;
-        border-radius: 0;
-        padding: 0.5rem;
-        min-width: auto;
-
+    @media (min-aspect-ratio: 1/1) {
+        grid-template:
+            "dial header" auto
+            "dial beats" minmax(0, 1fr)
+            "dial controls" auto
+            / minmax(0, 1fr) clamp(10rem, 40%, 14rem);
+        column-gap: 0.5rem;
     }
 
-    @media screen and (pointer: coarse) and (orientation: landscape) {
-        flex: 1;
-        justify-content: space-between;
-        box-shadow: none;
-        border-radius: 0;
-        padding: 0.5rem;
-        width: calc(100vw - 1rem);
-        min-width: auto;
-        height: calc(100vh - 1rem);
-    }
-
-    & header {
+    > header {
         display: flex;
+        grid-area: header;
         justify-content: space-between;
         align-items: center;
-    }
-
-    #metronome-inner {
-        display: flex;
-        flex: 1;
-        flex-direction: column;
-        flex-wrap: nowrap;
-        gap: 0.5rem;
-
-        @media screen and (pointer: coarse) and (orientation: landscape) {
-            flex-direction: row;
-        }
-
-        #controls {
-            display: flex;
-            flex: 1;
-            flex-direction: column;
-
-            #buttons {
-                display: flex;
-                flex-direction: column;
-                gap: 0.5rem;
-                font-size: 0.4rem;
-            }
-        }
+        gap: 0.3rem;
     }
 }
 
+/* ------------------------------------------------------------- header */
 
-input#tempo {
-    background-color: transparent;
-}
-
-#beat-container {
+.brand {
     display: flex;
-    gap: 0.5rem;
-
-    &> :first-child {
-        flex: 1;
-    }
-
-    #beat-subcontainer {
-        .btn {
-            font-size: 0.5rem !important;
-        }
-    }
+    align-items: center;
+    gap: 0.15rem;
 }
 
-body.help {
-    #help {
-        display: flex;
-    }
+.brand-mark {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 22%;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
 }
 
-#help {
-    display: none;
-    position: absolute;
-    flex-direction: column;
-    gap: 0.5rem;
-    z-index: 200;
-    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.3);
-    border-radius: 0.5rem;
-    background-color: rgba(0, 0, 0, 1);
-    padding: 0.5rem;
+.brand-word {
+    width: auto;
+    height: 0.32rem;
+    aspect-ratio: 694 / 86;
+    color: var(--text);
+    filter: drop-shadow(0 -1px 1px black);
+}
 
-    .key {
-        display: inline-block;
-        box-shadow: 2px 2px 2px black;
-        border-radius: 4px;
-        background-color: white;
-        opacity: 0.6;
-
-        padding: 0.25rem;
-        color: black;
-        text-shadow: none;
-        border: 4px outset;
-    }
+.brand-dot {
+    fill: var(--led);
+    filter: drop-shadow(0 0 6px var(--led));
 }
 
 #help-trigger {
-    outline: 1px solid rgba(255, 255, 255, 0.5);
-    padding: 0 5px;
+    margin-left: 0.05rem;
+    border-radius: 50%;
+    box-shadow: var(--raised);
+    background: var(--bg-button);
+    width: 0.4rem;
+    height: 0.4rem;
+    color: var(--muted);
+    font-size: 0.22rem;
+    line-height: 0.4rem;
+    text-align: center;
+    cursor: pointer;
 
     &:hover {
-        cursor: pointer;
-        background-color: white;
+        color: var(--led);
+        text-shadow: 0 0 5px var(--led);
     }
 
-    @media screen and (pointer: coarse) {
+    @media (pointer: coarse) {
         display: none;
     }
 }
 
-.bar {
+.readout {
     display: flex;
-    flex: 1;
-    justify-content: center;
-    font-size: 0.25rem;
-    align-items: center;
-    align-content: center;
+    gap: 0.15rem;
+}
 
-    .btn {
-        height: 100%;
+.lcd {
+    display: flex;
+    align-items: baseline;
+    gap: 0.08rem;
+    box-shadow: var(--screen-shadow);
+    border-radius: 0.15rem;
+    background: var(--screen);
+    padding: 0.04rem 0.15rem 0;
+    color: var(--led);
+    font-size: 0.4rem;
+    line-height: 1.2;
+    text-shadow: var(--lit-text);
+    font-variant-numeric: tabular-nums;
+
+    small {
+        color: var(--muted);
+        font-size: 0.2rem;
+        text-shadow: none;
     }
 }
 
+#tempo {
+    appearance: textfield;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    width: 1.25rem;
+    color: inherit;
+    text-align: right;
+    text-shadow: inherit;
+    cursor: text;
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+        appearance: none;
+        margin: 0;
+    }
+
+    &:focus {
+        outline: none;
+    }
+}
+
+/* ------------------------------------------------------------- controls */
+
+/* the tap button over the volume, sound and volume on one row, memory below.
+   The sound names never get cut, the right column takes what is left. */
+#controls {
+    display: grid;
+    grid-template:
+        ". tap" auto
+        "sound volume" auto
+        "memory memory" auto
+        / minmax(auto, 1fr) minmax(2.4rem, 3.6rem);
+    grid-area: controls;
+    align-items: end;
+    gap: 0.22rem 0.35rem;
+
+    .sound {
+        grid-area: sound;
+    }
+
+    tap-tempo {
+        grid-area: tap;
+        justify-self: end;
+    }
+
+    .memory {
+        grid-area: memory;
+    }
+
+    .volume {
+        grid-area: volume;
+    }
+}
+
+.control {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+
+    h2 {
+        color: var(--muted);
+        font-size: 0.22rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    output {
+        margin-left: 0.08rem;
+        color: var(--text);
+    }
+
+    &.sound {
+        min-width: auto;
+
+        .btn {
+            flex: 1 0 auto;
+            padding: 0 0.12rem;
+        }
+    }
+}
+
+.control-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.35rem;
+}
+
+/* a row of buttons on one raised pill */
+.bar {
+    display: flex;
+    box-shadow: var(--raised);
+    border-radius: 2rem;
+    height: var(--control-height);
+    overflow: hidden;
+}
+
 .btn {
+    display: grid;
     flex: 1;
-
+    place-items: center;
     background: var(--bg-button);
-    text-align: center;
+    min-width: 0;
+    color: var(--text);
+    text-transform: uppercase;
     cursor: pointer;
-    min-height: 40px;
-    min-width: 40px;
-    align-items: center;
-    align-content: center;
-    justify-content: center;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
 
-
-    &:first-child {
-        border-radius: 2rem 0rem 0rem 2rem;
+    & + & {
+        border-left: 1px solid rgba(0, 0, 0, 0.35);
     }
 
-    &:last-child {
-        border-radius: 0rem 2rem 2rem 0rem;
-    }
-
-    &.disabled {
-        box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.5);
-        pointer-events: none;
-        color: rgba(255, 255, 255, 0.3);
-    }
-
-    &.selected {
-        box-shadow: var(--of-shadow);
-        background: var(--bg-button-active);
-        color: var(--main-color);
-        text-shadow: 0 0 5px var(--main-color);
-        color: var(--main-color);
-
-        &:not(.toggle) {
-            cursor: default;
+    /* lights up a little; the selected and lit states below keep their LED colour */
+    @media (hover: hover) {
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+            color: white;
+            text-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
         }
     }
 
-    &:not(.selected):hover {
-        box-shadow: none;
-        background-color: rgba(0, 0, 0, 0.5);
+    &:active,
+    &.selected,
+    &.lit {
+        box-shadow: var(--sunken);
+        background: transparent;
+    }
+
+    /* the "lit" state */
+    &.selected,
+    &.lit {
+        color: var(--led);
+        text-shadow: 0 0 5px var(--led);
+    }
+
+    &.selected {
+        cursor: default;
+    }
+
+    &.disabled {
+        color: var(--faint);
+        pointer-events: none;
+    }
+}
+
+/* clicking the selected subdivision again switches subdivisions off */
+subdivisions-selector .btn.selected {
+    cursor: pointer;
+}
+
+/* ------------------------------------------------------------- help */
+
+#help {
+    display: none;
+    position: fixed;
+    flex-direction: column;
+    gap: 0.25rem;
+    z-index: 10;
+    inset: 0;
+    box-shadow: var(--screen-shadow), 0 0 1rem rgba(0, 0, 0, 0.6);
+    margin: auto;
+    border-radius: 0.3rem;
+    background: var(--screen);
+    padding: 0.4rem;
+    width: max-content;
+    max-width: calc(100% - 2 * var(--padding));
+    height: max-content;
+    text-transform: uppercase;
+
+    body.help & {
+        display: flex;
+    }
+
+    .key {
+        display: inline-block;
+        box-shadow: var(--raised);
+        border-radius: 0.1rem;
+        background: var(--bg-button);
+        padding: 0.02rem 0.1rem;
+    }
+
+    .version {
+        color: var(--faint);
     }
 }

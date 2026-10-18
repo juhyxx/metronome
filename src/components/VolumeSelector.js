@@ -1,40 +1,64 @@
+import { limit } from '../utils/limit.js';
+import { wheelDirection } from '../utils/wheel.js';
+
+const SEGMENTS = 20;
+const STEP = 100 / SEGMENTS;
+
+// Volume 0–100, set by clicking, dragging or the mouse wheel. Emits `change` with `{ value }`.
 export class VolumeSelector extends HTMLElement {
-    static observedAttributes = ['volume'];
+    #value = 0;
 
     constructor() {
         super();
+        this.addEventListener('pointerdown', (event) => {
+            if (event.button !== 0) return;
+
+            this.setPointerCapture(event.pointerId);
+            this.#changeFromPointer(event);
+        });
+        this.addEventListener('pointermove', (event) => {
+            if (this.hasPointerCapture(event.pointerId)) {
+                this.#changeFromPointer(event);
+            }
+        });
+        this.addEventListener('wheel', (event) => this.#change(this.#value + wheelDirection(event) * STEP), {
+            passive: true
+        });
     }
 
-    set volume(value) {
-        value = Math.max(Math.min(value, 100), 10);
-
-        let input = this.querySelector(`input[value="${value}"]`);
-        input.click();
+    get value() {
+        return this.#value;
     }
-
-    get volume() {
-        return parseInt(document.querySelector('input:checked').value, 10);
+    set value(value) {
+        this.#value = limit(value, 0, 100);
+        this.#render();
     }
 
     connectedCallback() {
-        this.innerHTML = Array.from({ length: 10 }, (_, i) => {
-            const value = (10 - i) * 10;
-            return `
-            <input type="radio" id="volume${value}" name="volume" value="${value}">
-            <label for="volume${value}" data-volume="${value}"></label>
-            `;
-        }).join('');
-        this.addEventListener('wheel', this.onWheel, { passive: true });
+        // --level grows from 0 to 1 and gives the LEDs their wedge shape
+        this.innerHTML = Array.from({ length: SEGMENTS }, (_, i) => `<i style="--level: ${i / (SEGMENTS - 1)}"></i>`)
+            .join('');
+        this.#render();
     }
 
-    onWheel(event) {
-        let value = this.volume;
-        this.volume = event.deltaY < 0 ? value - 10 : value + 10;
+    // a segment lights up as soon as the pointer is over it, the very left edge mutes
+    #changeFromPointer(event) {
+        const { left, width } = this.getBoundingClientRect();
+        this.#change(Math.ceil(((event.clientX - left) / width) * SEGMENTS) * STEP);
     }
 
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (name === 'volume') {
-            this.volume = newValue;
+    #change(value) {
+        const previous = this.#value;
+        this.value = value;
+        if (this.#value !== previous) {
+            this.dispatchEvent(new CustomEvent('change', { detail: { value: this.#value } }));
         }
+    }
+
+    #render() {
+        const lit = Math.round(this.#value / STEP);
+
+        this.title = `Volume ${this.#value} %`;
+        this.querySelectorAll('i').forEach((segment, index) => segment.classList.toggle('on', index < lit));
     }
 }

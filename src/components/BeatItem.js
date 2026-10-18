@@ -1,51 +1,32 @@
-import { Accent } from '../Accent.js';
-
+// One beat of the bar. Rendered from its `index`, `accent` and `subdivisions` attributes.
 export class BeatItem extends HTMLElement {
-    static observedAttributes = ['sub-divisions', 'accent'];
-
-    #subdivisions = 4;
-    #accent = Accent.value.MEDIUM;
-
-    constructor() {
-        super();
-    }
+    static observedAttributes = ['index', 'subdivisions'];
 
     set subBeat(value) {
-        this.querySelectorAll('.subdivisions div').forEach((el, index) =>
-            el.classList.toggle('highlight', index === value)
-        );
-    }
-
-    connectedCallback() {
-        this.innerHTML = `
-            <div>${this.getAttribute('index')}</div>
-            <div></div>
-            <div></div>
-            <div class="subdivisions"></div>
-        `;
-        this.#renderSubdivisions();
-        this.addEventListener('click', () => {
-            this.#accent = Accent.next(this.#accent);
-            this.setAttribute('accent', this.#accent);
-            this.dispatchEvent(new CustomEvent('select', { detail: { accent: this.#accent } }));
+        this.querySelectorAll('.subdivisions i').forEach((el, index) => {
+            el.classList.toggle('highlight', index === value);
         });
     }
 
-    #renderSubdivisions() {
-        if (this.querySelector('.subdivisions')) {
-            this.querySelector('.subdivisions').innerHTML = '<div></div>'.repeat(this.#subdivisions);
-        }
+    connectedCallback() {
+        this.#render();
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
-        switch (name) {
-            case 'sub-divisions':
-                this.#subdivisions = newValue;
-                this.#renderSubdivisions();
-                break;
-            case 'accent':
-                this.#accent = newValue;
-                break;
+        if (this.isConnected && oldValue !== newValue) {
+            this.#render();
         }
+    }
+
+    #render() {
+        const subdivisions = parseInt(this.getAttribute('subdivisions'), 10) || 1;
+
+        this.innerHTML = `
+            <div class="number">${this.getAttribute('index')}</div>
+            <div class="level high"></div>
+            <div class="level medium"></div>
+            <div class="level low"></div>
+            <div class="subdivisions">${'<i></i>'.repeat(subdivisions)}</div>
+        `;
     }
 }

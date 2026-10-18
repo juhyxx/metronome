@@ -1,163 +1,148 @@
-export class Controller {
-    #model = undefined;
-    #volume = undefined;
-    #subdivisions = undefined;
-    #sound = undefined;
-    #memoryManager = undefined;
-    #removeButton = undefined;
-    #tempo = undefined;
-    #beats = undefined;
-    #wakeLock = undefined;
-    #monitor = undefined;
+import { MAX_BEATS, TEMPO } from './config.js';
 
-    get model() {
-        return this.#model;
-    }
+// Wires the UI to the model: user input changes the model, model changes are rendered.
+export class Controller {
+    #model;
+    #view;
+    #wakeLock = null;
 
     constructor(model) {
         this.#model = model;
-        this.#volume = document.querySelector('volume-selector');
-        this.#sound = document.querySelector('sound-selector');
-        this.#subdivisions = document.querySelector('subdivisions-selector');
-        this.#memoryManager = document.querySelector('mem-manager');
-        this.#removeButton = document.querySelector('#remove');
-        this.#tempo = document.querySelector('tempo-selector');
-        this.#beats = document.querySelector('beat-selector');
-        this.#monitor = document.querySelector('beat-monitor');
+        this.#view = {
+            root: document.querySelector('#metronome'),
+            tempo: document.querySelector('tempo-selector'),
+            tempoInput: document.querySelector('#tempo'),
+            tapTempo: document.querySelector('tap-tempo'),
+            beats: document.querySelector('beat-selector'),
+            monitor: document.querySelector('beat-monitor'),
+            subdivisions: document.querySelector('subdivisions-selector'),
+            sound: document.querySelector('sound-selector'),
+            volume: document.querySelector('volume-selector'),
+            volumeValue: document.querySelector('#volume-value'),
+            memory: document.querySelector('mem-manager'),
+            addBeat: document.querySelector('#add-beat'),
+            removeBeat: document.querySelector('#remove-beat'),
+            help: document.querySelector('#help'),
+            helpTrigger: document.querySelector('#help-trigger')
+        };
+        this.#view.tempoInput.min = TEMPO.min;
+        this.#view.tempoInput.max = TEMPO.max;
 
-        this.#sound.setAttribute('sound', this.model.soundSet);
-        this.#tempo.setAttribute('tempo', this.model.tempo);
-        this.#tempo.setAttribute('min', this.model.minTempo);
-        this.#tempo.setAttribute('max', this.model.maxTempo);
-        this.#beats.setAttribute('sub-divisions', this.model.subdivisions);
-        this.#subdivisions.setAttribute('division', this.model.subdivisions);
-        this.#volume.setAttribute('volume', '80');
-        this.#monitor.counter = 1;
-        this.#monitor.subCounter = 1;
+        this.#addViewListeners();
+        this.#addKeyboardListeners();
 
-        this.#addBeatSelectorListeners();
-        this.#addEventListeners();
-        this.#addTempoSelectors();
-    }
-
-    #addBeatSelectorListeners() {
-        this.#beats.addEventListener('select', (event) => {
-            const beats = [...this.#model.beats];
-            beats[parseInt(event.detail.index, 10)].accent = event.detail.accent;
-            this.#model.beats = beats;
-        });
-        this.#beats.addEventListener('add', (event) => {
-            const beats = [...this.#model.beats];
-            beats.push({ accent: event.detail.accent });
-            this.#model.beats = beats;
-        });
-        this.#beats.addEventListener('remove', (event) => {
-            const beats = [...this.#model.beats];
-            beats.pop();
-            this.#model.beats = beats;
-        });
-    }
-    #addTempoSelectors() {
-        this.#tempo.addEventListener('change', (event) => {
-            this.model.tempo = event.detail;
-        });
-        this.#tempo.addEventListener('onPlay', (event) => {
-            this.model.togglePlay();
-        });
-        document.querySelector('#tempo').addEventListener('change', (event) => {
-            this.#tempo.setAttribute('tempo', parseInt(document.querySelector('#tempo').value, 10));
-        });
-        document.querySelector('tap-tempo').addEventListener('change', (event) => {
-            this.model.tempo = event.detail.tempo;
-            this.#tempo.setAttribute('tempo', this.model.tempo);
-        });
-    }
-
-    #addEventListeners() {
-        // Add/remove beats
-        document.querySelector('#add').addEventListener('click', (event) => {
-            this.#beats.addBeat();
-            this.#removeButton.classList.remove('disabled');
-            if (this.model.beats.length === this.model.maxBeats) {
-                event.target.classList.add('disabled');
-            }
-        });
-        this.#removeButton.addEventListener('click', (event) => {
-            this.#beats.removeBeat();
-            document.querySelector('#add').classList.remove('disabled');
-            if (this.model.beats.length === 1) {
-                event.target.classList.add('disabled');
-            }
-        });
-
-        // Memory Manager
-        this.#memoryManager.addEventListener('load', (event) => {
-            this.model.deserialize(event.detail.memory);
-            this.#monitor.subdivision = this.model.subdivisions;
-            this.#subdivisions.setAttribute('division', this.model.subdivisions);
-            this.#sound.setAttribute('sound', this.model.soundSet);
-            this.#tempo.setAttribute('tempo', this.model.tempo);
-        });
-        this.#memoryManager.addEventListener('save', (event) => {
-            this.model.serialize(event.detail.memory);
-        });
-
-        //other
-        this.#sound.addEventListener('select', (event) => {
-            this.model.soundSet = event.detail.sound;
-        });
-        this.#volume.addEventListener('change', (event) => {
-            this.model.volume = parseInt(event.target.value, 10);
-        });
-        this.#subdivisions.addEventListener('select', (event) => {
-            this.model.subdivisions = event.detail.subdivision;
-        });
-        document.querySelector('#help-trigger').addEventListener(
-            'mousedown',
-            (event) => {
-                document.body.classList.toggle('help');
-            },
-            { passive: true }
+        model.addEventListener('change', ({ detail }) => this.#render(detail.property, detail.value));
+        ['beats', 'tempo', 'subdivisions', 'soundSet', 'volume', 'isPlaying', 'position'].forEach((property) =>
+            this.#render(property, model[property])
         );
     }
 
-    updateProperty(property, value) {
+    #addViewListeners() {
+        const model = this.#model;
+        const view = this.#view;
+        const bind = (element, property) => {
+            element.addEventListener('change', (event) => (model[property] = event.detail.value));
+        };
+
+        bind(view.tempo, 'tempo');
+        bind(view.tapTempo, 'tempo');
+        bind(view.beats, 'beats');
+        bind(view.subdivisions, 'subdivisions');
+        bind(view.sound, 'soundSet');
+        bind(view.volume, 'volume');
+
+        view.tempo.addEventListener('toggle', () => model.togglePlay());
+        view.tempoInput.addEventListener('change', () => {
+            model.tempo = view.tempoInput.value;
+            view.tempoInput.value = model.tempo; // shows the clamped value even when the model did not change
+        });
+        view.addBeat.addEventListener('click', () => model.addBeat());
+        view.removeBeat.addEventListener('click', () => model.removeBeat());
+        view.memory.addEventListener('load', (event) => model.load(event.detail.slot));
+        view.memory.addEventListener('save', (event) => model.save(event.detail.slot));
+        view.helpTrigger.addEventListener('click', () => document.body.classList.toggle('help'));
+        view.help.addEventListener('click', () => document.body.classList.remove('help'));
+    }
+
+    #addKeyboardListeners() {
+        const model = this.#model;
+
+        document.addEventListener('keydown', (event) => {
+            if (event.target instanceof HTMLInputElement) {
+                if (event.code === 'Enter') {
+                    event.target.blur(); // commits the value and gives the shortcuts back
+                }
+                return;
+            }
+
+            switch (event.code) {
+                case 'Space':
+                case 'Enter':
+                    if (!event.repeat) {
+                        model.togglePlay();
+                    }
+                    break;
+                case 'ArrowUp':
+                    model.tempo = model.tempo + (event.altKey ? 10 : 1);
+                    break;
+                case 'ArrowDown':
+                    model.tempo = model.tempo - (event.altKey ? 10 : 1);
+                    break;
+                case 'Escape':
+                    document.body.classList.remove('help');
+                    break;
+                default:
+                    return;
+            }
+            event.preventDefault();
+        });
+    }
+
+    #render(property, value) {
+        const view = this.#view;
+
         switch (property) {
-            case 'sub-divisions':
-                this.#beats.setAttribute('sub-divisions', value);
-                this.#subdivisions.setAttribute('division', value);
+            case 'beats':
+                view.beats.beats = value;
+                view.addBeat.classList.toggle('disabled', value.length >= MAX_BEATS);
+                view.removeBeat.classList.toggle('disabled', value.length <= 1);
                 break;
             case 'tempo':
-                document.querySelector('#tempo').value = value;
+                view.tempo.value = value;
+                view.tempoInput.value = value;
                 break;
-            case 'sound-set':
-                this.#sound.setAttribute('sound', value);
+            case 'subdivisions':
+                view.subdivisions.value = value;
+                view.beats.subdivisions = value;
                 break;
-            case 'beats':
-                this.#beats.clear();
-                value.forEach((item) => this.#beats.addBeat(item.accent, true));
+            case 'soundSet':
+                view.sound.value = value;
                 break;
-            case 'play':
-                value == true ? this.lock() : this.unlock();
+            case 'volume':
+                view.volume.value = value;
+                view.volumeValue.textContent = value;
                 break;
-            case 'current-beat':
-                this.#beats.beat = value.beat;
-                this.#beats.subBeat = value.subBeat;
-                this.#monitor.counter = value.beat;
-                this.#monitor.subCounter = value.subBeat;
+            case 'isPlaying':
+                view.root.classList.toggle('playing', value);
+                value ? this.#lockScreen() : this.#releaseScreen();
+                break;
+            case 'position':
+                view.beats.position = value;
+                view.monitor.position = value;
                 break;
         }
     }
 
-    async lock() {
+    async #lockScreen() {
         try {
             this.#wakeLock = await navigator.wakeLock.request('screen');
-        } catch (err) {}
+        } catch {
+            // wake lock is not supported or not allowed
+        }
     }
 
-    unlock() {
-        if (this.#wakeLock) {
-            this.#wakeLock.release().then(() => (this.wakeLock = null));
-        }
+    #releaseScreen() {
+        this.#wakeLock?.release();
+        this.#wakeLock = null;
     }
 }

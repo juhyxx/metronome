@@ -1,13 +1,13 @@
 beat-monitor {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    #beat-counter {
-        width: 0.2rem;
+    span {
+        display: inline-block;
+        min-width: 0.4rem;
+        text-align: center;
     }
 
-    #beat-sub-counter {
-        width: 0.2rem;
+    /* dim while stopped, like an idle LCD */
+    #metronome:not(.playing) & {
+        color: hsla(84, 100%, 59%, 0.15);
+        text-shadow: none;
     }
 }

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="sheen" cx="0" cy="0" r="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".1"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="14"/></filter>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#1c1c1c"/>
+  <rect width="512" height="512" rx="112" fill="url(#sheen)"/>
+  <!-- four beats, accents high / low / medium / low; the first one is playing -->
+  <g fill="#fff" fill-opacity=".1">
+    <rect x="184" y="120" width="56" height="64" rx="8"/>
+    <rect x="184" y="208" width="56" height="64" rx="8"/>
+    <rect x="272" y="120" width="56" height="64" rx="8"/>
+    <rect x="360" y="120" width="56" height="64" rx="8"/>
+    <rect x="360" y="208" width="56" height="64" rx="8"/>
+  </g>
+  <g fill="#abff2e" fill-opacity=".45">
+    <rect x="184" y="296" width="56" height="64" rx="8"/>
+    <rect x="272" y="208" width="56" height="64" rx="8"/>
+    <rect x="272" y="296" width="56" height="64" rx="8"/>
+    <rect x="360" y="296" width="56" height="64" rx="8"/>
+  </g>
+  <g fill="#abff2e">
+    <g filter="url(#glow)" opacity=".8">
+      <rect x="96" y="120" width="56" height="240" rx="8"/>
+    </g>
+    <rect x="96" y="120" width="56" height="64" rx="8"/>
+    <rect x="96" y="208" width="56" height="64" rx="8"/>
+    <rect x="96" y="296" width="56" height="64" rx="8"/>
+  </g>
+  <circle cx="124" cy="404" r="14" fill="#e4ffbf"/>
+  <circle cx="212" cy="404" r="14" fill="#fff" fill-opacity=".1"/>
+  <circle cx="300" cy="404" r="14" fill="#fff" fill-opacity=".1"/>
+  <circle cx="388" cy="404" r="14" fill="#fff" fill-opacity=".1"/>
+</svg>

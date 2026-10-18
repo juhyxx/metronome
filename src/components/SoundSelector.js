@@ -1,37 +1,8 @@
-export class SoundSelector extends HTMLElement {
-    static observedAttributes = ['sound'];
-    static data = ['sticks', 'drums', 'metronome', 'beeps'];
-    #selected = SoundSelector.data[0];
+import { SOUND_SETS } from '../config.js';
+import { SegmentedSelector } from './SegmentedSelector.js';
 
-    constructor() {
-        super();
-        this.className = 'bar';
-    }
-
-    connectedCallback() {
-        this.innerHTML = SoundSelector.data.map((i) => `<div class="btn" data-sound="${i}">${i}</div>`).join('');
-        this.querySelectorAll('.btn').forEach((el) => {
-            el.addEventListener('click', () => {
-                this.select(el.dataset.sound);
-                this.dispatchEvent(
-                    new CustomEvent('select', {
-                        detail: { sound: this.#selected }
-                    })
-                );
-            });
-        });
-    }
-
-    select(value) {
-        this.#selected = value;
-        this.querySelectorAll('.btn').forEach((el) => {
-            el.classList.toggle('selected', el.dataset.sound === this.#selected);
-        });
-    }
-
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (name === 'sound') {
-            this.select(newValue);
-        }
+export class SoundSelector extends SegmentedSelector {
+    get options() {
+        return SOUND_SETS.map((value) => ({ value, label: value }));
     }
 }

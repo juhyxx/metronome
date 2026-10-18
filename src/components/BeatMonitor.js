@@ -1,22 +1,22 @@
+// Current beat and subdivision, e.g. `3:2`.
 export class BeatMonitor extends HTMLElement {
-    #counterEl = null;
-    #subCounterEl = null;
+    #position = { beat: 0, subBeat: 0 };
 
-    set counter(value) {
-        this.#counterEl.textContent = value + 1;
-    }
-
-    set subCounter(value) {
-        this.#subCounterEl.textContent = value + 1;
-    }
-
-    constructor() {
-        super();
+    set position(value) {
+        this.#position = value;
+        this.#render();
     }
 
     connectedCallback() {
-        this.innerHTML = `<span id="beat-counter">1</span>:<span id="beat-sub-counter">1</span>`;
-        this.#counterEl = this.querySelector('#beat-counter');
-        this.#subCounterEl = this.querySelector('#beat-sub-counter');
+        this.innerHTML = '<span></span>:<span></span>';
+        this.#render();
+    }
+
+    #render() {
+        const [beat, subBeat] = this.querySelectorAll('span');
+        if (!beat) return;
+
+        beat.textContent = this.#position.beat + 1;
+        subBeat.textContent = this.#position.subBeat + 1;
     }
 }
