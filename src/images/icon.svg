@@ -1,37 +1,67 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
-    <radialGradient id="sheen" cx="0" cy="0" r="1">
-      <stop offset="0" stop-color="#fff" stop-opacity=".1"/>
-      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    <radialGradient id="bg" cx=".4" cy=".3" r=".9">
+      <stop offset="0" stop-color="#2a2a2a"/>
+      <stop offset="1" stop-color="#080808"/>
     </radialGradient>
-    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="14"/></filter>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a86c3c"/>
+      <stop offset="1" stop-color="#5c3219"/>
+    </linearGradient>
+    <linearGradient id="rod" x1="249.5" y1="0" x2="262.5" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f2f2f2"/>
+      <stop offset="1" stop-color="#9a9a9a"/>
+    </linearGradient>
+    <pattern id="scan" width="8" height="6" patternUnits="userSpaceOnUse">
+      <rect width="8" height="2" fill="#000" fill-opacity=".14"/>
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="16"/>
+    </filter>
+    <filter id="inset" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+    <clipPath id="slot-clip">
+      <path d="M242 104H270L316 356H196Z"/>
+    </clipPath>
   </defs>
-  <rect width="512" height="512" rx="112" fill="#1c1c1c"/>
-  <rect width="512" height="512" rx="112" fill="url(#sheen)"/>
-  <!-- four beats, accents high / low / medium / low; the first one is playing -->
-  <g fill="#fff" fill-opacity=".1">
-    <rect x="184" y="120" width="56" height="64" rx="8"/>
-    <rect x="184" y="208" width="56" height="64" rx="8"/>
-    <rect x="272" y="120" width="56" height="64" rx="8"/>
-    <rect x="360" y="120" width="56" height="64" rx="8"/>
-    <rect x="360" y="208" width="56" height="64" rx="8"/>
-  </g>
-  <g fill="#abff2e" fill-opacity=".45">
-    <rect x="184" y="296" width="56" height="64" rx="8"/>
-    <rect x="272" y="208" width="56" height="64" rx="8"/>
-    <rect x="272" y="296" width="56" height="64" rx="8"/>
-    <rect x="360" y="296" width="56" height="64" rx="8"/>
-  </g>
-  <g fill="#abff2e">
-    <g filter="url(#glow)" opacity=".8">
-      <rect x="96" y="120" width="56" height="240" rx="8"/>
+
+  <rect width="512" height="512" fill="url(#bg)"/>
+
+  <!-- body: a raised panel, like the buttons -->
+  <path d="M230 80H282L396 436H116Z" fill="#000" opacity=".6" filter="url(#shadow)" transform="translate(0 12)"/>
+  <path d="M230 80H282L396 436H116Z" fill="url(#body)" stroke="url(#body)" stroke-width="16" stroke-linejoin="round"/>
+  <path d="M117 433L230 73H282" fill="none" stroke="#ffd9b0" stroke-opacity=".35" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- recessed slot with the tempo scale, like the screens -->
+  <path d="M242 104H270L316 356H196Z" fill="#0e0f0d" stroke="#0e0f0d" stroke-width="8" stroke-linejoin="round"/>
+  <g clip-path="url(#slot-clip)">
+    <path d="M242 104H270L316 356H196Z" fill="none" stroke="#000" stroke-width="18" filter="url(#inset)"/>
+    <g stroke="#fff" stroke-opacity=".16" stroke-width="4" stroke-linecap="round">
+      <path d="M246 132h20M250 160h12M242 188h28M250 216h12M238 244h36M250 272h12M234 300h44M250 328h12"/>
     </g>
-    <rect x="96" y="120" width="56" height="64" rx="8"/>
-    <rect x="96" y="208" width="56" height="64" rx="8"/>
-    <rect x="96" y="296" width="56" height="64" rx="8"/>
   </g>
-  <circle cx="124" cy="404" r="14" fill="#e4ffbf"/>
-  <circle cx="212" cy="404" r="14" fill="#fff" fill-opacity=".1"/>
-  <circle cx="300" cy="404" r="14" fill="#fff" fill-opacity=".1"/>
-  <circle cx="388" cy="404" r="14" fill="#fff" fill-opacity=".1"/>
+  <path d="M200 362H312" stroke="#fff" stroke-opacity=".12" stroke-width="2"/>
+
+  <!-- base with a power LED, like the dot in the logo -->
+  <path d="M152 392H360" stroke="#000" stroke-opacity=".45" stroke-width="3"/>
+  <path d="M150 395H362" stroke="#ffd9b0" stroke-opacity=".15" stroke-width="2"/>
+
+  <!-- pendulum, swung to the right -->
+  <g transform="rotate(24 256 340)">
+    <path d="M262 346V64" stroke="#000" stroke-opacity=".5" stroke-width="12" stroke-linecap="round" filter="url(#inset)"/>
+    <path d="M256 340V60" stroke="url(#rod)" stroke-width="13" stroke-linecap="round"/>
+    <!-- the weight is a lit LED -->
+    <rect x="222" y="140" width="68" height="56" rx="8" fill="#abff2e" filter="url(#glow)" opacity=".8"/>
+    <rect x="222" y="140" width="68" height="56" rx="8" fill="#abff2e"/>
+    <rect x="222" y="140" width="68" height="56" rx="8" fill="url(#scan)"/>
+    <rect x="226" y="143" width="60" height="3" rx="1.5" fill="#fff" fill-opacity=".5"/>
+  </g>
+  <circle cx="256" cy="340" r="14" fill="#2a2a2a" stroke="#777" stroke-width="3"/>
+
+  <circle cx="256" cy="416" r="22" fill="#abff2e" filter="url(#glow)" opacity=".5"/>
+  <circle cx="256" cy="416" r="9" fill="#e4ffbf"/>
 </svg>

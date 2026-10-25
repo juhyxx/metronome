@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- icon.svg simplified for 16–32 px: no scale or LED, thicker lines, filling more of the tile -->
+  <defs>
+    <radialGradient id="bg" cx=".4" cy=".3" r=".9">
+      <stop offset="0" stop-color="#2a2a2a"/>
+      <stop offset="1" stop-color="#080808"/>
+    </radialGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b8763f"/>
+      <stop offset="1" stop-color="#6a3a1c"/>
+    </linearGradient>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="20"/>
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" fill="url(#bg)"/>
+
+  <g transform="translate(256 262) scale(1.18) translate(-256 -262)">
+    <path d="M230 80H282L396 436H116Z" fill="url(#body)" stroke="url(#body)" stroke-width="16" stroke-linejoin="round"/>
+    <path d="M246 112H266L290 352H222Z" fill="#0e0f0d" stroke="#0e0f0d" stroke-width="8" stroke-linejoin="round"/>
+    <g transform="rotate(24 256 340)">
+      <path d="M256 340V64" stroke="#e6e6e6" stroke-width="26" stroke-linecap="round"/>
+      <rect x="211" y="136" width="90" height="70" rx="10" fill="#abff2e" filter="url(#glow)" opacity=".7"/>
+      <rect x="211" y="136" width="90" height="70" rx="10" fill="#abff2e"/>
+    </g>
+  </g>
+</svg>
