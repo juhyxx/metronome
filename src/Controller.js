@@ -12,7 +12,7 @@ export class Controller {
             root: document.querySelector('#metronome'),
             tempo: document.querySelector('tempo-selector'),
             tempoInput: document.querySelector('#tempo'),
-            tapTempo: document.querySelector('tap-tempo'),
+            play: document.querySelector('#play'),
             beats: document.querySelector('beat-selector'),
             monitor: document.querySelector('beat-monitor'),
             subdivisions: document.querySelector('subdivisions-selector'),
@@ -45,13 +45,12 @@ export class Controller {
         };
 
         bind(view.tempo, 'tempo');
-        bind(view.tapTempo, 'tempo');
         bind(view.beats, 'beats');
         bind(view.subdivisions, 'subdivisions');
         bind(view.sound, 'soundSet');
         bind(view.volume, 'volume');
 
-        view.tempo.addEventListener('toggle', () => model.togglePlay());
+        view.play.addEventListener('click', () => model.togglePlay());
         view.tempoInput.addEventListener('change', () => {
             model.tempo = view.tempoInput.value;
             view.tempoInput.value = model.tempo; // shows the clamped value even when the model did not change

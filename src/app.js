@@ -4,7 +4,6 @@ import { BeatSelector } from './components/BeatSelector.js';
 import { MemManager } from './components/MemManager.js';
 import { SoundSelector } from './components/SoundSelector.js';
 import { SubdivisionsSelector } from './components/SubdivisionsSelector.js';
-import { TapTempoButton } from './components/TapTempoButton.js';
 import { TempoSelector } from './components/TempoSelector.js';
 import { VolumeSelector } from './components/VolumeSelector.js';
 import { Controller } from './Controller.js';
@@ -17,7 +16,6 @@ customElements.define('beat-selector', BeatSelector);
 customElements.define('mem-manager', MemManager);
 customElements.define('sound-selector', SoundSelector);
 customElements.define('subdivisions-selector', SubdivisionsSelector);
-customElements.define('tap-tempo', TapTempoButton);
 customElements.define('tempo-selector', TempoSelector);
 customElements.define('volume-selector', VolumeSelector);
 

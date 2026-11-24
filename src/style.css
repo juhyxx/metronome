@@ -5,7 +5,7 @@
 @import url(./components/BeatMonitor.css);
 @import url(./components/TempoSelector.css);
 @import url(./components/VolumeSelector.css);
-@import url(./components/TapTempoButton.css);
+@import url(./components/PlayButton.css);
 @import url(./components/MemManager.css);
 
 @font-face {
@@ -100,8 +100,8 @@ output {
     display: grid;
     grid-template:
         "header" auto
-        "beats" minmax(3.4rem, 0.6fr)
-        "dial" minmax(0, 1fr)
+        "beats" minmax(3.4rem, 1fr)
+        "dial" minmax(0, calc((100vw - 2 * var(--padding)) * 0.77)) /* as tall as the knob, the beats take the rest */
         "controls" auto
         / minmax(0, 1fr);
     gap: var(--gap);
@@ -227,15 +227,15 @@ output {
 
 /* ------------------------------------------------------------- controls */
 
-/* the tap button over the volume, sound and volume on one row, memory below.
-   The sound names never get cut, the right column takes what is left. */
+/* volume and the play bar on the top row, sound below it, memory at the bottom.
+   The volume on the left and the play button on the right are equally wide, the gap between takes the rest. */
 #controls {
     display: grid;
     grid-template:
-        ". tap" auto
-        "sound volume" auto
-        "memory memory" auto
-        / minmax(auto, 1fr) minmax(2.4rem, 3.6rem);
+        "volume . play" auto
+        "sound sound sound" auto
+        "memory memory memory" auto
+        / minmax(2.4rem, 3.6rem) minmax(0, 1fr) minmax(2.4rem, 3.6rem);
     grid-area: controls;
     align-items: end;
     gap: 0.22rem 0.35rem;
@@ -244,9 +244,8 @@ output {
         grid-area: sound;
     }
 
-    tap-tempo {
-        grid-area: tap;
-        justify-self: end;
+    #play {
+        grid-area: play;
     }
 
     .memory {

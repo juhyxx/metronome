@@ -1,0 +1,25 @@
+/* wide play / stop bar next to the volume: a play triangle, a stop square while playing */
+#play.btn {
+    flex: none;
+    box-shadow: var(--raised);
+    border-radius: 2rem;
+    height: var(--control-height);
+
+    .play {
+        clip-path: polygon(0% 0%, 100% 50%, 0% 100%, 0% 100%);
+        background: var(--faint);
+        width: 0.4rem;
+        height: 0.4rem;
+        translate: 0.04rem 0; /* the triangle looks centred by its weight */
+
+        #metronome.playing & {
+            clip-path: polygon(10% 10%, 90% 10%, 90% 90%, 10% 90%);
+            background: hsla(84, 100%, 59%, 0.6);
+            translate: 0 0;
+        }
+    }
+
+    &:hover .play {
+        background: var(--text);
+    }
+}

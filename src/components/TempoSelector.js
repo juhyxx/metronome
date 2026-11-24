@@ -1,5 +1,6 @@
 import { TEMPO } from '../config.js';
 import { limit } from '../utils/limit.js';
+import { TapTempo } from '../utils/tapTempo.js';
 import { wheelDirection } from '../utils/wheel.js';
 
 const TEMPO_NAMES = [
@@ -14,11 +15,14 @@ const SCALE_STEP = 10; // BPM between two ticks
 const SCALE_ARC = 280; // degrees covered by the scale, symmetric around the top
 const DRAG_STEP = 4; // px of vertical drag per BPM
 
-// Tempo knob. Emits `change` with `{ value }` when the user sets a tempo and `toggle` when the wheel is clicked.
+// Tempo knob: drag or scroll it, click a tick, or tap the wheel in time.
+// Emits `change` with `{ value }` when the user sets a tempo.
 export class TempoSelector extends HTMLElement {
     #value = TEMPO.default;
     #dragY = null;
     #dragged = false;
+    #pressedAt = 0; // pointerdown time of the current click, the moment the finger hits
+    #tapTempo = new TapTempo();
 
     constructor() {
         super();
@@ -55,7 +59,7 @@ export class TempoSelector extends HTMLElement {
                 <div class="wheel">
                     <div class="tempo-name"></div>
                     <div class="tempo-value"></div>
-                    <div class="play"></div>
+                    <div class="tap">Tap</div>
                 </div>
                 ${ticks.join('')}
             </div>
@@ -78,13 +82,25 @@ export class TempoSelector extends HTMLElement {
         if (mark) {
             this.#change(parseInt(mark.dataset.tempo, 10));
         } else if (event.target.closest('.wheel')) {
-            this.dispatchEvent(new CustomEvent('toggle'));
+            this.#tap();
+        }
+    }
+
+    #tap() {
+        const wheel = this.querySelector('.wheel');
+        wheel.classList.add('lit');
+        setTimeout(() => wheel.classList.remove('lit'), 120);
+
+        const value = this.#tapTempo.tap(this.#pressedAt);
+        if (value) {
+            this.#change(value);
         }
     }
 
     #onPointerDown(event) {
         const wheel = event.target.closest('.wheel');
         this.#dragged = false;
+        this.#pressedAt = event.timeStamp;
         if (!wheel || event.button !== 0) return;
 
         this.#dragY = event.clientY;
@@ -124,7 +140,5 @@ export class TempoSelector extends HTMLElement {
         });
         this.querySelector('.tempo-value').textContent = value;
         this.querySelector('.tempo-name').textContent = TEMPO_NAMES.find((item) => value <= item.value)?.name ?? 'Presto';
-        // the play icon turns once per four beats
-        this.querySelector('.play').style.animationDuration = `${(4 * 60) / value}s`;
     }
 }
